@@ -1,6 +1,11 @@
 - clean: ['~']
 
 - link:
+    ~/.config/nvim:
+        path: nvim
+        create: true
+        relink: false
+        force: false
     ~/.profile:
         path: profile
         create: false
