@@ -244,7 +244,7 @@ require('telescope').setup {
     },
   },
   pickers = {
-   buffers = {
+    buffers = {
       sort_lastused = true,
       sort_mru = true,
       ignore_current_buffer = true,
@@ -254,7 +254,7 @@ require('telescope').setup {
         i = { ['<C-d>'] = require('telescope.actions').delete_buffer },
         n = { ['<C-d>'] = require('telescope.actions').delete_buffer },
       },
-    }, 
+    },
   }
 }
 
