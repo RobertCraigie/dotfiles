@@ -98,6 +98,9 @@ require('packer').startup(function(use)
     end
   })
 
+  -- Collection of plugins
+  use 'echasnovski/mini.nvim'
+
   -- Custom highlighting plugins
   -- use 'HiPhish/jinja.vim'
 
@@ -220,6 +223,8 @@ require('nvim-web-devicons').setup {
 vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
 require('neo-tree').setup()
 
+-- Mini plugins
+require('mini.pairs').setup()
 
 
 -- Set lualine as statusline
