@@ -6,6 +6,11 @@
         create: true
         relink: false
         force: false
+    ~/.config/starship.toml:
+        path: starship.toml
+        create: true
+        relink: false
+        force: false
     ~/.profile:
         path: profile
         create: false
