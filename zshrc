@@ -139,5 +139,3 @@ export PATH="$PNPM_HOME:$PATH"
 export PATH=/Users/robert/Library/Python/3.10/bin:$PATH
 
 export PATH=/Users/robert/.local/bin:$PATH
-
-eval "$(starship init zsh)"
