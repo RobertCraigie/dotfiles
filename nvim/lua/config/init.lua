@@ -1,5 +1,7 @@
 -- TODO:
 -- - [ ] Remove nned for multiple LSP clients, e.g. remove efm and lsp-format
+-- - [ ] Support custom prettier
+-- - [ ] Support "workspaces" & showing the full relative file pat
 
 -- Install packer
 local install_path = vim.fn.stdpath 'data' .. '/site/pack/packer/start/packer.nvim'
@@ -57,9 +59,6 @@ require('packer').startup(function(use)
       }
     end
   }
-
-  -- Auto formatting
-  use "lukas-reineke/lsp-format.nvim"
 
   use { -- File Tree
     "nvim-neo-tree/neo-tree.nvim",
@@ -422,25 +421,6 @@ local on_attach = function(_, bufnr)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
 end
-
--- Auto formatting
-require("lsp-format").setup()
-
-local blue = {
-  formatCommand = [[blue -]],
-  formatStdin = true,
-}
-require("lspconfig").efm.setup {
-  on_attach = require("lsp-format").on_attach,
-  init_options = { documentFormatting = true },
-  settings = {
-    languages = {
-      python = { blue },
-    },
-  },
-}
-
--- telescope.actions.delete_buffer()
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
