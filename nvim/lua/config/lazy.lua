@@ -3,6 +3,7 @@
 -- - [ ] Support "workspaces" & showing the full relative file path
 -- - [ ] Try out the git plugins
 -- - [ ] Use treesitter context plugin
+-- - [ ] Auto formatting
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
