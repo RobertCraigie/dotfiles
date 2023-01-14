@@ -31,5 +31,9 @@
         create: false
         relink: false
         force: false
-
+    ~/.hammerspoon:
+        path: hammerspoon
+        create: false
+        relink: false
+        force: false
 
