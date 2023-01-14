@@ -4,6 +4,7 @@
 -- - [ ] Try out the git plugins
 -- - [ ] Use treesitter context plugin
 -- - [ ] Auto formatting
+-- - [ ] Lazy load more plugins
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
