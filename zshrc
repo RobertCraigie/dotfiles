@@ -103,10 +103,8 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# From pre Oh My Zsh configuration
+HOMEBREW_NO_AUTO_UPDATE=1
 
-# autoload -U promptinit; promptinit
-# prompt pure
 
 eval "$(pyenv init -)"
 
