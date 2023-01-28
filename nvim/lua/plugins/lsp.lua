@@ -42,8 +42,11 @@ local servers = {
 
   prismals = {},
 
+  gopls = {},
+
   -- rust_analyzer = {},
   tsserver = {},
+  eslint = {},
 
   sumneko_lua = {
     Lua = {
@@ -55,6 +58,9 @@ local servers = {
     },
   },
 }
+
+-- TODO: switch to lsp-format?
+vim.cmd[[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]]
 
 return {
   -- Tools
