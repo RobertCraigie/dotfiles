@@ -127,6 +127,7 @@ export PATH="/opt/homebrew/opt/libxslt/bin:$PATH"
 export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/cairo/1.16.0_5/lib
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 export PATH="/Users/robert/Library/Python/3.9/bin:$PATH"
+export PATH="/Users/robert/bin:$PATH"
 
 # pnpm
 export PNPM_HOME="/Users/robert/Library/pnpm"
