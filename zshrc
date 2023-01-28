@@ -140,3 +140,15 @@ export PATH=/Users/robert/Library/Python/3.10/bin:$PATH
 export PATH=/Users/robert/.local/bin:$PATH
 
 export PATH=/Users/robert/.local/share/neovim/bin:$PATH
+
+
+# alias for easier go coverage reporting
+go_cover () { 
+    t="/tmp/go-cover.$$.tmp"
+    go test -coverprofile=$t $@ && go tool cover -html=$t
+}
+
+export GOPATH=~/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOBIN
+
