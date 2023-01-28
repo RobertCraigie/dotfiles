@@ -31,6 +31,12 @@ return {
         component_separators = "|",
         section_separators = "",
       },
+      sections = {
+        lualine_c = { "%f" },
+      },
+      inactive_sections = {
+        lualine_c = { "%f" },
+      },
     },
     config = function(_, opts)
       require("lualine").setup(opts)
