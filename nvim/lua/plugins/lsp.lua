@@ -35,6 +35,13 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, "LspFormat", function(_)
     vim.lsp.buf.format()
   end, { desc = "Format current buffer with LSP" })
+
+  -- Disable diagnostics for Jinja2 files as they won't be useful
+  local filetype = vim.bo.filetype;
+  if string.match(filetype, ".jinja") then
+    vim.diagnostic.disable()
+  end
+
 end
 
 local servers = {
