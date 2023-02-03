@@ -37,11 +37,10 @@ local on_attach = function(_, bufnr)
   end, { desc = "Format current buffer with LSP" })
 
   -- Disable diagnostics for Jinja2 files as they won't be useful
-  local filetype = vim.bo.filetype;
+  local filetype = vim.bo.filetype
   if string.match(filetype, ".jinja") then
     vim.diagnostic.disable()
   end
-
 end
 
 local servers = {
@@ -67,7 +66,7 @@ local servers = {
 }
 
 -- TODO: switch to lsp-format?
-vim.cmd[[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]]
+vim.cmd([[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]])
 
 return {
   -- Tools
