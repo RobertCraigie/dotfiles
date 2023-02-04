@@ -17,6 +17,18 @@ return {
     end,
   },
 
+  -- Add blank lines to scrolloff at the end of the file
+  {
+    "Aasim-A/scrollEOF.nvim",
+    opts = {
+      pattern = "*",
+    },
+    config = function(_, opts)
+      vim.o.scrolloff = 20
+      require("scrollEOF").setup(opts)
+    end,
+  },
+
   -- Improve working with comments
   {
     "numToStr/Comment.nvim",
