@@ -39,7 +39,7 @@ local on_attach = function(_, bufnr)
   -- Disable diagnostics for Jinja2 files as they won't be useful
   local filetype = vim.bo.filetype
   if string.match(filetype, ".jinja") then
-    vim.diagnostic.disable()
+    vim.diagnostic.disable(bufnr)
   end
 end
 
