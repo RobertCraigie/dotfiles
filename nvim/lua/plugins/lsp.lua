@@ -152,6 +152,8 @@ return {
         virtual_text = false,
       })
     end,
+    -- TODO: too much layout shift, need to keep existing diagnostics when entering insert mode
+    enabled = false,
   },
 
   -- Autocompletion
