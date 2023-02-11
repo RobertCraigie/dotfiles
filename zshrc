@@ -152,3 +152,4 @@ export GOPATH=~/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
 
+export PATH=$PATH:/Users/robert/.local/share/neovim/bin
