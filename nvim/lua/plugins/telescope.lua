@@ -9,7 +9,7 @@ return {
     {
       "<leader>sf",
       function()
-        require("telescope.builtin").find_files()
+        require("telescope.builtin").find_files({ hidden = true })
       end,
       desc = "[S]earch [F]iles",
     },
