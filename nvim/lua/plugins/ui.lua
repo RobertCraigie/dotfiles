@@ -68,4 +68,25 @@ return {
       },
     },
   },
+
+  -- Duck!
+  {
+    "tamton-aquib/duck.nvim",
+    keys = {
+      {
+        "<leader>dd",
+        function ()
+          require("duck").hatch()
+        end,
+        desc = "Hatch"
+      },
+      {
+        "<leader>dk",
+        function ()
+          require("duck").cook()
+        end,
+        desc = "Cook"
+      },
+    },
+  }
 }

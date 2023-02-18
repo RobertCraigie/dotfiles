@@ -26,6 +26,8 @@ return {
         "graphql",
         "prisma",
         "kotlin",
+        "yaml",
+        "query",
       },
 
       -- TODO: vet & understand these options
@@ -89,4 +91,18 @@ return {
       require("nvim-treesitter.configs").setup(opts)
     end,
   },
+
+  {
+    "nvim-treesitter/playground",
+    opts = {
+      query_linter = {
+        enable = true,
+        use_virtual_text = true,
+        lint_events = {"BufWrite", "CursorHold"},
+      }
+    },
+    config = function (_, opts)
+      require("nvim-treesitter.configs").setup(opts)
+    end
+  }
 }

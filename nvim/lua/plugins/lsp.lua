@@ -1,4 +1,4 @@
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
   local nmap = function(keys, func, desc)
@@ -36,25 +36,46 @@ local on_attach = function(_, bufnr)
     vim.lsp.buf.format()
   end, { desc = "Format current buffer with LSP" })
 
+  -- Create a command to disable formatting the current buffer
+  local formatting_enabled = true
+  vim.api.nvim_buf_create_user_command(bufnr, "LspToggleFormat", function(_)
+    formatting_enabled = not formatting_enabled
+  end, { desc = "Toggle LSP formatting on save" })
+
   -- Disable diagnostics for Jinja2 files as they won't be useful
   local filetype = vim.bo.filetype
   if string.match(filetype, ".jinja") then
     vim.diagnostic.disable(bufnr)
   end
+
+  -- format on save
+  local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+  if client.supports_method("textDocument/formatting") then
+    vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = augroup,
+      buffer = bufnr,
+      callback = function()
+        if formatting_enabled then
+          vim.lsp.buf.format({
+            -- stop Neovim from asking which server to use
+            filter = function(client)
+              return client.name == "null-ls"
+            end,
+          })
+        end
+      end,
+    })
+  end
 end
 
 local servers = {
   pyright = {},
-
   prismals = {},
-
-  gopls = {},
-
+  -- gopls = {},
   -- rust_analyzer = {},
   tsserver = {},
-  eslint = {},
-
-  sumneko_lua = {
+  lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
@@ -64,9 +85,6 @@ local servers = {
     },
   },
 }
-
--- TODO: switch to lsp-format?
-vim.cmd([[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]])
 
 return {
   -- Tools
@@ -175,7 +193,7 @@ return {
           end,
         },
         mapping = cmp.mapping.preset.insert({
-          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-d>"] = cmp.mapping.scroll_docs( -4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-Space>"] = cmp.mapping.complete(),
           ["<CR>"] = cmp.mapping.confirm({
@@ -194,8 +212,8 @@ return {
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
+            elseif luasnip.jumpable( -1) then
+              luasnip.jump( -1)
             else
               fallback()
             end
@@ -204,6 +222,26 @@ return {
         sources = {
           { name = "nvim_lsp" },
           { name = "luasnip" },
+        },
+      })
+    end,
+  },
+
+  -- Custom LSP shenanigans + formatting
+  {
+    "jose-elias-alvarez/null-ls.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    enabled = true,
+    config = function()
+      local null_ls = require("null-ls")
+
+      null_ls.setup({
+        on_attach = on_attach,
+        sources = {
+          null_ls.builtins.formatting.stylua,
+          null_ls.builtins.formatting.eslint_d,
         },
       })
     end,
