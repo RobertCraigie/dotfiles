@@ -68,12 +68,14 @@ return {
     },
   },
   opts = function()
+    local actions = require("telescope.actions")
     return {
       defaults = {
         mappings = {
           i = {
             ["<C-u>"] = false,
             ["<C-d>"] = false,
+            ["<C-q>"] = actions.smart_add_to_qflist + actions.open_qflist,
           },
         },
       },
