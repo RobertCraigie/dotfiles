@@ -73,7 +73,8 @@ local servers = {
   pyright = {},
   prismals = {},
   -- gopls = {},
-  -- rust_analyzer = {},
+  eslint = {},
+  rust_analyzer = {},
   tsserver = {},
   lua_ls = {
     Lua = {
@@ -85,6 +86,8 @@ local servers = {
     },
   },
 }
+
+vim.cmd([[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]])
 
 return {
   -- Tools
@@ -193,7 +196,7 @@ return {
           end,
         },
         mapping = cmp.mapping.preset.insert({
-          ["<C-d>"] = cmp.mapping.scroll_docs( -4),
+          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-Space>"] = cmp.mapping.complete(),
           ["<CR>"] = cmp.mapping.confirm({
@@ -212,8 +215,8 @@ return {
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item()
-            elseif luasnip.jumpable( -1) then
-              luasnip.jump( -1)
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
             else
               fallback()
             end
@@ -241,7 +244,6 @@ return {
         on_attach = on_attach,
         sources = {
           null_ls.builtins.formatting.stylua,
-          null_ls.builtins.formatting.eslint_d,
         },
       })
     end,
