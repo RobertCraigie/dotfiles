@@ -16,6 +16,11 @@
         create: false
         relink: false
         force: false
+    ~/.gitignore:
+        path: gitignore
+        create: false
+        relink: false
+        force: false
     ~/.zprofile:
         path: zprofile
         create: false
