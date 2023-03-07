@@ -24,22 +24,29 @@ return {
   -- Fancier statusline
   {
     "nvim-lualine/lualine.nvim",
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = "tokyonight",
-        component_separators = "|",
-        section_separators = "",
-      },
-      sections = {
-        lualine_c = { "%f" },
-      },
-      inactive_sections = {
-        lualine_c = { "%f" },
-      },
+    dependencies = {
+      "f-person/git-blame.nvim",
     },
-    config = function(_, opts)
-      require("lualine").setup(opts)
+    opts = function()
+      local git_blame = require("gitblame")
+
+      -- This disables showing of the blame text next to the cursor
+      vim.g.gitblame_display_virtual_text = 0
+
+      return {
+        options = {
+          icons_enabled = false,
+          theme = "tokyonight",
+          component_separators = "|",
+          section_separators = "",
+        },
+        sections = {
+          lualine_c = { "%f", { git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available } },
+        },
+        inactive_sections = {
+          lualine_c = { "%f" },
+        },
+      }
     end,
   },
 
@@ -75,18 +82,18 @@ return {
     keys = {
       {
         "<leader>dd",
-        function ()
+        function()
           require("duck").hatch()
         end,
-        desc = "Hatch"
+        desc = "Hatch",
       },
       {
         "<leader>dk",
-        function ()
+        function()
           require("duck").cook()
         end,
-        desc = "Cook"
+        desc = "Cook",
       },
     },
-  }
+  },
 }
