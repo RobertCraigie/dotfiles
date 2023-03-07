@@ -72,7 +72,6 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
 	git
-	virtualenvwrapper
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -153,3 +152,5 @@ export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
 
 export PATH=$PATH:/Users/robert/.local/share/neovim/bin
+
+eval "$(direnv hook zsh)"
