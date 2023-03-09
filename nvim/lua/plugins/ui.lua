@@ -21,6 +21,12 @@ return {
     end,
   },
 
+  -- Improved quickfix
+  {
+    'kevinhwang91/nvim-bqf',
+    ft = 'qf',
+  },
+
   -- Fancier statusline
   {
     "nvim-lualine/lualine.nvim",
