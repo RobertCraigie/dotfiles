@@ -3,6 +3,7 @@ return {
   { "tpope/vim-rhubarb" },
   {
     "lewis6991/gitsigns.nvim",
+    enabled = false,
     opts = {
       signs = {
         add = { text = "+" },
