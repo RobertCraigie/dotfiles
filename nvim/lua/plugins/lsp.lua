@@ -75,13 +75,21 @@ local servers = {
   -- gopls = {},
   eslint = {},
   rust_analyzer = {},
-  tsserver = {},
+  tsserver = {
+    init_options = {
+      preferences = {
+        importModuleSpecifierPreference = "non-relative",
+      },
+    },
+  },
   lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-      diagnostics = {
-        globals = { "vim" },
+    settings = {
+      Lua = {
+        workspace = { checkThirdParty = false },
+        telemetry = { enable = false },
+        diagnostics = {
+          globals = { "vim" },
+        },
       },
     },
   },
@@ -133,10 +141,9 @@ return {
             lineFoldingOnly = true,
           }
 
-          require("lspconfig")[server_name].setup({
+          local default_config = {
             capabilities = capabilities,
             on_attach = on_attach,
-            settings = servers[server_name],
             before_init = function(_, config)
               local Util = require("config.util.lsp")
 
@@ -145,7 +152,11 @@ return {
                 config.settings.python.pythonPath = Util.get_python_path(config.root_dir)
               end
             end,
-          })
+          }
+
+          local merged = vim.tbl_deep_extend("force", {}, default_config, servers[server_name])
+
+          require("lspconfig")[server_name].setup(merged)
         end,
       })
     end,
