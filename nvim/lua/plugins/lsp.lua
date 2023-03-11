@@ -176,16 +176,36 @@ return {
   -- Improved LSP diagnostics
   {
     "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+    keys = {
+      {
+        "<leader>tl",
+        function()
+          local enable_lines = not vim.diagnostic.config().virtual_lines
+          if enable_lines == true then
+            vim.diagnostic.config({
+              virtual_text = false,
+              virtual_lines = true,
+            })
+          else
+            vim.diagnostic.config({
+              virtual_text = true,
+              virtual_lines = false,
+            })
+          end
+        end,
+        desc = "Toggle LSP Lines",
+      },
+    },
     config = function(_, opts)
       require("lsp_lines").setup(opts)
 
-      -- Disable virtual_text since it's redundant due to lsp_lines.
+      -- Disable lsp_lines by default.
+      -- Can be re-enabled using <leader>tl
       vim.diagnostic.config({
-        virtual_text = false,
+        virtual_text = true,
+        virtual_lines = false,
       })
     end,
-    -- TODO: too much layout shift, need to keep existing diagnostics when entering insert mode
-    enabled = false,
   },
 
   -- Autocompletion
