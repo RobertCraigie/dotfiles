@@ -1,3 +1,52 @@
+-- table of lsp client name to a boolean indicating whether or not autoformatting is enabled
+local formatting_clients = {}
+
+local on_formatter_attach = function(client, bufnr)
+  local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+  -- Create a command `:LspFormat` local to the LSP buffer
+  vim.api.nvim_buf_create_user_command(bufnr, "LspFormat", function(_)
+    vim.lsp.buf.format()
+  end, { desc = "Format current buffer with LSP" })
+
+  -- Create a command and keymap to disable formatting using the current client
+  function toggle_format()
+    formatting_clients[client.name] = not formatting_clients[client.name]
+  end
+
+  vim.api.nvim_buf_create_user_command(bufnr, "ToggleLspFormat", function(_)
+    toggle_format()
+  end, { desc = "LSP: Toggle formatting on save for the current client" })
+
+  vim.keymap.set("n", "<leader>tf", function()
+    toggle_format()
+  end, { buffer = bufnr, desc = "Toggle formatting on save" })
+
+  -- default to formatting on
+  if formatting_clients[client.name] == nil then
+    formatting_clients[client.name] = true
+  end
+
+  vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    group = augroup,
+    buffer = bufnr,
+    callback = function()
+      local should_format = formatting_clients[client.name]
+
+      if should_format == true then
+        vim.lsp.buf.format({
+          -- stop Neovim from asking which server to use
+          filter = function(f_client)
+            return f_client.name == "null-ls"
+          end,
+          timeout_ms = 5000,
+        })
+      end
+    end,
+  })
+end
+
 local on_attach = function(client, bufnr)
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
@@ -31,41 +80,15 @@ local on_attach = function(client, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, "[W]orkspace [L]ist Folders")
 
-  -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, "LspFormat", function(_)
-    vim.lsp.buf.format()
-  end, { desc = "Format current buffer with LSP" })
-
-  -- Create a command to disable formatting the current buffer
-  local formatting_enabled = true
-  vim.api.nvim_buf_create_user_command(bufnr, "LspToggleFormat", function(_)
-    formatting_enabled = not formatting_enabled
-  end, { desc = "Toggle LSP formatting on save" })
-
   -- Disable diagnostics for Jinja2 files as they won't be useful
   local filetype = vim.bo.filetype
   if string.match(filetype, ".jinja") then
     vim.diagnostic.disable(bufnr)
   end
 
-  -- format on save
-  local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-  if client.supports_method("textDocument/formatting") then
-    vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      group = augroup,
-      buffer = bufnr,
-      callback = function()
-        if formatting_enabled then
-          vim.lsp.buf.format({
-            -- stop Neovim from asking which server to use
-            filter = function(client)
-              return client.name == "null-ls"
-            end,
-          })
-        end
-      end,
-    })
+  -- add support for formatting on save etc
+  if client.supports_method("textDocument/formatting") and client.name ~= "tsserver" then
+    on_formatter_attach(client, bufnr)
   end
 end
 
@@ -95,6 +118,7 @@ local servers = {
   },
 }
 
+-- TODO: don't do this
 vim.cmd([[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]])
 
 return {
@@ -270,6 +294,12 @@ return {
     enabled = true,
     config = function()
       local null_ls = require("null-ls")
+
+      if vim.fn.executable("blue") == 1 then
+        null_ls.register(null_ls.builtins.formatting.blue)
+      else
+        null_ls.register(null_ls.builtins.formatting.black)
+      end
 
       null_ls.setup({
         on_attach = on_attach,
