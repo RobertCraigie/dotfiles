@@ -1,9 +1,10 @@
 return {
+  -- For learning Vim
   {
-    -- For learning Vim
     "ThePrimeagen/vim-be-good",
     cmd = "VimBeGood",
   },
+
   {
     "folke/which-key.nvim",
     config = function(_, opts)
@@ -12,4 +13,16 @@ return {
       require("which-key").setup(opts)
     end,
   },
+
+  -- JSON Path helpers
+  {
+    "mogelbrod/vim-jsonpath",
+    ft = "json",
+    config = function ()
+      vim.g.jsonpath_register = ""
+    end,
+    keys = {
+      { "<leader>jp", "<cmd>JsonPath<cr>", desc = "Yank the current JSON path" },
+    }
+  }
 }

@@ -23,8 +23,8 @@ return {
 
   -- Improved quickfix
   {
-    'kevinhwang91/nvim-bqf',
-    ft = 'qf',
+    "kevinhwang91/nvim-bqf",
+    ft = "qf",
   },
 
   -- Fancier statusline
