@@ -38,7 +38,8 @@ local on_formatter_attach = function(client, bufnr)
         vim.lsp.buf.format({
           -- stop Neovim from asking which server to use
           filter = function(f_client)
-            return f_client.name == "null-ls"
+            local name = f_client.name
+            return name == "null-ls" or name == "prismals"
           end,
           timeout_ms = 5000,
         })
