@@ -95,7 +95,7 @@ end
 local servers = {
   pyright = {},
   prismals = {},
-  -- gopls = {},
+  gopls = {},
   eslint = {},
   rust_analyzer = {},
   tsserver = {
