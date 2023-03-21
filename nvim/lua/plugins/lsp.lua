@@ -297,7 +297,7 @@ return {
 
       if vim.fn.executable("blue") == 1 then
         null_ls.register(null_ls.builtins.formatting.blue)
-      else
+      elseif vim.fn.executable("black") == 1 then
         null_ls.register(null_ls.builtins.formatting.black)
       end
 
