@@ -192,9 +192,9 @@ return {
     dependencies = {
       -- "kyazdani42/nvim-web-devicons",
     },
-    config = function(_, opts)
-      require("trouble").setup(opts)
-    end,
+    opts = {
+      mode = "quickfix",
+    },
   },
 
   -- Improved LSP diagnostics
