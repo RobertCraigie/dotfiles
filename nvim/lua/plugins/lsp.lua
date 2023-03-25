@@ -97,7 +97,18 @@ local servers = {
   pyright = {},
   prismals = {},
   gopls = {},
-  eslint = {},
+  eslint = {
+    handlers = {
+      ["textDocument/publishDiagnostics"] = function(_, result, ctx, config)
+        result.diagnostics = vim.tbl_filter(function(diagnostic)
+          -- ignore all prettier diagnostics as they're completely redundant
+          return not vim.tbl_contains({ "prettier/prettier" }, diagnostic.code)
+        end, result.diagnostics)
+
+        return vim.lsp.handlers["textDocument/publishDiagnostics"](nil, result, ctx, config)
+      end,
+    },
+  },
   rust_analyzer = {},
   tsserver = {
     init_options = {
