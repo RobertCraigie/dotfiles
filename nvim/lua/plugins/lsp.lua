@@ -10,7 +10,7 @@ local on_formatter_attach = function(client, bufnr)
   end, { desc = "Format current buffer with LSP" })
 
   -- Create a command and keymap to disable formatting using the current client
-  function toggle_format()
+  local function toggle_format()
     formatting_clients[client.name] = not formatting_clients[client.name]
   end
 
@@ -93,7 +93,9 @@ local on_attach = function(client, bufnr)
   end
 end
 
-vim.lsp.set_log_level(vim.log.levels.DEBUG)
+if vim.env.DEBUG_LSP then
+  vim.lsp.set_log_level(vim.log.levels.DEBUG)
+end
 
 local servers = {
   pyright = {},
