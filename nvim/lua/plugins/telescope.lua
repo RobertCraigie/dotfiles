@@ -23,7 +23,11 @@ return {
     {
       "<leader>sg",
       function()
-        require("telescope.builtin").live_grep()
+        require("telescope.builtin").live_grep({
+          additional_args = function()
+            return { "--hidden" }
+          end,
+        })
       end,
       desc = "[S]earch by [G]rep",
     },
