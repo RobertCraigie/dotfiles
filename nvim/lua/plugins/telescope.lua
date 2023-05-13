@@ -76,6 +76,7 @@ return {
             ["<C-u>"] = false,
             ["<C-d>"] = false,
             ["<C-q>"] = actions.smart_add_to_qflist + actions.open_qflist,
+            ["<C-h>"] = "which_key",
           },
         },
       },
