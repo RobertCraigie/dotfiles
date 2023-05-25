@@ -73,7 +73,11 @@ return {
       vim.keymap.set("n", "zR", ufo.openAllFolds)
       vim.keymap.set("n", "zM", ufo.closeAllFolds)
 
-      ufo.setup()
+      ufo.setup(opts)
     end,
+  },
+
+  {
+    "folke/zen-mode.nvim",
   },
 }
