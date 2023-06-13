@@ -28,3 +28,5 @@ require("lazy").setup({
     { import = "plugins" },
   },
 })
+
+require("oil").setup()
