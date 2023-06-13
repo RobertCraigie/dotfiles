@@ -58,8 +58,6 @@ return {
       "f-person/git-blame.nvim",
     },
     opts = function()
-      local git_blame = require("gitblame")
-
       -- This disables showing of the blame text next to the cursor
       vim.g.gitblame_display_virtual_text = 0
 
@@ -71,7 +69,7 @@ return {
           section_separators = "",
         },
         sections = {
-          lualine_c = { "%f", { git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available } },
+          lualine_c = { "%f" },
         },
         inactive_sections = {
           lualine_c = { "%f" },
