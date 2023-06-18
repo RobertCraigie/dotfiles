@@ -1,4 +1,3 @@
-
 -- TODOs:
 -- [ ] Configurable background colour
 -- [ ] Configurable source languages
@@ -33,7 +32,7 @@ end
 local buffers = {}
 
 -- Returns a table of languages to found code blocks
-M.extract_code_chunks = function(main_nr, lang)
+local function extract_code_chunks(main_nr, lang)
   main_nr = main_nr or api.nvim_get_current_buf()
   local row, col = unpack(api.nvim_win_get_cursor(0))
   row = row - 1
@@ -106,8 +105,8 @@ end
 local ns = api.nvim_create_namespace("InjectionsHighlight")
 api.nvim_command("highlight InjectionsHighlight guibg=#212436")
 
-M.update_buf = function(bufnr)
-  local chunks = M.extract_code_chunks()
+local function update_buf(bufnr)
+  local chunks = extract_code_chunks()
   if chunks == nil then
     return
   end
@@ -167,7 +166,7 @@ end
 
 -- Highlight injections for the given buffer and register it so that
 -- injection highlights can be updated as the buffer is edited
-M.add_buf = function(bufnr)
+local function add_buf(bufnr)
   local ft = api.nvim_buf_get_option(bufnr, "filetype")
   local parsername = vim.treesitter.language.get_lang(ft)
   if not parsername then
@@ -183,14 +182,14 @@ M.add_buf = function(bufnr)
 
   buffers[bufnr] = { parser = parser }
 
-  M.update_buf(bufnr)
+  update_buf(bufnr)
 
   buffers[bufnr].parser:register_cbs({
     on_changedtree = function()
       -- defer updating the buf until the next available tick
       -- as updating immediately can cause severe lag
       vim.defer_fn(function()
-        M.update_buf(bufnr)
+        update_buf(bufnr)
       end, 0)
     end,
   })
@@ -198,9 +197,30 @@ M.add_buf = function(bufnr)
   return true
 end
 
-M.dev_setup = function()
+function M.on()
   local bufnr = api.nvim_get_current_buf()
-  M.add_buf(bufnr)
+  if not buffers[bufnr] then
+    add_buf(bufnr)
+  end
+end
+
+function M.off()
+  local bufnr = api.nvim_get_current_buf()
+  vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+  if buffers[bufnr] then
+    -- Register an empty function to remove the previous callback
+    buffers[bufnr].parser:register_cbs({ on_changedtree = function() end })
+    buffers[bufnr] = nil
+  end
+end
+
+function M.toggle()
+  local bufnr = api.nvim_get_current_buf()
+  if buffers[bufnr] then
+    M.off()
+  else
+    M.on()
+  end
 end
 
 return M
