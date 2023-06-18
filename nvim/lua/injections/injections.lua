@@ -6,8 +6,10 @@
 local M = {}
 local api = vim.api
 local ts = vim.treesitter
-local contains = require("config.util.index").contains
-local lines = require("config.util.index").lines
+local contains = require("config.util").contains
+local lines = require("config.util").lines
+
+local opts = require("injections").options
 
 local extensions = {
   python = "py",
@@ -32,7 +34,7 @@ end
 local buffers = {}
 
 -- Returns a table of languages to found code blocks
-local function extract_code_chunks(main_nr, lang)
+local function extract_code_chunks(main_nr)
   main_nr = main_nr or api.nvim_get_current_buf()
   local row, col = unpack(api.nvim_win_get_cursor(0))
   row = row - 1
@@ -64,7 +66,11 @@ local function extract_code_chunks(main_nr, lang)
       text = ts.get_node_text(node, main_nr, metadata)
       lang_capture = text
       found_chunk = true
-    elseif name == "content" and found_chunk and (lang == nil or lang_capture == lang) then
+    elseif
+      name == "content"
+      and found_chunk
+      and (opts.highlight_languages == nil or opts.highlight_languages[lang_capture])
+    then
       text = ts.get_node_text(node, main_nr, metadata)
 
       local row1, col1, row2, col2 = node:range()
@@ -82,7 +88,7 @@ local function extract_code_chunks(main_nr, lang)
       found_chunk = false
     elseif contains(injectable_languages, name) then
       -- chunks where the name of the language is the name of the capture
-      if lang == nil or name == lang then
+      if opts.highlight_languages == nil or opts.highlight_languages[name] then
         text = ts.get_node_text(node, main_nr, metadata)
         local row1, col1, row2, col2 = node:range()
         local result = {
