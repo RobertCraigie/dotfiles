@@ -88,7 +88,7 @@ local on_attach = function(client, bufnr)
   end
 
   -- add support for formatting on save etc
-  if client.supports_method("textDocument/formatting") and client.name ~= "tsserver" then
+  if client.supports_method("textDocument/formatting") and client.name ~= "typescript-tools" then
     on_formatter_attach(client, bufnr)
   end
 end
@@ -114,28 +114,6 @@ local servers = {
     },
   },
   rust_analyzer = {},
-  tsserver = {
-    init_options = {
-      preferences = {
-        importModuleSpecifierPreference = "non-relative",
-      },
-    },
-    handlers = {
-      ["textDocument/definition"] = function(_, result, ctx, config)
-        -- If there are 2 results that are defined next to each other then use the first one
-        local line_diff_limit = 20
-        if #result == 2 then
-          local line1 = result[1].targetSelectionRange.start.line
-          local line2 = result[2].targetSelectionRange.start.line
-          if line2 - line1 < line_diff_limit and result[1].targetUri == result[2].targetUri then
-            result = result[1]
-          end
-        end
-
-        return vim.lsp.handlers["textDocument/definition"](nil, result, ctx, config)
-      end,
-    },
-  },
   lua_ls = {
     settings = {
       Lua = {
@@ -215,6 +193,34 @@ return {
         end,
       })
     end,
+  },
+
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    opts = {
+      on_attach = on_attach,
+      settings = {
+        tsserver_file_preferences = {
+          importModuleSpecifierPreference = "non-relative",
+        },
+      },
+      handlers = {
+        ["textDocument/definition"] = function(_, result, ctx, config)
+          -- If there are 2 results that are defined next to each other then use the first one
+          local line_diff_limit = 20
+          if #result == 2 then
+            local line1 = result[1].targetSelectionRange.start.line
+            local line2 = result[2].targetSelectionRange.start.line
+            if line2 - line1 < line_diff_limit and result[1].targetUri == result[2].targetUri then
+              result = result[1]
+            end
+          end
+
+          return vim.lsp.handlers["textDocument/definition"](nil, result, ctx, config)
+        end,
+      },
+    },
   },
 
   -- LSP Diagnostics
