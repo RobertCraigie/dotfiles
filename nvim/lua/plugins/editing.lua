@@ -8,6 +8,19 @@ return {
   },
 
   {
+    "cshuaimin/ssr.nvim",
+    keys = {
+      {
+        "<leader>sr",
+        function()
+          require("ssr").open()
+        end,
+        desc = "[S]tructural Search and [R]eplace",
+      },
+    },
+  },
+
+  {
     "ggandor/leap.nvim",
     dependencies = {
       "tpope/vim-repeat",
