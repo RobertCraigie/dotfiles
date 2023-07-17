@@ -1,4 +1,9 @@
 return {
+  -- In-browser editing
+  {
+    "subnut/nvim-ghost.nvim",
+  },
+
   -- For learning Vim
   {
     "ThePrimeagen/vim-be-good",
@@ -18,11 +23,11 @@ return {
   {
     "mogelbrod/vim-jsonpath",
     ft = "json",
-    config = function ()
+    config = function()
       vim.g.jsonpath_register = ""
     end,
     keys = {
       { "<leader>jp", "<cmd>JsonPath<cr>", desc = "Yank the current JSON path" },
-    }
-  }
+    },
+  },
 }
