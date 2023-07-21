@@ -130,7 +130,10 @@ export PATH="/Users/robert/bin:$PATH"
 
 # pnpm
 export PNPM_HOME="/Users/robert/Library/pnpm"
-export PATH="$PNPM_HOME:$PATH"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
 # pnpm end
 
 # pdm
@@ -154,3 +157,13 @@ export PATH=$PATH:$GOBIN
 export PATH=$PATH:/Users/robert/.local/share/neovim/bin
 
 eval "$(direnv hook zsh)"
+
+export DENO_INSTALL="/Users/robert/.deno"
+export PATH="$DENO_INSTALL/bin:$PATH"
+
+# bun completions
+[ -s "/Users/robert/.bun/_bun" ] && source "/Users/robert/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
