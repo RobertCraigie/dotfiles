@@ -22,7 +22,6 @@ return {
         "markdown",
         "markdown_inline",
         "typescript",
-        "help",
         "graphql",
         "prisma",
         "kotlin",
