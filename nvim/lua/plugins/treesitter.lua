@@ -12,6 +12,7 @@ return {
       ensure_installed = {
         "c",
         "cpp",
+        "kdl",
         "go",
         "lua",
         "vim",

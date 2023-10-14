@@ -6,6 +6,11 @@
         create: true
         relink: false
         force: false
+    ~/.config/zellij/:
+        path: zellij
+        create: true
+        relink: false
+        force: false
     ~/.profile:
         path: profile
         create: false
@@ -41,4 +46,3 @@
         create: false
         relink: false
         force: false
-
