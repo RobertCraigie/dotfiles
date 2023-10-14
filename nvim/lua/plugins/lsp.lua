@@ -39,7 +39,7 @@ local on_formatter_attach = function(client, bufnr)
           -- stop Neovim from asking which server to use
           filter = function(f_client)
             local name = f_client.name
-            return name == "null-ls" or name == "prismals"
+            return name == "null-ls" or name == "prismals" or name == 'ocamllsp'
           end,
           timeout_ms = 5000,
         })
@@ -101,6 +101,7 @@ local servers = {
   pyright = {},
   prismals = {},
   gopls = {},
+  ocamllsp = {},
   eslint = {
     handlers = {
       ["textDocument/publishDiagnostics"] = function(_, result, ctx, config)
