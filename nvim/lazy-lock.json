@@ -39,6 +39,7 @@
   "scrollEOF.nvim": { "branch": "master", "commit": "08034984164382c7bf8d007a77ec0c0fb2ecb3c3" },
   "ssr.nvim": { "branch": "main", "commit": "bc9c0d2dd765dafc1b8fecb28d0a317e7913b81f" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "9bc8237565ded606e6c366a71c64c0af25cd7a50" },
+  "telescope-live-grep-args.nvim": { "branch": "master", "commit": "20656efd7a0dbb4483290649c9671af14b0cfb0d" },
   "telescope.nvim": { "branch": "master", "commit": "dc192faceb2db64231ead71539761e055df66d73" },
   "toggleterm.nvim": { "branch": "main", "commit": "b90a1381e9b5b8596f49070ee86c71db267ac868" },
   "tokyonight.nvim": { "branch": "main", "commit": "1ee11019f8a81dac989ae1db1a013e3d582e2033" },

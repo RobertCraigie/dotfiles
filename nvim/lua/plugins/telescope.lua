@@ -3,6 +3,10 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    {
+      "nvim-telescope/telescope-live-grep-args.nvim",
+      version = "^1.0.0",
+    },
   },
   cmd = "Telescope",
   keys = {
@@ -103,5 +107,6 @@ return {
     local telescope = require("telescope")
     telescope.setup(opts)
     telescope.load_extension("fzf")
+    telescope.load_extension("live_grep_args")
   end,
 }
