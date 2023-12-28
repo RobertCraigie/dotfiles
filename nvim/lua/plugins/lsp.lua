@@ -1,3 +1,51 @@
+local servers = {
+  pyright = {},
+  ruff_lsp = {},
+  prismals = {},
+  gopls = {},
+  ocamllsp = {},
+  yamlls = {
+    settings = {
+      yaml = {
+        schemas = {
+          ["./lib/config.schema.json"] = "*.stainless.yml",
+        },
+      },
+    },
+  },
+  eslint = {
+    handlers = {
+      ["textDocument/publishDiagnostics"] = function(_, result, ctx, config)
+        result.diagnostics = vim.tbl_filter(function(diagnostic)
+          -- ignore all prettier diagnostics as they're completely redundant
+          return not vim.tbl_contains({ "prettier/prettier" }, diagnostic.code)
+        end, result.diagnostics)
+
+        return vim.lsp.handlers["textDocument/publishDiagnostics"](nil, result, ctx, config)
+      end,
+    },
+  },
+  rust_analyzer = {},
+  lua_ls = {
+    settings = {
+      Lua = {
+        workspace = { checkThirdParty = false },
+        telemetry = { enable = false },
+        diagnostics = {
+          globals = { "vim" },
+        },
+      },
+    },
+  },
+}
+local whitelist_formatting_servers = {
+  "null-ls",
+  "prismals",
+  "ocamllsp",
+  "ruff_lsp",
+  "rust_analyzer",
+}
+
 -- table of lsp client name to a boolean indicating whether or not autoformatting is enabled
 local formatting_clients = {}
 
@@ -39,7 +87,7 @@ local on_formatter_attach = function(client, bufnr)
           -- stop Neovim from asking which server to use
           filter = function(f_client)
             local name = f_client.name
-            return name == "null-ls" or name == "prismals" or name == 'ocamllsp'
+            return vim.tbl_contains(whitelist_formatting_servers, name)
           end,
           timeout_ms = 5000,
         })
@@ -96,37 +144,6 @@ end
 if vim.env.DEBUG_LSP then
   vim.lsp.set_log_level(vim.log.levels.DEBUG)
 end
-
-local servers = {
-  pyright = {},
-  prismals = {},
-  gopls = {},
-  ocamllsp = {},
-  eslint = {
-    handlers = {
-      ["textDocument/publishDiagnostics"] = function(_, result, ctx, config)
-        result.diagnostics = vim.tbl_filter(function(diagnostic)
-          -- ignore all prettier diagnostics as they're completely redundant
-          return not vim.tbl_contains({ "prettier/prettier" }, diagnostic.code)
-        end, result.diagnostics)
-
-        return vim.lsp.handlers["textDocument/publishDiagnostics"](nil, result, ctx, config)
-      end,
-    },
-  },
-  rust_analyzer = {},
-  lua_ls = {
-    settings = {
-      Lua = {
-        workspace = { checkThirdParty = false },
-        telemetry = { enable = false },
-        diagnostics = {
-          globals = { "vim" },
-        },
-      },
-    },
-  },
-}
 
 -- TODO: don't do this
 vim.cmd([[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]])
