@@ -34,4 +34,11 @@ return {
       { "<leader>jp", "<cmd>JsonPath<cr>", desc = "Yank the current JSON path" },
     },
   },
+
+  {
+    "folke/neoconf.nvim",
+    config = function ()
+      require("neoconf").setup(require("config.conf"))
+    end
+  },
 }
