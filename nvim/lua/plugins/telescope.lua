@@ -79,6 +79,11 @@ return {
     local actions = require("telescope.actions")
     return {
       defaults = {
+        file_ignore_patterns = {
+          "node_modules/",
+          ".git/",
+          "services/app/public/src/worker/yml.worker.js",
+        },
         mappings = {
           i = {
             ["<C-u>"] = false,
