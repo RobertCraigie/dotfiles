@@ -145,9 +145,6 @@ if vim.env.DEBUG_LSP then
   vim.lsp.set_log_level(vim.log.levels.DEBUG)
 end
 
--- TODO: don't do this
-vim.cmd([[ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll ]])
-
 return {
   -- Tools
   {
