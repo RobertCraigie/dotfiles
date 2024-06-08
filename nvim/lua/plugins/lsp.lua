@@ -176,7 +176,6 @@ return {
     },
     config = function(_, opts)
       require("mason").setup()
-      require("neoconf").setup(require("config.conf"))
 
       local mason_lspconfig = require("mason-lspconfig")
       mason_lspconfig.setup(opts)
