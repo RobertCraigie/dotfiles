@@ -154,8 +154,9 @@ export GOPATH=~/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
 
-export PATH=$PATH:/Users/robert/.local/share/neovim/bin
-
+# quiet logs
+# https://github.com/direnv/direnv/issues/203
+export DIRENV_LOG_FORMAT=
 eval "$(direnv hook zsh)"
 
 export DENO_INSTALL="/Users/robert/.deno"
