@@ -8,14 +8,36 @@ return {
   },
 
   {
-    "cshuaimin/ssr.nvim",
+    "OXY2DEV/markview.nvim",
+    branch = "dev",
+    lazy = false,
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
+    },
+    opts = {
+      modes = { "n", "no", "c" },
+      hybrid_modes = { "n" },
+      callbacks = {
+        on_enable = function(_, win)
+          vim.wo[win].conceallevel = 2
+          vim.wo[win].conecalcursor = "c"
+        end,
+      },
+    },
+  },
+
+  {
+    "MagicDuck/grug-far.nvim",
+    config = function(_, opts)
+      require("grug-far").setup(opts)
+    end,
     keys = {
       {
-        "<leader>sr",
-        function()
-          require("ssr").open()
-        end,
-        desc = "[S]tructural Search and [R]eplace",
+        "<leader>gf",
+        "<cmd>:horizontal GrugFar<cr>",
+        desc = "[G]rug [F]ar (search/replace)",
+        mode = { "n", "v" },
       },
     },
   },
