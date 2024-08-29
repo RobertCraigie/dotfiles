@@ -46,3 +46,18 @@
       create: false
       relink: false
       force: false
+    ~/.wezterm.lua:
+      path: wezterm.lua
+      create: false
+      relink: false
+      force: false
+    ~/.config/wezterm/wezterm_utils.lua:
+      path: wezterm_utils.lua
+      create: true
+      relink: false
+      force: false
+    ~/.p10k.zsh:
+      path: p10k.zsh
+      create: false
+      relink: false
+      force: false
