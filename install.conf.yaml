@@ -1,48 +1,48 @@
-- clean: ['~']
+- clean: ["~"]
 
 - link:
     ~/.config/nvim:
-        path: nvim
-        create: true
-        relink: false
-        force: false
+      path: nvim
+      create: true
+      relink: false
+      force: false
     ~/.config/zellij/:
-        path: zellij
-        create: true
-        relink: false
-        force: false
+      path: zellij
+      create: true
+      relink: false
+      force: false
     ~/.profile:
-        path: profile
-        create: false
-        relink: false
-        force: false
+      path: profile
+      create: false
+      relink: false
+      force: false
     ~/.gitconfig:
-        path: gitconfig
-        create: false
-        relink: false
-        force: false
+      path: gitconfig
+      create: false
+      relink: false
+      force: false
     ~/.gitignore:
-        path: gitignore
-        create: false
-        relink: false
-        force: false
+      path: gitignore
+      create: false
+      relink: false
+      force: false
     ~/.zprofile:
-        path: zprofile
-        create: false
-        relink: false
-        force: false
+      path: zprofile
+      create: false
+      relink: false
+      force: false
     ~/.zshenv:
-        path: zshenv
-        create: false
-        relink: false
-        force: false
+      path: zshenv
+      create: false
+      relink: false
+      force: false
     ~/.zshrc:
-        path: zshrc
-        create: false
-        relink: false
-        force: false
+      path: zshrc
+      create: false
+      relink: false
+      force: false
     ~/.hammerspoon:
-        path: hammerspoon
-        create: false
-        relink: false
-        force: false
+      path: hammerspoon
+      create: false
+      relink: false
+      force: false
