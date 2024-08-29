@@ -148,7 +148,7 @@ export PATH=/Users/robert/Library/Python/3.10/bin:$PATH
 
 export PATH=/Users/robert/.local/bin:$PATH
 
-export PATH=/Users/robert/.local/share/neovim/bin:$PATH
+export PATH=/Users/robert/.local/share/bob/nvim-bin:$PATH
 
 # vim mode
 bindkey -v
