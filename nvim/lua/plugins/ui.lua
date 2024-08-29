@@ -47,6 +47,8 @@ return {
           section_separators = "",
         },
         sections = {
+          lualine_a = { "mode" },
+          lualine_b = { "diagnostics" },
           lualine_c = { "%f" },
         },
         inactive_sections = {
