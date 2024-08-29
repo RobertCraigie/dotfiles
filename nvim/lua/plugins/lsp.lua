@@ -1,5 +1,24 @@
 local servers = {
-  pyright = {},
+  pyright = {
+    handlers = {
+      ["textDocument/publishDiagnostics"] = function(_, result, ctx, config)
+        result.diagnostics = vim.tbl_filter(function(diagnostic)
+          -- ignore diagnostics for method arguments that aren't accessed
+          -- as this is reported for stub methods that don't have an implementation
+          --
+          -- ruff will also report if an argument isn't used correctly anyway so this
+          -- is redundant
+          if diagnostic.severity == 4 and string.match(diagnostic.message, "is not accessed$") then
+            return false
+          end
+
+          return true
+        end, result.diagnostics)
+
+        return vim.lsp.handlers["textDocument/publishDiagnostics"](nil, result, ctx, config)
+      end,
+    },
+  },
   ruff_lsp = {},
   prismals = {},
   gopls = {},
