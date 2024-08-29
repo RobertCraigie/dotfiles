@@ -23,4 +23,29 @@ return {
       { "<leader>jp", "<cmd>JsonPath<cr>", desc = "Yank the current JSON path" },
     },
   },
+
+  {
+    "kndndrj/nvim-dbee",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    build = function()
+      -- Install tries to automatically detect the install method.
+      -- if it fails, try calling it with one of these parameters:
+      --    "curl", "wget", "bitsadmin", "go"
+      require("dbee").install()
+    end,
+    config = function(config)
+      require("dbee").setup(config)
+    end,
+    keys = {
+      {
+        "<leader>td",
+        function()
+          require("dbee").toggle()
+        end,
+        desc = "Toggle DBee UI",
+      },
+    },
+  },
 }
