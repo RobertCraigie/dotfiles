@@ -62,12 +62,12 @@ local function extract_code_chunks(main_nr)
 
     -- chunks where the name of the injected language is dynamic
     -- e.g. markdown code chunks
-    if name == "_lang" or name == "language" then
+    if name == "_lang" or name == "language" or name == "injection.language" then
       text = ts.get_node_text(node, main_nr, metadata)
       lang_capture = text
       found_chunk = true
     elseif
-      name == "content"
+      (name == "content" or name == "injection.content")
       and found_chunk
       and (opts.highlight_languages == nil or opts.highlight_languages[lang_capture])
     then
