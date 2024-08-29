@@ -406,12 +406,6 @@ return {
     config = function()
       local null_ls = require("null-ls")
 
-      if vim.fn.executable("blue") == 1 then
-        null_ls.register(null_ls.builtins.formatting.blue)
-      elseif vim.fn.executable("black") == 1 then
-        null_ls.register(null_ls.builtins.formatting.black)
-      end
-
       null_ls.setup({
         on_attach = on_attach,
         sources = {
