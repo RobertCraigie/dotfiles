@@ -22,6 +22,7 @@ vim.opt.rtp:prepend(lazypath)
 require("config.options")
 require("config.keymaps")
 require("config.groups")
+require("config.files")
 
 -- TODO: move local plugins to proper structure so this isn't needed
 require("config.local")
