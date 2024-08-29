@@ -86,8 +86,14 @@ return {
       indent = {
         char = "┊",
       },
-      -- show_trailing_blankline_indent = false,
+      scope = {
+        enabled = false,
+      },
     },
+    config = function(_, opts)
+      require("ibl").setup(opts)
+      vim.api.nvim_set_hl(0, "IblScope", { fg = "#E06C75", bold = false, underdotted = true })
+    end,
   },
 
   -- Better folding
