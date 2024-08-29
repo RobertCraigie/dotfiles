@@ -344,6 +344,54 @@ return {
           { name = "nvim_lsp" },
           { name = "luasnip" },
         },
+        sorting = {
+          priority_weight = 2,
+          comparators = {
+            function(entry1, entry2)
+              if not entry1 or not entry2 then
+                return nil
+              end
+
+              local item1 = entry1.completion_item
+              local item2 = entry2.completion_item
+
+              if not item1 or not item2 then
+                return nil
+              end
+
+              -- Define the criteria for sorting
+              local function sort_criteria(label)
+                if label:sub(1, 1) ~= "_" then
+                  return 1 -- Non-underscored items first
+                elseif label:sub(1, 2) == "__" and label:sub(-2) == "__" then
+                  return 3 -- Items starting and ending with __ afterward
+                elseif label:sub(1, 1) == "_" then
+                  return 2 -- Items starting with a single underscore _ next
+                else
+                  return 4 -- Everything else
+                end
+              end
+
+              local criteria1 = sort_criteria(item1.label)
+              local criteria2 = sort_criteria(item2.label)
+
+              if criteria1 ~= criteria2 then
+                return criteria1 < criteria2
+              end
+
+              -- Fallback to the default comparator if the custom criteria are the same
+              return nil
+            end,
+            -- Default comparators are usually fine, but you can customize order here
+            cmp.config.compare.offset,
+            cmp.config.compare.exact,
+            cmp.config.compare.score,
+            cmp.config.compare.kind,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+          },
+        },
       })
     end,
   },
