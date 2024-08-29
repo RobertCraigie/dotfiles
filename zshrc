@@ -141,7 +141,11 @@ case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
+
+alias p=pnpm
 # pnpm end
+
+eval "$(rbenv init - zsh)"
 
 # pdm
 export PATH=/Users/robert/Library/Python/3.10/bin:$PATH
