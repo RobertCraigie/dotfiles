@@ -1,17 +1,6 @@
 return {
-  -- In-browser editing
-  {
-    "subnut/nvim-ghost.nvim",
-  },
-
   {
     "anuvyklack/hydra.nvim",
-  },
-
-  -- For learning Vim
-  {
-    "ThePrimeagen/vim-be-good",
-    cmd = "VimBeGood",
   },
 
   {

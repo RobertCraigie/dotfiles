@@ -51,11 +51,6 @@ return {
     end,
   },
 
-  -- Support for multiple cursors
-  {
-    "mg979/vim-visual-multi",
-  },
-
   -- Detect tabstop and shiftwidth automatically
   {
     "tpope/vim-sleuth",
