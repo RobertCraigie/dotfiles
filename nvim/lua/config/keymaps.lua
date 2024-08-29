@@ -1,3 +1,6 @@
+-- Motions
+vim.keymap.set("i", "jj", "<Esc>", { noremap = true })
+
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
