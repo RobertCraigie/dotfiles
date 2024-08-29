@@ -83,6 +83,7 @@ return {
           "node_modules/",
           ".git/",
           "services/app/public/src/worker/yml.worker.js",
+          "output.log",
         },
         mappings = {
           i = {
