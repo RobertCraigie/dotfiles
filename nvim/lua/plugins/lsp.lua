@@ -45,63 +45,6 @@ local servers = {
     },
   },
 }
-local whitelist_formatting_servers = {
-  "null-ls",
-  "prismals",
-  "ocamllsp",
-  "ruff_lsp",
-  "rust_analyzer",
-}
-
--- table of lsp client name to a boolean indicating whether or not autoformatting is enabled
-local formatting_clients = {}
-
-local on_formatter_attach = function(client, bufnr)
-  local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-
-  -- Create a command `:LspFormat` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, "LspFormat", function(_)
-    vim.lsp.buf.format()
-  end, { desc = "Format current buffer with LSP" })
-
-  -- Create a command and keymap to disable formatting using the current client
-  local function toggle_format()
-    formatting_clients[client.name] = not formatting_clients[client.name]
-  end
-
-  vim.api.nvim_buf_create_user_command(bufnr, "ToggleLspFormat", function(_)
-    toggle_format()
-  end, { desc = "LSP: Toggle formatting on save for the current client" })
-
-  vim.keymap.set("n", "<leader>tf", function()
-    toggle_format()
-  end, { buffer = bufnr, desc = "Toggle formatting on save" })
-
-  -- default to formatting on
-  if formatting_clients[client.name] == nil then
-    formatting_clients[client.name] = true
-  end
-
-  vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    group = augroup,
-    buffer = bufnr,
-    callback = function()
-      local should_format = formatting_clients[client.name]
-
-      if should_format == true then
-        vim.lsp.buf.format({
-          -- stop Neovim from asking which server to use
-          filter = function(f_client)
-            local name = f_client.name
-            return vim.tbl_contains(whitelist_formatting_servers, name)
-          end,
-          timeout_ms = 5000,
-        })
-      end
-    end,
-  })
-end
 
 local on_attach = function(client, bufnr)
   -- In this case, we create a function that lets us more easily define mappings specific
@@ -141,11 +84,6 @@ local on_attach = function(client, bufnr)
   if string.match(filetype, ".jinja") then
     vim.diagnostic.disable(bufnr)
   end
-
-  -- add support for formatting on save etc
-  if client.supports_method("textDocument/formatting") and client.name ~= "typescript-tools" then
-    on_formatter_attach(client, bufnr)
-  end
 end
 
 if vim.env.DEBUG_LSP then
@@ -164,8 +102,8 @@ return {
 
   -- Additional lua configuration, makes nvim stuff amazing
   {
-    "folke/neodev.nvim",
-    ft = "lua",
+    "folke/lazydev.nvim",
+    -- ft = "lua",
   },
 
   {
@@ -403,22 +341,70 @@ return {
     end,
   },
 
-  -- Custom LSP shenanigans + formatting
+  -- auto formatting
   {
-    "jose-elias-alvarez/null-ls.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    enabled = true,
-    config = function()
-      local null_ls = require("null-ls")
+    "stevearc/conform.nvim",
+    ---@module "conform"
+    ---@type conform.setupOpts
+    opts = {
+      format_on_save = function(bufnr)
+        -- Disable autoformat on certain filetypes
+        local ignore_filetypes = { "sql", "java" }
+        if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
+          return
+        end
 
-      null_ls.setup({
-        on_attach = on_attach,
-        sources = {
-          null_ls.builtins.formatting.stylua,
-          null_ls.builtins.formatting.prettierd,
-        },
+        -- Disable with a global or buffer-local variable
+        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+          return
+        end
+
+        -- Disable autoformat for files in a certain path
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+        if bufname:match("/node_modules/") then
+          return
+        end
+
+        return { timeout_ms = 500, lsp_format = "fallback" }
+      end,
+      formatters_by_ft = {
+        lua = { "stylua" },
+        javascript = { "prettierd", "prettier", stop_after_first = true },
+        typescript = { "prettierd", "prettier", stop_after_first = true },
+      },
+    },
+    config = function(_, opts)
+      require("conform").setup(opts)
+
+      vim.api.nvim_create_user_command("FormatBuf", function(args)
+        local range = nil
+        if args.count ~= -1 then
+          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ["end"] = { args.line2, end_line:len() },
+          }
+        end
+        require("conform").format({ async = true, lsp_format = "fallback", range = range })
+      end, { range = true })
+
+      vim.api.nvim_create_user_command("FormatDisable", function(args)
+        if args.bang then
+          -- FormatDisable! will disable formatting just for this buffer
+          vim.b.disable_autoformat = true
+        else
+          vim.g.disable_autoformat = true
+        end
+      end, {
+        desc = "Disable autoformat-on-save",
+        bang = true,
+      })
+
+      vim.api.nvim_create_user_command("FormatEnable", function()
+        vim.b.disable_autoformat = false
+        vim.g.disable_autoformat = false
+      end, {
+        desc = "Re-enable autoformat-on-save",
       })
     end,
   },
