@@ -241,6 +241,12 @@ return {
       local cmp = require("cmp")
       local luasnip = require("luasnip")
 
+      luasnip.add_snippets("ocaml", {
+        luasnip.snippet(">>*", {
+          luasnip.text_node(">>= fun () ->"),
+        }),
+      })
+
       cmp.setup({
         snippet = {
           expand = function(args)
