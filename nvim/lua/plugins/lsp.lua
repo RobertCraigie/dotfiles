@@ -155,17 +155,6 @@ return {
     end,
   },
 
-  -- project wide type checking
-  {
-    "dmmulroy/tsc.nvim",
-    opts = {
-      flags = {
-        -- TODO: don't hardocde
-        project = "bin/ci-tsconfig.json",
-      },
-    },
-  },
-
   {
     "pmizio/typescript-tools.nvim",
     dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
