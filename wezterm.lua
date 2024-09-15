@@ -31,7 +31,7 @@ config.hyperlink_rules = wezterm.default_hyperlink_rules()
 -- Custom rule for opening file paths in neovim
 wezterm.on("open-uri", utils.on_uri_open)
 table.insert(config.hyperlink_rules, {
-  regex = "(/)?[A-Za-z0-9_-]+/[/.A-Za-z0-9_-]*\\.[A-Za-z0-9]+(:\\d+)*(?=\\s*|$)",
+  regex = "([/\\.])?[A-Za-z0-9_-]+/[/.A-Za-z0-9_-]*\\.[A-Za-z0-9]+(:\\d+)*(?=\\s*|$)",
   format = "$EDITOR:$0",
 })
 
