@@ -27,7 +27,7 @@ local servers = {
     settings = {
       yaml = {
         schemas = {
-          ["./lib/config.schema.json"] = "*.stainless.yml",
+          ["./legacy-dir-root/lib/config.schema.json"] = "*.stainless.yml",
         },
       },
     },
