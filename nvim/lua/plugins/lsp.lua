@@ -32,7 +32,25 @@ local servers = {
       },
     },
   },
-  rust_analyzer = {},
+  rust_analyzer = {
+    settings = {
+      -- inlayHints = {
+      --   enable = true,
+      -- },
+      inlayHints = {
+        enable = true,
+        chainingHints = {
+          enable = true,
+        },
+        -- showParameterNames = true,
+        -- parameterHintsPrefix = "<- ",
+        -- otherHintsPrefix = "=> ",
+      },
+      procMacro = {
+        enable = true,
+      },
+    },
+  },
   lua_ls = {
     settings = {
       Lua = {
@@ -78,6 +96,11 @@ local on_attach = function(client, bufnr)
   nmap("<leader>wl", function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, "[W]orkspace [L]ist Folders")
+
+  if client.name == "rust_analyzer" then
+    print("enabling for buf", bufnr)
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
 
   -- Disable diagnostics for Jinja2 files as they won't be useful
   local filetype = vim.bo.filetype
