@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# note: doesn't bootstrap everything in these dotfiles yet
+
+set -e
+
+
+clone_if_not_exists() {
+    local repo_url="$1"
+    local target_dir="$2"
+
+    if [ ! -d "$target_dir" ]; then
+        echo "Cloning $repo_url to $target_dir"
+        git clone --depth=1 "$repo_url" "$target_dir"
+    else
+        echo "Directory $target_dir already exists. Skipping clone."
+    fi
+}
+
+ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
+
+clone_if_not_exists \
+    "https://github.com/romkatv/powerlevel10k.git" \
+    "${ZSH_CUSTOM}/themes/powerlevel10k"
+
+clone_if_not_exists \
+    "https://github.com/Aloxaf/fzf-tab" \
+    "${ZSH_CUSTOM}/plugins/fzf-tab"

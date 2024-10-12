@@ -1,0 +1,6 @@
+# Setup
+
+```bash
+./bootstrap
+./install
+```
