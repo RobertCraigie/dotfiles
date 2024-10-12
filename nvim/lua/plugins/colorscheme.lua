@@ -31,6 +31,7 @@ return {
           hl.TelescopePromptTitle = { bg = c.fg_gutter, fg = c.orange }
           hl.TelescopePreviewTitle = { bg = c.bg_dark, fg = c.bg_dark }
           hl.TelescopeResultsTitle = { bg = c.bg_dark, fg = c.bg_dark }
+          hl["@variable.kdl"] = { fg = c.cyan }
         end,
       }
     end,
