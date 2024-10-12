@@ -364,6 +364,9 @@ return {
       end,
       formatters_by_ft = {
         lua = { "stylua" },
+        zsh = { "shfmt" },
+        php = { "php_cs_fixer" },
+        yaml = { "prettierd", "prettier", stop_after_first = true },
         javascript = { "prettierd", "prettier", stop_after_first = true },
         typescript = { "prettierd", "prettier", stop_after_first = true },
       },
