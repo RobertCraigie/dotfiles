@@ -147,7 +147,7 @@ return {
             end,
           }
 
-          local merged = vim.tbl_deep_extend("force", {}, default_config, servers[server_name])
+          local merged = vim.tbl_deep_extend("force", {}, default_config, servers[server_name] or {})
 
           require("lspconfig")[server_name].setup(merged)
         end,
