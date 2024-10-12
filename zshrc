@@ -191,6 +191,9 @@ if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
 fi
 # End Nix
 
+# php
+export PATH="$PATH:$HOME/.config/composer/vendor/bin"
+
 # opam configuration
 [[ ! -r /Users/robert/.opam/opam-init/init.zsh ]] || source /Users/robert/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
 
