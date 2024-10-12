@@ -208,3 +208,16 @@ source ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab/fzf-tab.plugin.zsh
 
 # # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# unfunction _dummy
+fpath=(/Users/Robert/.zsh/functions $fpath)
+autoload -Uz compinit && compinit
+
+# source ~/.zsh/functions/_curl_json_completion_min
+# source ~/.zsh/functions/_curl_json_completion
+
+# zstyle ':completion:*' verbose yes
+# zstyle ':completion:*:descriptions' format '%B%d%b'
+# zstyle ':completion:*:messages' format '%d'
+# zstyle ':completion:*:warnings' format 'No matches for: %d'
+# zstyle ':completion:*' group-name ''
