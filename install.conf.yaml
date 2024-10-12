@@ -61,3 +61,8 @@
       create: false
       relink: false
       force: false
+    ~/.config/gitui:
+      path: gitui
+      create: true
+      relink: false
+      force: false
