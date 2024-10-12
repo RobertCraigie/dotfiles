@@ -61,3 +61,8 @@
       create: false
       relink: false
       force: false
+    ~/Library/Application Support/lazygit/config.yml:
+      path: lazygit/config.yml
+      create: true
+      relink: false
+      force: false
