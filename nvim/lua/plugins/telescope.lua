@@ -98,6 +98,9 @@ return {
         buffers = {
           -- show all buffers
           file_ignore_patterns = {},
+          layout_config = {
+            width = 0.8, -- 80% of screen width
+          },
           sort_lastused = true,
           sort_mru = true,
           ignore_current_buffer = true,
