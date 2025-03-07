@@ -6,6 +6,11 @@
       create: true
       relink: false
       force: false
+    ~/.config/karabiner:
+      path: karabiner
+      create: true
+      relink: false
+      force: false
     ~/.config/zellij/:
       path: zellij
       create: true
