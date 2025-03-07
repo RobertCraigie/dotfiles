@@ -63,7 +63,7 @@ return {
       pattern = "*",
     },
     config = function(_, opts)
-      vim.o.scrolloff = 20
+      vim.o.scrolloff = 10
       require("scrollEOF").setup(opts)
     end,
   },
