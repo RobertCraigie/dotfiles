@@ -1,0 +1,15 @@
+theme = catppuccin-macchiato
+# theme = tokyonight
+
+shell-integration-features = cursor,no-sudo,title
+
+cursor-style = bar
+
+confirm-close-surface = false
+
+macos-titlebar-style = tabs
+
+font-feature = -calt
+
+# window-decoration = none
+# macos-titlebar-style = hidden
