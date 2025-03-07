@@ -1,9 +1,13 @@
+export DISABLE_AUTO_UPDATE=true
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+
+export KEYTIMEOUT=1
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -126,14 +130,18 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_FIND_NO_DUPS
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_BEEP
+setopt globdots
 
 export PATH="$HOME/.poetry/bin:$PATH"
+export PATH="$PATH:/opt/homebrew/opt/capstone/lib"
 export PIP_REQUIRE_VIRTUALENV=true
 export PATH="/opt/homebrew/opt/libxslt/bin:$PATH"
-export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/cairo/1.16.0_5/lib
+export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/capstone/5.0.3/lib
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 export PATH="/Users/robert/Library/Python/3.9/bin:$PATH"
 export PATH="/Users/robert/bin:$PATH"
+export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/ruby@3.1/lib"
 
 # pnpm
 export PNPM_HOME="/Users/robert/Library/pnpm"
@@ -208,6 +216,68 @@ eval "$(atuin init zsh)"
 source <(fzf --zsh)
 
 source ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab/fzf-tab.plugin.zsh
+
+source <(jj util completion zsh)
+
+if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
+  autoload -Uz -- "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
+  ghostty-integration
+  unfunction ghostty-integration
+fi
+
+fcp() {
+  fzf -m | pbcopy
+}
+
+frm() {
+  fzf -m | xargs rm
+}
+
+clone() {
+  if [ -z "$1" ]; then
+    echo "Error: No GitHub URL provided."
+    echo "Usage: clone_github_repo <github-url>"
+    return 1
+  fi
+
+  local url="$1"
+
+  if [[ "$url" != *"github.com"* ]]; then
+    echo "Error: The provided URL does not appear to be a GitHub URL: $url"
+    return 1
+  fi
+
+  # 3. Remove trailing ".git" if present
+  local clean_url="${url%.git}"
+
+  # 4. Extract the part after "github.com/" => e.g. "org/repo"
+  local path="${clean_url#*github.com/}"
+
+  # 5. Extract org and repo using parameter expansion
+  #    org = everything up to the first slash
+  #    repo = everything after the first slash
+  local org="${path%%/*}"
+  local repo="${path#*/}"
+
+  # 6. Basic validation
+  if [ -z "$org" ] || [ -z "$repo" ]; then
+    echo "Error: Could not parse organization/repository from URL."
+    echo "       Make sure the URL is in the form https://github.com/<org>/<repo>.git"
+    return 1
+  fi
+
+  local target_dir="$HOME/github.com/$org/$repo"
+
+  # 7. Check if the target directory already exists
+  if [ -d "$target_dir" ]; then
+    echo "Error: The directory '$target_dir' already exists."
+    echo "       To clone again, remove or rename this directory first."
+    return 1
+  fi
+
+  # 8. Perform the clone
+  /usr/bin/git clone "$url" "$target_dir"
+}
 
 # # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
