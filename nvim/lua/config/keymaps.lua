@@ -31,7 +31,7 @@ vim.keymap.set({ "n", "v" }, "<leader>D", '"+D') -- delete line
 vim.keymap.set("n", "<leader>p", '"+p') -- paste after cursor
 vim.keymap.set("n", "<leader>P", '"+P') -- paste before cursor
 
--- Yank currnet file path to system clipboard
+-- Yank current file path to system clipboard
 vim.keymap.set("n", "<leader>cp", function()
   vim.fn.setreg("+", vim.fn.expand("%:p"))
 end, { desc = "Yank file path to clipboard" })
