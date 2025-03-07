@@ -1,0 +1,1 @@
+/Applications/qutebrowser.app/Contents/MacOS/qutebrowser

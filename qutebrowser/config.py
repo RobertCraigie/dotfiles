@@ -5,6 +5,14 @@
 # TODO: binding to open kagi with search focused
 # TODO: custom bindings for common websites, e.g. claude
 
+# TODO: how to go back to last tab? builtin binding?
+# TODO: custom command for close-preview-prs???
+# TODO: https://github.com/qutebrowser/qutebrowser/issues/4397
+# TODO: fix theme in https://tomeraberba.ch/the-making-of-keyalesce
+
+# TODO: quicklink for google calendar, claude, github
+# TODO: is there a way to change how select works when there's one entry? idk
+# TODO: map jj to escape in insert mode
 # TODO: setup bitwarden integration
 # TODO: consider disabling tab view, if possible
 # TODO: look into quickmarks / bookmarks
@@ -12,6 +20,26 @@
 # TODO: go through all the settings
 # TODO: try and get auto complete / type checking to work for config options
 # TODO: is there a userscript for auto rejecting cookies
+# TODO: support cmd+} for tab navigation in insert mode
+
+# TODO: fix insert-mode detection for
+# - [ ] github review assigner
+# - [ ] claude.ai homepage
+# - [ ] kagi homepage, or the `gs` binding
+# - [ ] read issue about blinking cursor in normal mode
+# - [ ] notion search button
+# - [ ] replying to github review comments, also doesn't work for ;t
+# - [ ] linear inputs
+
+# passthroughs:
+# - [ ] bkspce on linear.app
+
+# sites with bad dark mode handling
+# - edinburgh city council
+# - zoom join meeting
+
+# exit insert mode when
+#  - [ ] github PR comment left
 
 from typing import TYPE_CHECKING, Any, cast
 
@@ -38,6 +66,7 @@ c.tabs.select_on_remove = "last-used"
 c.tabs.show_switching_delay = 0
 
 c.content.pdfjs = True
+c.content.javascript.clipboard = "access"
 
 # search engines
 c.url.searchengines = {
@@ -59,7 +88,7 @@ config.bind(
 # TODO: unbind "g-s" "g s"
 config.bind(
     "gs",
-    'open -t https://kagi.com ; jseval -q document.querySelector("input[name=q]").focus()',
+    "open -t https://kagi.com ;; mode-enter insert",
 )
 
 # reverse default tab navigation ordering
@@ -89,14 +118,3 @@ def setup_theme() -> None:
 
 
 setup_theme()
-
-
-# TODO
-"""
-In other browsers I can press `Esc` to close a popover menu, that doesn't appear to work out of the box with qutebrowser in normal or insert mode. I've found thay `Ctrl+Esc` does close the menu visuals but doesn't remove focus which means when I try to scroll, the menu is opened again.
-
-For example, this menu in the github issues page:
-<img width="598" alt="Screenshot 2024-10-19 at 22 21 29" src="https://github.com/user-attachments/assets/03f4a4f7-a341-4eea-8247-8d3a411a2a27">
-
-In chromeK
-"""
