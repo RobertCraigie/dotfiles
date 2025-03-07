@@ -21,3 +21,10 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo.shiftwidth = 2
   end,
 })
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = "*.webidl",
+  callback = function()
+    vim.bo.syntax = "cpp"
+  end,
+})
