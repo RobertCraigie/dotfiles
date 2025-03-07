@@ -56,6 +56,11 @@
       create: false
       relink: false
       force: false
+    ~/.config/glide:
+      path: glide
+      create: true
+      relink: false
+      force: false
     ~/.config/wezterm/wezterm_utils.lua:
       path: wezterm_utils.lua
       create: true
