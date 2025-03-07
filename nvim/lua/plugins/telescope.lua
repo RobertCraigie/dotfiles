@@ -2,10 +2,13 @@ return {
   "nvim-telescope/telescope.nvim",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     {
       "nvim-telescope/telescope-live-grep-args.nvim",
       version = "^1.0.0",
+    },
+    {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
     },
   },
   cmd = "Telescope",
@@ -80,9 +83,12 @@ return {
     return {
       defaults = {
         file_ignore_patterns = {
+          "js/",
           "node_modules/",
           ".git/",
+          "packages/stainless-monaco/public/yml.worker.js",
           "services/app/public/src/worker/yml.worker.js",
+          "glide/bundled/",
           "output.log",
         },
         mappings = {
@@ -111,6 +117,9 @@ return {
             n = { ["<C-d>"] = require("telescope.actions").delete_buffer },
           },
         },
+      },
+      extensions = {
+        fzf = {},
       },
     }
   end,
