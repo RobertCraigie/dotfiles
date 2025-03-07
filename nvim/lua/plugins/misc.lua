@@ -25,10 +25,10 @@ return {
 
   {
     "folke/which-key.nvim",
-    config = function(_, opts)
+    config = function()
       vim.o.timeout = true
       vim.o.timeoutlen = 300
-      require("which-key").setup(opts)
+      require("which-key").setup({ preset = "helix" })
     end,
   },
 
