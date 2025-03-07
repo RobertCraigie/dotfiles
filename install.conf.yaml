@@ -11,6 +11,11 @@
       create: true
       relink: false
       force: false
+    ~/.config/ghostty/:
+      path: ghostty
+      create: true
+      relink: false
+      force: false
     ~/.profile:
       path: profile
       create: false
