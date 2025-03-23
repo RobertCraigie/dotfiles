@@ -21,9 +21,7 @@ local servers = {
   },
   ruff = {},
   clangd = {},
-  prismals = {},
   gopls = {},
-  ocamllsp = {},
   yamlls = {
     settings = {
       yaml = {
@@ -34,6 +32,7 @@ local servers = {
     },
   },
   rust_analyzer = {},
+  tsserver = {},
   lua_ls = {
     settings = {
       Lua = {
@@ -118,7 +117,9 @@ return {
       "neovim/nvim-lspconfig",
     },
     opts = {
-      ensure_installed = vim.tbl_keys(servers),
+      ensure_installed = vim.tbl_filter(function(name)
+        return name ~= "tsserver"
+      end, vim.tbl_keys(servers)),
     },
     config = function(_, opts)
       require("mason").setup()
@@ -154,34 +155,6 @@ return {
         end,
       })
     end,
-  },
-
-  {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-    opts = {
-      on_attach = on_attach,
-      settings = {
-        tsserver_file_preferences = {
-          importModuleSpecifierPreference = "non-relative",
-        },
-      },
-      handlers = {
-        ["textDocument/definition"] = function(_, result, ctx, config)
-          -- If there are 2 results that are defined next to each other then use the first one
-          local line_diff_limit = 20
-          if #result == 2 then
-            local line1 = result[1].targetSelectionRange.start.line
-            local line2 = result[2].targetSelectionRange.start.line
-            if line2 - line1 < line_diff_limit and result[1].targetUri == result[2].targetUri then
-              result = result[1]
-            end
-          end
-
-          return vim.lsp.handlers["textDocument/definition"](nil, result, ctx, config)
-        end,
-      },
-    },
   },
 
   -- LSP Diagnostics
