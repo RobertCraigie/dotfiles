@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-# note: doesn't bootstrap everything in these dotfiles yet
+set -eux
 
-set -e
-
+./defaults
 
 clone_if_not_exists() {
     local repo_url="$1"
@@ -17,6 +16,10 @@ clone_if_not_exists() {
     fi
 }
 
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
 ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
 
 clone_if_not_exists \
@@ -26,3 +29,86 @@ clone_if_not_exists \
 clone_if_not_exists \
     "https://github.com/Aloxaf/fzf-tab" \
     "${ZSH_CUSTOM}/plugins/fzf-tab"
+
+if ! which brew > /dev/null 2>&1; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+if ! which cargo > /dev/null 2>&1; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  source "$HOME/.cargo/env"
+fi
+
+if ! which bob > /dev/null 2>&1; then
+  cargo install bob-nvim
+  bob use nightly
+fi
+
+if ! which atuin > /dev/null 2>&1; then
+  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+fi
+
+if ! which fzf > /dev/null 2>&1; then
+  brew install fzf
+fi
+
+if ! which direnv > /dev/null 2>&1; then
+  brew install direnv
+fi
+
+if ! which rye > /dev/null 2>&1; then
+  curl -sSf https://rye.astral.sh/get | bash
+fi
+
+if ! which git-credential-manager > /dev/null 2>&1; then
+  brew install --cask git-credential-manager
+fi
+
+if ! which rg > /dev/null 2>&1; then
+  brew install ripgrep
+fi
+
+if ! which pnpm > /dev/null 2>&1; then
+  curl -fsSL https://get.pnpm.io/install.sh | sh -
+fi
+
+if ! which uv > /dev/null 2>&1; then
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+
+if ! which go > /dev/null 2>&1; then
+  brew install go
+fi
+
+if ! which yq > /dev/null 2>&1; then
+  brew install yq
+fi
+
+if ! which gh > /dev/null 2>&1; then
+  brew install gh
+fi
+
+if ! which cloud-sql-proxy > /dev/null 2>&1; then
+  brew install cloud-sql-proxy
+fi
+
+if ! which deno > /dev/null 2>&1; then
+  curl -fsSL https://deno.land/install.sh | sh
+fi
+
+if ! which docker > /dev/null 2>&1; then
+  brew install docker
+fi
+
+if [ ! -d "/Applications/Ice.app" ]; then
+  brew install jordanbaird-ice
+fi
+
+if [ ! -d "/Applications/Bitwarden.app" ]; then
+  brew install bitwarden
+fi
+
+if [ ! -d "/Applications/Mullvad VPN.app" ]; then
+  brew install --cask mullvadvpn
+fi

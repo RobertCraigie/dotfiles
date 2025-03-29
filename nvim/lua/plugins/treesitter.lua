@@ -23,6 +23,7 @@ return {
         "markdown",
         "markdown_inline",
         "typescript",
+        "javascript",
         "graphql",
         "prisma",
         "kotlin",
