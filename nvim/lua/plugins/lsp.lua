@@ -32,7 +32,8 @@ local servers = {
     },
   },
   rust_analyzer = {},
-  tsserver = {},
+  -- ts_ls = {},
+  -- tsserver = {},
   lua_ls = {
     settings = {
       Lua = {
@@ -118,7 +119,8 @@ return {
     },
     opts = {
       ensure_installed = vim.tbl_filter(function(name)
-        return name ~= "tsserver"
+        return true
+        -- return name ~= "tsserver"
       end, vim.tbl_keys(servers)),
     },
     config = function(_, opts)
@@ -155,6 +157,34 @@ return {
         end,
       })
     end,
+  },
+
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    opts = {
+      on_attach = on_attach,
+      settings = {
+        tsserver_file_preferences = {
+          importModuleSpecifierPreference = "non-relative",
+        },
+      },
+      handlers = {
+        ["textDocument/definition"] = function(_, result, ctx, config)
+          -- If there are 2 results that are defined next to each other then use the first one
+          local line_diff_limit = 20
+          if #result == 2 then
+            local line1 = result[1].targetSelectionRange.start.line
+            local line2 = result[2].targetSelectionRange.start.line
+            if line2 - line1 < line_diff_limit and result[1].targetUri == result[2].targetUri then
+              result = result[1]
+            end
+          end
+
+          return vim.lsp.handlers["textDocument/definition"](nil, result, ctx, config)
+        end,
+      },
+    },
   },
 
   -- LSP Diagnostics
@@ -318,7 +348,7 @@ return {
     opts = {
       format_on_save = function(bufnr)
         -- Disable autoformat on certain filetypes
-        local ignore_filetypes = { "sql", "java" }
+        local ignore_filetypes = { "sql", "java", "json", "jsonc" }
         if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
           return
         end
@@ -334,6 +364,11 @@ return {
           return
         end
 
+        local no_lsp = { "css", "json" }
+        if vim.tbl_contains(no_lsp, vim.bo[bufnr].filetype) then
+          return { timeout_ms = 500, lsp_format = "never" }
+        end
+
         return { timeout_ms = 500, lsp_format = "fallback" }
       end,
       formatters_by_ft = {
@@ -344,6 +379,7 @@ return {
         yaml = { "prettierd", "prettier", stop_after_first = true },
         javascript = { "prettierd", "prettier", stop_after_first = true },
         typescript = { "prettierd", "prettier", stop_after_first = true },
+        css = { "prettierd", "prettier", stop_after_first = true },
       },
     },
     config = function(_, opts)

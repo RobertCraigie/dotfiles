@@ -9,6 +9,7 @@ confirm-close-surface = false
 
 macos-titlebar-style = tabs
 
+font-family = Berkeley Mono
 font-feature = -calt
 
 # window-decoration = none

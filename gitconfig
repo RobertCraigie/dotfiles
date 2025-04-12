@@ -1,22 +1,29 @@
 [user]
-	name = Robert Craigie
 	email = robert@craigie.dev
-	signingkey = 06D901800DF80979
-[gpg]
-	program = gpg
-[commit]
-	gpgsign = true
-[init]
-	defaultBranch = main
-[url "https://github.com/"]
-	insteadOf = git@github.com:
+	name = Robert Craigie
 [credential]
-	helper = 
-	helper = /usr/local/share/gcm-core/git-credential-manager-core
+	helper = /usr/local/share/gcm-core/git-credential-manager
 [credential "https://dev.azure.com"]
 	useHttpPath = true
+[core]
+	excludesfile = /Users/robert/.gitignore
+	pager = delta --dark
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+[rerere]
+	enabled = true
+[credential "https://github.com"]
+	username = RobertCraigie
 [push]
 	autoSetupRemote = true
 
 [alias]
-	prcreate = "!sh -c 'git push origin $@ && gh pr create --fill --draft --head \"$1\"'"
+	prcreate = "!sh -c 'git push origin $@ && gh pr create --fill --draft --template=~/stainless/stainless/.github/PULL_REQUEST_TEMPLATE.md --head \"$1\"'"
+[diff]
+	tool = smerge
+[difftool "smerge"]
+	cmd = smerge difftool \"$LOCAL\" \"$REMOTE\"
+[interactive]
+	diffFilter = delta --color-only
+[cinnabar]
+	version-check = 1740943618

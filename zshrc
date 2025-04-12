@@ -89,6 +89,8 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -115,12 +117,15 @@ fi
 
 HOMEBREW_NO_AUTO_UPDATE=1
 
-
-eval "$(pyenv init -)"
-
- export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  && \. "$NVM_DIR/nvm.sh"
+# export NVM_DIR="$HOME/.nvm"
+#   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+#   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+# alias nvm="$NVM_DIR/nvm-exec"
+# alias nvm="$NVM_DIR/nvm.sh"
 
 setopt EXTENDED_HISTORY
 setopt HIST_EXPIRE_DUPS_FIRST
@@ -133,6 +138,7 @@ setopt HIST_BEEP
 setopt globdots
 
 export PATH="$HOME/.poetry/bin:$PATH"
+export PATH="$NVM_DIR:$PATH"
 export PATH="$PATH:/opt/homebrew/opt/capstone/lib"
 export PIP_REQUIRE_VIRTUALENV=true
 export PATH="/opt/homebrew/opt/libxslt/bin:$PATH"
@@ -141,19 +147,16 @@ export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 export PATH="/Users/robert/Library/Python/3.9/bin:$PATH"
 export PATH="/Users/robert/bin:$PATH"
 export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/ruby@3.1/lib"
+# export LDFLAGS="-L/opt/homebrew/opt/ruby@3.1/lib"
 
 # pnpm
+alias p=pnpm
 export PNPM_HOME="/Users/robert/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-
-alias p=pnpm
 # pnpm end
-
-eval "$(rbenv init - zsh)"
 
 # pdm
 export PATH=/Users/robert/Library/Python/3.10/bin:$PATH
@@ -217,7 +220,7 @@ source <(fzf --zsh)
 
 source ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab/fzf-tab.plugin.zsh
 
-source <(jj util completion zsh)
+# source <(jj util completion zsh)
 
 if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
   autoload -Uz -- "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
@@ -281,3 +284,8 @@ clone() {
 
 # # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH"
+export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH"

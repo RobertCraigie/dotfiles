@@ -11,6 +11,11 @@
       create: true
       relink: false
       force: false
+    ~/.nvmrc:
+      path: nvmrc
+      create: true
+      relink: false
+      force: false
     ~/.config/zellij/:
       path: zellij
       create: true
@@ -59,6 +64,11 @@
     ~/.wezterm.lua:
       path: wezterm.lua
       create: false
+      relink: false
+      force: false
+    ~/.config/glide:
+      path: glide
+      create: true
       relink: false
       force: false
     ~/.config/wezterm/wezterm_utils.lua:
