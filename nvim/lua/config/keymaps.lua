@@ -1,3 +1,5 @@
+vim.keymap.set("n", ";", ":")
+
 -- Motions
 vim.keymap.set("i", "jj", "<Esc>", { noremap = true })
 
