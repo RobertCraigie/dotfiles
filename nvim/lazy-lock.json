@@ -12,7 +12,6 @@
   "grug-far.nvim": { "branch": "main", "commit": "b7c2b28e49d55ff71cd9bb3ad19a2021316510d8" },
   "hydra.nvim": { "branch": "master", "commit": "3ced42c0b6a6c85583ff0f221635a7f4c1ab0dd0" },
   "indent-blankline.nvim": { "branch": "master", "commit": "3af6493bf69e4a857a8b1fab36f333629d413a18" },
-  "jinja.vim": { "branch": "master", "commit": "d112541c062122969c6c0bc3df7e3cab3595c253" },
   "lazy.nvim": { "branch": "main", "commit": "6c3bda4aca61a13a9c63f1c1d1b16b9d3be90d7a" },
   "lazydev.nvim": { "branch": "main", "commit": "491452cf1ca6f029e90ad0d0368848fac717c6d2" },
   "leap.nvim": { "branch": "main", "commit": "346a16ef942635a8ca5ff92e603d07e7e8be6cbe" },
