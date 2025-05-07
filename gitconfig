@@ -1,6 +1,7 @@
 [user]
 	email = robert@craigie.dev
 	name = Robert Craigie
+	signingkey = 37AC7132F25857D1
 [credential]
 	helper = /usr/local/share/gcm-core/git-credential-manager
 [credential "https://dev.azure.com"]
@@ -26,4 +27,8 @@
 [interactive]
 	diffFilter = delta --color-only
 [cinnabar]
-	version-check = 1740943618
+	version-check = 1745806577
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
