@@ -37,3 +37,7 @@ vim.keymap.set("n", "<leader>P", '"+P') -- paste before cursor
 vim.keymap.set("n", "<leader>cp", function()
   vim.fn.setreg("+", vim.fn.expand("%:p"))
 end, { desc = "Yank file path to clipboard" })
+
+vim.keymap.set("n", "<leader>cP", function()
+  vim.fn.setreg("+", vim.fn.expand("%"))
+end, { desc = "Yank relative file path to clipboard" })
