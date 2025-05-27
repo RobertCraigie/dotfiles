@@ -12,5 +12,8 @@ macos-titlebar-style = tabs
 font-family = Berkeley Mono
 font-feature = -calt
 
+# https://github.com/ghostty-org/ghostty/issues/1409
+window-vsync = true
+
 # window-decoration = none
 # macos-titlebar-style = hidden
