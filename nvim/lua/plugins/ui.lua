@@ -1,4 +1,61 @@
+local M = {
+  ---@type snacks.win
+  claude_terminal = nil,
+
+  ---@type snacks.win
+  lazygit_terminal = nil,
+}
+
 return {
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    ---@type snacks.Config
+    opts = {
+      lazygit = {},
+      terminal = { enabled = true },
+    },
+    keys = {
+      -- manage terminals
+      {
+        "<c-;>",
+        function()
+          -- if the claude or lazygit terminals are active, close them first
+          --
+          -- invariant is that only one can be active at any time
+          if M.claude_terminal ~= nil and not M.claude_terminal.closed then
+            M.claude_terminal:toggle()
+          elseif M.lazygit_terminal ~= nil and not M.lazygit_terminal.closed then
+            M.lazygit_terminal:toggle()
+          else
+            Snacks.terminal.toggle()
+          end
+        end,
+        desc = "Toggle Terminal",
+        mode = { 't', 'n' }
+      },
+
+      -- lazygit
+      {
+        "<leader>gg",
+        function()
+          M.lazygit_terminal, _ = Snacks.lazygit()
+        end,
+        desc = "Lazygit"
+      },
+
+      -- claude
+      {
+        "<leader>cc",
+        function()
+          M.claude_terminal, _ = Snacks.terminal({ "claude" })
+        end,
+        desc = "Lazygit"
+      },
+    }
+  },
+
   {
     "stevearc/oil.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -99,11 +156,11 @@ return {
       },
       -- you can enable a preset for easier configuration
       presets = {
-        bottom_search = false, -- use a classic bottom cmdline for search
-        command_palette = true, -- position the cmdline and popupmenu together
+        bottom_search = false,        -- use a classic bottom cmdline for search
+        command_palette = true,       -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
-        inc_rename = false, -- enables an input dialog for inc-rename.nvim
-        lsp_doc_border = true, -- add a border to hover docs and signature help
+        inc_rename = false,           -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = true,        -- add a border to hover docs and signature help
       },
     },
   },
