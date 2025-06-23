@@ -13,8 +13,27 @@ return {
     lazy = false,
     ---@type snacks.Config
     opts = {
-      lazygit = {},
-      terminal = { enabled = true },
+      styles = {
+        float = {
+          border = "rounded",
+          width = 0.8, -- percentage of screen
+          height = 0.8,
+          wo = {
+            winblend = 10,
+          },
+        },
+      },
+      lazygit = {
+        win = {
+          border = "none",
+        }
+      },
+      terminal = {
+        enabled = true,
+        win = {
+          position = "float",
+        }
+      },
     },
     keys = {
       -- manage terminals
