@@ -21,7 +21,7 @@
       create: true
       relink: false
       force: false
-    ~/.config/ghostty/:
+    ~/Library/Application Support/com.mitchellh.ghostty:
       path: ghostty
       create: true
       relink: false
