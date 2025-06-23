@@ -27,7 +27,7 @@
 [interactive]
 	diffFilter = delta --color-only
 [cinnabar]
-	version-check = 1745806577
+	version-check = 1747696892
 [commit]
 	gpgsign = true
 [tag]
