@@ -67,7 +67,14 @@ return {
         function()
           M.claude_terminal, _ = Snacks.terminal({ "claude" })
         end,
-        desc = "Lazygit"
+        desc = "Claude"
+      },
+      {
+        "<leader>ca",
+        function()
+          M.claude_terminal, _ = Snacks.terminal({ "claude", "--dangerously-skip-permissions" })
+        end,
+        desc = "Claude with all the permissions"
       },
     }
   },
