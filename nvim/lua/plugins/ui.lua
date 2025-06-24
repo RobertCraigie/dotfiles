@@ -18,9 +18,6 @@ return {
           border = "rounded",
           width = 0.8, -- percentage of screen
           height = 0.8,
-          wo = {
-            winblend = 10,
-          },
         },
       },
       lazygit = {
