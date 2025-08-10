@@ -117,9 +117,6 @@ fi
 
 HOMEBREW_NO_AUTO_UPDATE=1
 
-export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  && \. "$NVM_DIR/nvm.sh"
 # export NVM_DIR="$HOME/.nvm"
 #   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
 #   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
@@ -137,16 +134,6 @@ setopt HIST_SAVE_NO_DUPS
 setopt HIST_BEEP
 setopt globdots
 
-export PATH="$HOME/.poetry/bin:$PATH"
-export PATH="$NVM_DIR:$PATH"
-export PATH="$PATH:/opt/homebrew/opt/capstone/lib"
-export PIP_REQUIRE_VIRTUALENV=true
-export PATH="/opt/homebrew/opt/libxslt/bin:$PATH"
-export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/capstone/5.0.3/lib
-export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
-export PATH="/Users/robert/Library/Python/3.9/bin:$PATH"
-export PATH="/Users/robert/bin:$PATH"
-export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH"
 # export LDFLAGS="-L/opt/homebrew/opt/ruby@3.1/lib"
 
 # pnpm
@@ -158,13 +145,6 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-# pdm
-export PATH=/Users/robert/Library/Python/3.10/bin:$PATH
-
-export PATH=/Users/robert/.local/bin:$PATH
-
-export PATH=/Users/robert/.local/share/bob/nvim-bin:$PATH
-
 # vim mode
 bindkey -v
 
@@ -173,10 +153,6 @@ go_cover () {
     t="/tmp/go-cover.$$.tmp"
     go test -coverprofile=$t $@ && go tool cover -html=$t
 }
-
-export GOPATH=~/go
-export GOBIN=$GOPATH/bin
-export PATH=$PATH:$GOBIN
 
 # quiet logs
 # https://github.com/direnv/direnv/issues/203
@@ -188,9 +164,6 @@ export PATH="$DENO_INSTALL/bin:$PATH"
 
 # bun completions
 [ -s "/Users/robert/.bun/_bun" ] && source "/Users/robert/.bun/_bun"
-
-# add wezterm CLI
-export PATH="$PATH:/Applications/WezTerm.app/Contents/MacOS"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
@@ -207,10 +180,6 @@ export PATH="$PATH:$HOME/.config/composer/vendor/bin"
 
 # opam configuration
 [[ ! -r /Users/robert/.opam/opam-init/init.zsh ]] || source /Users/robert/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
-
-source "$HOME/.rye/env"
-
-export PATH="$HOME/.rye/shims:$PATH"
 
 . "$HOME/.atuin/bin/env"
 
@@ -289,3 +258,10 @@ export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH"
 export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH"
+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+export PATH="/opt/homebrew/opt/php@8.3/bin:$PATH"
+export PATH="/opt/homebrew/opt/php@8.3/sbin:$PATH"
+export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"
+export PATH="/opt/homebrew/opt/dotnet@8/bin:$PATH"
+
+export PATH=$PATH:/Users/robert/.spicetify
