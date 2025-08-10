@@ -53,7 +53,6 @@ return {
     },
     config = function()
       require("leap").add_default_mappings()
-      vim.keymap.del("v", "x") -- annoyingly overrides a builtin mapping
     end,
   },
 

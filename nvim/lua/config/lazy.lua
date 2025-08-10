@@ -24,9 +24,6 @@ require("config.keymaps")
 require("config.groups")
 require("config.files")
 
--- TODO: move local plugins to proper structure so this isn't needed
-require("config.local")
-
 require("lazy").setup({
   spec = {
     { import = "plugins" },
