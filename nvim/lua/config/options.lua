@@ -29,3 +29,6 @@ vim.o.termguicolors = true
 -- Make line numbers default
 vim.wo.number = true
 vim.o.relativenumber = true
+
+-- project local config
+vim.opt.exrc = true
