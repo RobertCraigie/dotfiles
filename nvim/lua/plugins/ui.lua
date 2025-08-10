@@ -153,6 +153,7 @@ return {
           lualine_a = { "mode" },
           lualine_b = { "diagnostics" },
           lualine_c = { "%f" },
+          lualine_x = { terminal_status },
         },
         inactive_sections = {
           lualine_c = { "%f" },
