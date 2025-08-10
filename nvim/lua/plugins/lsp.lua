@@ -91,6 +91,91 @@ if vim.env.DEBUG_LSP then
   vim.lsp.set_log_level(vim.log.levels.DEBUG)
 end
 
+local function create_html_snippets()
+  local luasnip = require("luasnip")
+  local s = luasnip.snippet
+  local t = luasnip.text_node
+  local i = luasnip.insert_node
+
+  local html_elements = {
+    -- Structure
+    "html", "head", "body", "div", "span", "header", "footer", "main", "nav",
+    "section", "article", "aside", "details", "summary", "dialog",
+
+    -- Text content
+    "h1", "h2", "h3", "h4", "h5", "h6", "p", "blockquote", "pre", "code",
+    "em", "strong", "small", "mark", "del", "ins", "sub", "sup", "cite",
+    "q", "abbr", "time", "var", "samp", "kbd", "bdi", "bdo", "ruby", "rt", "rp",
+
+    -- Lists
+    "ul", "ol", "li", "dl", "dt", "dd", "menu",
+
+    -- Tables
+    "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
+
+    -- Forms
+    "form", "input", "textarea", "button", "select", "option", "optgroup",
+    "label", "fieldset", "legend", "datalist", "output", "progress", "meter",
+
+    -- Media
+    "img", "audio", "video", "source", "track", "picture", "figure", "figcaption",
+    "canvas", "svg", "math",
+
+    -- Embedded content
+    "iframe", "embed", "object", "param",
+
+    -- Interactive
+    "a", "button", "details", "summary",
+
+    -- Semantic
+    "address", "main", "search",
+
+    -- Head
+    "script", "meta", "link", "title",
+
+    -- Other
+    "br", "hr", "wbr", "data", "template", "slot",
+
+    -- custom
+    "highlight",
+  }
+
+  local snippets = {}
+
+  local self_closing = {
+    br = true,
+    hr = true,
+    img = true,
+    input = true,
+    col = true,
+    wbr = true,
+    meta = true,
+    link = true,
+    source = true,
+    track = true,
+    embed = true,
+    param = true
+  }
+
+  for _, element in ipairs(html_elements) do
+    if self_closing[element] then
+      table.insert(snippets, s("<" .. element, {
+        t("<" .. element .. " "),
+        i(1),
+        t("/>"),
+      }))
+    else
+      table.insert(snippets, s("<" .. element, {
+        t("<" .. element .. ">"),
+        i(1),
+        t("</" .. element .. ">"),
+      }))
+    end
+  end
+
+  return snippets
+end
+
 return {
   -- Tools
   {
@@ -250,6 +335,7 @@ return {
           luasnip.text_node(">>= fun () ->"),
         }),
       })
+      luasnip.add_snippets('html', create_html_snippets())
 
       cmp.setup({
         snippet = {
