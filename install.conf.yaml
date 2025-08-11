@@ -11,6 +11,11 @@
       create: true
       relink: false
       force: false
+    ~/.config/kitty:
+      path: kitty
+      create: true
+      relink: false
+      force: false
     ~/.nvmrc:
       path: nvmrc
       create: true
