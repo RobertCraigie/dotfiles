@@ -32,3 +32,6 @@ vim.o.relativenumber = true
 
 -- project local config
 vim.opt.exrc = true
+
+-- reduce scrollback count for improved perf
+vim.o.scrollback = 1000
