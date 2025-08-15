@@ -6,6 +6,8 @@ local M = {
   lazygit_terminal = nil,
 }
 
+local terminal_opts = {}
+
 return {
   {
     "dmtrKovalenko/fff.nvim",
@@ -60,7 +62,7 @@ return {
           elseif M.lazygit_terminal ~= nil and not M.lazygit_terminal.closed then
             M.lazygit_terminal:toggle()
           else
-            Snacks.terminal.toggle()
+            Snacks.terminal.toggle(vim.o.shell, terminal_opts)
           end
         end,
         desc = "Toggle Terminal",
@@ -71,7 +73,7 @@ return {
       {
         "<leader>gg",
         function()
-          M.lazygit_terminal, _ = Snacks.lazygit()
+          M.lazygit_terminal, _ = Snacks.lazygit(terminal_opts)
         end,
         desc = "Lazygit"
       },
@@ -80,14 +82,14 @@ return {
       {
         "<leader>cc",
         function()
-          M.claude_terminal, _ = Snacks.terminal({ "claude" })
+          M.claude_terminal, _ = Snacks.terminal({ "claude" }, terminal_opts)
         end,
         desc = "Claude"
       },
       {
         "<leader>ca",
         function()
-          M.claude_terminal, _ = Snacks.terminal({ "claude", "--dangerously-skip-permissions" })
+          M.claude_terminal, _ = Snacks.terminal({ "claude", "--dangerously-skip-permissions" }, terminal_opts)
         end,
         desc = "Claude with all the permissions"
       },
