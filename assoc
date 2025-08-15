@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# update all "open in editor" functionality to use my custom app that forwards to the terminal
+
+duti -s com.apple.automator.Editor .ts all
+duti -s com.apple.automator.Editor .tsx all
+duti -s com.apple.automator.Editor .js all
+duti -s com.apple.automator.Editor .jsx all
+duti -s com.apple.automator.Editor .json all
+duti -s com.apple.automator.Editor .md all
+duti -s com.apple.automator.Editor .yml all
+duti -s com.apple.automator.Editor .yaml all
+duti -s com.apple.automator.Editor .py all
+duti -s com.apple.automator.Editor .css all
+duti -s com.apple.automator.Editor .toml all
+duti -s com.apple.automator.Editor .ini all
+duti -s com.apple.automator.Editor .sh all
+
+duti -s com.apple.automator.Editor public.plain-text all
+duti -s com.apple.automator.Editor public.source-code all
+duti -s com.apple.automator.Editor public.shell-script all
+duti -s com.apple.automator.Editor public.json all
