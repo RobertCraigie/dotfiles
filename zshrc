@@ -136,6 +136,9 @@ setopt globdots
 
 # export LDFLAGS="-L/opt/homebrew/opt/ruby@3.1/lib"
 
+alias gg=lazygit
+alias n=nvim
+
 # pnpm
 alias p=pnpm
 export PNPM_HOME="/Users/robert/Library/pnpm"
