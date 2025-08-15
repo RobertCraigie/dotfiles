@@ -61,6 +61,8 @@ return {
     "Aasim-A/scrollEOF.nvim",
     opts = {
       pattern = "*",
+      disabled_filetypes = { "terminal" },
+      disabled_modes = { "t" },
     },
     config = function(_, opts)
       vim.o.scrolloff = 10
