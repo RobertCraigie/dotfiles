@@ -1,5 +1,13 @@
+local Util = require("config.util.lsp")
+
 local servers = {
   pyright = {
+    before_init = function(_, config)
+      config.settings = config.settings or {}
+      config.settings.python = config.settings.python or {}
+      config.settings.python.pythonPath = Util.get_python_path(config.root_dir)
+    end,
+
     handlers = {
       ["textDocument/publishDiagnostics"] = function(_, result, ctx, config)
         result.diagnostics = vim.tbl_filter(function(diagnostic)
@@ -17,10 +25,44 @@ local servers = {
 
         return vim.lsp.handlers["textDocument/publishDiagnostics"](nil, result, ctx, config)
       end,
+
+      -- Override the default rename handler to remove the `annotationId` from edits.
+      --
+      -- Pyright is being non-compliant here by returning `annotationId` in the edits, but not
+      -- populating the `changeAnnotations` field in the `WorkspaceEdit`. This causes Neovim to
+      -- throw an error when applying the workspace edit.
+      --
+      -- See:
+      -- - https://github.com/neovim/neovim/issues/34731
+      -- - https://github.com/microsoft/pyright/issues/10671
+      [vim.lsp.protocol.Methods.textDocument_rename] = function(err, result, ctx)
+        if err then
+          vim.notify('Pyright rename failed: ' .. err.message, vim.log.levels.ERROR)
+          return
+        end
+
+        ---@cast result lsp.WorkspaceEdit
+        for _, change in ipairs(result.documentChanges or {}) do
+          for _, edit in ipairs(change.edits or {}) do
+            if edit.annotationId then
+              edit.annotationId = nil
+            end
+          end
+        end
+
+        local client = assert(vim.lsp.get_client_by_id(ctx.client_id))
+        vim.lsp.util.apply_workspace_edit(result, client.offset_encoding)
+      end,
     },
   },
   ruff = {},
   clangd = {},
+  },
+  jsonls = {
+    settings = {
+      doValidation = false,
+    }
+  },
   gopls = {},
   yamlls = {
     settings = {
@@ -45,46 +87,6 @@ local servers = {
     },
   },
 }
-
-local on_attach = function(client, bufnr)
-  -- In this case, we create a function that lets us more easily define mappings specific
-  -- for LSP related items. It sets the mode, buffer and description for us each time.
-  local nmap = function(keys, func, desc)
-    if desc then
-      desc = "LSP: " .. desc
-    end
-
-    vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
-  end
-
-  nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-  nmap("<leader>Ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-
-  nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
-  nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-  nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-  nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
-  nmap("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-  nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
-
-  -- See `:help K` for why this keymap
-  nmap("K", vim.lsp.buf.hover, "Hover Documentation")
-  nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
-
-  -- Lesser used LSP functionality
-  nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-  nmap("<leader>wa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
-  nmap("<leader>wr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
-  nmap("<leader>wl", function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, "[W]orkspace [L]ist Folders")
-
-  -- Disable diagnostics for Jinja2 files as they won't be useful
-  local filetype = vim.bo.filetype
-  if string.match(filetype, ".jinja") then
-    vim.diagnostic.disable(bufnr)
-  end
-end
 
 if vim.env.DEBUG_LSP then
   vim.lsp.set_log_level(vim.log.levels.DEBUG)
@@ -212,34 +214,23 @@ return {
 
       local mason_lspconfig = require("mason-lspconfig")
       mason_lspconfig.setup(opts)
-      mason_lspconfig.setup_handlers({
-        function(server_name)
-          -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-          local capabilities = vim.lsp.protocol.make_client_capabilities()
-          capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
-          capabilities.textDocument.foldingRange = {
-            dynamigRegistration = false,
-            lineFoldingOnly = true,
-          }
 
-          local default_config = {
-            capabilities = capabilities,
-            on_attach = on_attach,
-            before_init = function(_, config)
-              local Util = require("config.util.lsp")
+      -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+      capabilities.textDocument.foldingRange = {
+        dynamigRegistration = false,
+        lineFoldingOnly = true,
+      }
 
-              if server_name == "pyright" then
-                -- tell Pyright to use the right python binary
-                config.settings.python.pythonPath = Util.get_python_path(config.root_dir)
-              end
-            end,
-          }
+      local defaults = {
+        capabilities = capabilities,
+        on_attach = Util.on_attach,
+      }
 
-          local merged = vim.tbl_deep_extend("force", {}, default_config, servers[server_name] or {})
-
-          require("lspconfig")[server_name].setup(merged)
-        end,
-      })
+      for name, conf in pairs(servers) do
+        vim.lsp.config(name, vim.tbl_deep_extend("force", {}, defaults, conf))
+      end
     end,
   },
 
@@ -405,7 +396,7 @@ return {
     opts = {
       format_on_save = function(bufnr)
         -- Disable autoformat on certain filetypes
-        local ignore_filetypes = { "sql", "java", "json", "jsonc" }
+        local ignore_filetypes = { "sql", "java", "json" }
         if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
           return
         end
@@ -421,7 +412,7 @@ return {
           return
         end
 
-        local no_lsp = { "css", "json" }
+        local no_lsp = { "css", "json", "javascript", "typescript" }
         if vim.tbl_contains(no_lsp, vim.bo[bufnr].filetype) then
           return { timeout_ms = 500, lsp_format = "never" }
         end
@@ -439,6 +430,10 @@ return {
         css = { "prettierd", "prettier", stop_after_first = true },
       },
     },
+    keys = {
+      { "<leader>ff", "<cmd>FormatBuf<cr>", desc = "Conform - Format buf" },
+    },
+    lazy = false,
     config = function(_, opts)
       require("conform").setup(opts)
 
