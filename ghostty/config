@@ -17,3 +17,6 @@ window-vsync = true
 
 # window-decoration = none
 # macos-titlebar-style = hidden
+keybind = shift+enter=text:\n
+keybind = ctrl+tab=unbind
+keybind = ctrl+shift+tab=unbind
