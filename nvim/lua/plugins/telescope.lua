@@ -14,13 +14,6 @@ return {
   cmd = "Telescope",
   keys = {
     {
-      "<leader>sf",
-      function()
-        require("telescope.builtin").find_files({ hidden = true })
-      end,
-      desc = "[S]earch [F]iles",
-    },
-    {
       "<leader>sh",
       function()
         require("telescope.builtin").help_tags()

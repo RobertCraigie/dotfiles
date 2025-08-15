@@ -8,6 +8,21 @@ local M = {
 
 return {
   {
+    "dmtrKovalenko/fff.nvim",
+    build = "cargo build --release",
+    opts = {},
+    keys = {
+      {
+        "ff",
+        function()
+          require("fff").find_files()
+        end,
+        desc = "Open file picker",
+      },
+    },
+  },
+
+  {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
