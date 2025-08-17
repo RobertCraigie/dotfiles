@@ -293,7 +293,21 @@ return {
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
-    opts = {}
+    opts = {},
+    config = function(_, opts)
+      require("render-markdown").setup(opts)
+
+      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+        pattern = "*.md",
+        callback = function()
+          vim.cmd([[RenderMarkdown buf_disable]])
+
+          vim.keymap.set("n", "<leader>p", function()
+            vim.cmd([[RenderMarkdown buf_toggle]])
+          end, { buffer = true })
+        end,
+      })
+    end
   },
 
   -- LSP Diagnostics
