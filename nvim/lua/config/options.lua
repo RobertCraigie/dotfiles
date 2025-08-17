@@ -35,3 +35,6 @@ vim.opt.exrc = true
 
 -- reduce scrollback count for improved perf
 vim.o.scrollback = 1000
+
+-- rounded border for every floating window
+vim.o.winborder = "rounded"
