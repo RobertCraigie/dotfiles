@@ -353,6 +353,9 @@ return {
     config = function()
       local cmp = require("cmp")
       local luasnip = require("luasnip")
+      local s = luasnip.snippet
+      local f = luasnip.function_node
+      local i = luasnip.insert_node
 
       luasnip.add_snippets("ocaml", {
         luasnip.snippet(">>*", {
@@ -360,6 +363,33 @@ return {
         }),
       })
       luasnip.add_snippets('html', create_html_snippets())
+
+      -- Expands "TypeV" to "TypeVar('<LHS>')" based on the name to the left of "=".
+      local function typevar_from_line()
+        local line   = vim.api.nvim_get_current_line()
+        local col    = (vim.api.nvim_win_get_cursor(0) or { 1, #line })[2] + 1
+        local to_cur = line:sub(1, col)
+
+        -- Try to get the name to the left of "="
+        local lhs    = to_cur:match("([%a_][%w_]*)%s*=%s*[^=\n]*$") -- typical: Foo = TypeV
+            or line:match("^%s*([%a_][%w_]*)%s*=")                  -- fallback: start of line
+            or "T"
+        return ("TypeVar('%s')"):format(lhs)
+      end
+
+      luasnip.add_snippets('python', {
+        s(
+          {
+            trig = "TypeV",
+            wordTrig = false,
+            desc = "… -> TypeVar('<LHS>')",
+            show_condition = function(line_to_cursor)
+              return line_to_cursor:match("%f[%w_]TypeV.*") ~= nil
+            end,
+          },
+          { f(typevar_from_line), i(0) }
+        ),
+      })
 
       cmp.setup({
         snippet = {
