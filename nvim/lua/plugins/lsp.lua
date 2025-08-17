@@ -56,7 +56,8 @@ local servers = {
     },
   },
   ruff = {},
-  clangd = {},
+  clangd = {
+    cmd = { vim.fn.expand("~/.mozbuild/clang/bin/clangd") },
   },
   jsonls = {
     settings = {
@@ -234,6 +235,67 @@ return {
     end,
   },
 
+  -- fix the terrible errors
+  {
+    "youyoumu/pretty-ts-errors.nvim",
+    lazy = false,
+    dir = "~/github.com/youyoumu/pretty-ts-errors.nvim",
+    opts = {
+      auto_open = false,
+    },
+    config = function(_, opts)
+      require('pretty-ts-errors').setup(opts)
+
+      local win_opts = {
+        lazy_window = true,
+      }
+
+      vim.keymap.set('n', '<leader>te',
+        function() require('pretty-ts-errors').show_formatted_error(win_opts) end,
+        { desc = "Show TS error" })
+
+      vim.keymap.set('n', '<leader>tE', function() require('pretty-ts-errors').open_all_errors() end,
+        { desc = "Show all TS errors" })
+
+      vim.keymap.set('n', '<leader>tt', function() require('pretty-ts-errors').toggle_auto_open() end,
+        { desc = "Toggle TS error auto-display" })
+
+
+      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+        pattern = { "*.ts", "*.tsx", "*.mts", "*.cts", "*.js", "*.jsx", "*.mjs", "*.cjs" },
+        callback = function()
+          local pretty = require('pretty-ts-errors')
+          vim.keymap.set('n', '<leader>e', function() pretty.show_formatted_error(win_opts) end,
+            { buffer = true, desc = "Show TS error" })
+
+          -- overrides of the go-to-diagnostic keymaps that use the prettier view
+          --
+          vim.keymap.set("n", "[d", function()
+            vim.diagnostic.jump({ count = -1, float = false })
+            vim.schedule(function()
+              require('pretty-ts-errors').show_formatted_error(win_opts)
+            end)
+          end, { buffer = true })
+
+          vim.keymap.set("n", "]d", function()
+            vim.diagnostic.jump({ count = 1, float = false })
+            vim.schedule(function()
+              require('pretty-ts-errors').show_formatted_error(win_opts)
+            end)
+          end, { buffer = true })
+        end,
+      })
+    end
+  },
+
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {}
+  },
+
   -- LSP Diagnostics
   {
     "folke/trouble.nvim",
@@ -335,6 +397,7 @@ return {
         sources = {
           { name = "nvim_lsp" },
           { name = "luasnip" },
+          { name = "render-markdown" },
         },
         sorting = {
           priority_weight = 2,
