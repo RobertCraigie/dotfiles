@@ -48,3 +48,5 @@ end, { desc = "Yank file path to clipboard" })
 vim.keymap.set("n", "<leader>cP", function()
   vim.fn.setreg("+", vim.fn.expand("%"))
 end, { desc = "Yank relative file path to clipboard" })
+
+vim.keymap.set("n", "<C-h>", "<C-6>", { desc = "Alternative to <C-6>" })
