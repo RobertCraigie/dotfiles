@@ -188,6 +188,18 @@ return {
     },
   },
 
+  {
+    "stainless",
+    dir = "~/stainless/stainless/editors/nvim",
+    config = function()
+      require("stainless")
+
+      vim.lsp.config("stainless",
+        vim.tbl_extend("force", vim.lsp.config["stainless"], { on_attach = Util.on_attach })
+      )
+    end
+  },
+
   -- Additional lua configuration, makes nvim stuff amazing
   {
     "folke/lazydev.nvim",
