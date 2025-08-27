@@ -62,7 +62,7 @@ return {
     opts = {
       pattern = "*",
       disabled_filetypes = { "terminal" },
-      disabled_modes = { "t" },
+      disabled_modes = { "t", "nt", "vt" },
     },
     config = function(_, opts)
       vim.o.scrolloff = 10
