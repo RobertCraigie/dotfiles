@@ -3,6 +3,8 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.o.swapfile = false
+
 -- Enable mouse mode
 vim.o.mouse = "a"
 
