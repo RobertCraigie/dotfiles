@@ -40,3 +40,12 @@ vim.o.scrollback = 1000
 
 -- rounded border for every floating window
 vim.o.winborder = "rounded"
+
+vim.filetype.add({
+  extension = {
+    prr = 'prr',
+  },
+  filename = {
+    ['.prr'] = 'prr',
+  },
+})
