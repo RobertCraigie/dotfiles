@@ -1,6 +1,7 @@
 local Util = require("config.util.lsp")
 
 local servers = {
+  ocamllsp = {},
   pyright = {
     before_init = function(_, config)
       config.settings = config.settings or {}
@@ -547,6 +548,7 @@ return {
         javascript = { "prettierd", "prettier", stop_after_first = true },
         typescript = { "prettierd", "prettier", stop_after_first = true },
         css = { "prettierd", "prettier", stop_after_first = true },
+        ocaml = { "ocamlformat" },
       },
     },
     keys = {
