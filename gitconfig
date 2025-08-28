@@ -17,6 +17,8 @@
 	username = RobertCraigie
 [push]
 	autoSetupRemote = true
+[fetch]
+	prune = true
 
 [alias]
 	prcreate = "!sh -c 'git push origin $@ && gh pr create --fill --draft --template=~/stainless/stainless/.github/PULL_REQUEST_TEMPLATE.md --head \"$1\"'"
