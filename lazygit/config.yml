@@ -5,9 +5,9 @@ git:
     pager: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"
 
 customCommands:
-  - key: 'F'
-    context: 'remotes'
-    description: 'Fetch + prune'
-    command: 'git fetch --prune {{.SelectedRemote.Name}}'
+  - key: "F"
+    context: "remotes"
+    description: "Fetch + prune"
+    command: "git fetch --prune {{.SelectedRemote.Name}}"
     output: log
-    loadingText: 'Fetching & pruning…'
+    loadingText: "Fetching & pruning…"
