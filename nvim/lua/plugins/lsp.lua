@@ -90,7 +90,7 @@ local servers = {
 }
 
 if vim.env.DEBUG_LSP then
-  vim.lsp.set_log_level(vim.log.levels.DEBUG)
+  vim.lsp.log.set_level(vim.log.levels.DEBUG)
 end
 
 local function create_html_snippets()
