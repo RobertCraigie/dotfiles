@@ -39,7 +39,20 @@ M.on_attach = function(client, bufnr)
   nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
   nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
   nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
-  nmap("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+
+  nmap("ds", function()
+    require("telescope.builtin").lsp_document_symbols()
+  end, "[D]ocument [S]ymbols")
+  nmap("gm", function()
+    require("telescope.builtin").lsp_document_symbols({ symbols = { 'method' } })
+  end, "[G]oto [m]ethod")
+  nmap("gc", function()
+    require("telescope.builtin").lsp_document_symbols({ symbols = { 'class' } })
+  end, "[G]oto [c]lass")
+  nmap("gf", function()
+    require("telescope.builtin").lsp_document_symbols({ symbols = { 'function' } })
+  end, "[G]oto [f]unction")
+
   nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
   -- See `:help K` for why this keymap
