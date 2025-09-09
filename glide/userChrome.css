@@ -1,0 +1,22 @@
+#TabsToolbar {
+  visibility: collapse;
+}
+
+#sidebar-header {
+  display: none;
+}
+
+* {
+  font-family: "Berkeley Mono" !important;
+}
+
+/* TODO */
+toolbarpaletteitem[place="toolbar"][id^="wrapper-customizableui-special-spring"],
+toolbarspring {
+  #nav-bar & {
+    flex: 20 20 !important;
+    /* Ensure flexible spacers don't shrink to nothing so they can be
+     * manipulated in customize mode. */
+    min-width: 10px;
+  }
+}

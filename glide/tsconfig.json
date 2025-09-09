@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "lib": ["DOM", "ES2022"],
+    "types": [
+      "./glide.d.ts"
+    ],
+    "target": "ES2024",
+    "module": "nodenext",
+    "moduleDetection": "force",
+    "allowJs": true,
+    "noEmit": true,
+    /**
+     * Recommended type checking rules.
+     *
+     * Feel free to modify these.
+     */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "skipLibCheck": true,
+    "noErrorTruncation": true,
+    "allowImportingTsExtensions": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  }
+}
