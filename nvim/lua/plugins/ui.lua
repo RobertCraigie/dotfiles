@@ -97,6 +97,22 @@ return {
   },
 
   {
+    "nvim-tree/nvim-web-devicons",
+    config = function()
+      require 'nvim-web-devicons'.setup {
+        override = {
+          -- for some reason this was broken
+          css = {
+            icon = "",
+            color = "#563d7c",
+            name = "Css"
+          }
+        }
+      }
+    end
+  },
+
+  {
     "stevearc/oil.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
