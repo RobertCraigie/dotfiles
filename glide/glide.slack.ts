@@ -22,4 +22,3 @@ function create_slack_summarize_deleter() {
       .forEach((element) => element.remove());
   }
 }
-

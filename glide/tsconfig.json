@@ -4,12 +4,10 @@
     "node_modules"
   ],
   "compilerOptions": {
-    "lib": ["DOM", "ES2022"],
-    "types": [
-      "./glide.d.ts"
-    ],
-    "target": "ES2024",
-    "module": "nodenext",
+    "lib": ["DOM", "DOM.Iterable", "DOM.AsyncIterable", "ESNext"],
+    "types": ["./glide.d.ts"],
+    "target": "esnext",
+    "module": "esnext",
     "moduleDetection": "force",
     "allowJs": true,
     "noEmit": true,
@@ -31,7 +29,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "skipLibCheck": true,
     "noErrorTruncation": true,
-    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true
   }

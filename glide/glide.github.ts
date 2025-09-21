@@ -1,35 +1,9 @@
 /// <reference path="./glide.d.ts" />
 
-const already_set = new Set<number>();
-glide.autocmds.create("UrlEnter", /github\.com\/$/, async ({ tab_id }) => {
-  if (already_set.has(tab_id)) {
-    return;
-  }
-
-  console.log(glide.ctx.url);
-  browser.tabs.insertCSS(tab_id, {
-    code: css`
-      .copilotPreview__suggestionButton,
-      .copilotPreview,
-      .copilotPreview__container,
-      #copilot-dashboard-entrypoint-textarea {
-        display: none !important;
-      }
-    `,
-  });
-
-  already_set.add(tab_id);
-});
-
-
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, ({ tab_id }) => {
   if (
-    !(
-      glide.ctx.url.includes("/pull/") ||
-      glide.ctx.url.includes("/commit/") ||
-      glide.ctx.url.includes("/commits/") ||
-      glide.ctx.url.includes("/compare/")
-    )
+    !(glide.ctx.url.includes("/pull/") || glide.ctx.url.includes("/commit/") || glide.ctx.url.includes("/commits/")
+      || glide.ctx.url.includes("/compare/"))
   ) {
     return;
   }
@@ -39,46 +13,35 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, ({ tab_id }) => {
   glide.content.execute(remove_bad_pulls_ci_button, { tab_id });
 });
 
-glide.autocmds.create(
-  "UrlEnter",
-  /https:\/\/github\.com\/.*\/.*\/pull\/.*/,
-  ({ tab_id }) => {
-    glide.buf.keymaps.set("normal", "<leader>yb", async () => {
-      await glide.content.execute(
-        () => {
-          const elements = document.querySelectorAll(".js-copy-branch");
-          for (const element of elements) {
-            if (
-              !element.checkVisibility({
-                contentVisibilityAuto: true,
-                opacityProperty: true,
-                visibilityProperty: true,
-                checkOpacity: true,
-                checkVisibilityCSS: true,
-              })
-            ) {
-              continue;
-            }
+glide.autocmds.create("UrlEnter", /https:\/\/github\.com\/.*\/.*\/pull\/.*/, ({ tab_id }) => {
+  glide.buf.keymaps.set("normal", "<leader>yb", async () => {
+    await glide.content.execute(() => {
+      const elements = document.querySelectorAll(".js-copy-branch");
+      for (const element of elements) {
+        if (
+          !element.checkVisibility({
+            contentVisibilityAuto: true,
+            opacityProperty: true,
+            visibilityProperty: true,
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          })
+        ) {
+          continue;
+        }
 
-            // ahhhhhhhhhhh, this doesn't work as it's blocked :((
-            (element as HTMLElement).click();
-            break;
-          }
-        },
-        { tab_id },
-      );
-      // glide.content.execute(create_marquee_for_truncated_paths, { tab_id });
-    });
-  },
-);
+        (element as HTMLElement).click();
+        break;
+      }
+    }, { tab_id });
+  });
+});
 
 function create_file_truncate_fixer() {
   fix_truncated_paths();
 
   const observer = new MutationObserver((mutations) => {
-    const has_new_nodes = mutations.some(
-      (mutation) => mutation.addedNodes.length > 0,
-    );
+    const has_new_nodes = mutations.some((mutation) => mutation.addedNodes.length > 0);
     if (has_new_nodes) {
       fix_truncated_paths();
     }
@@ -111,9 +74,7 @@ function create_marquee_for_truncated_paths() {
   add_marquee_to_paths();
 
   const observer = new MutationObserver((mutations) => {
-    const has_new_nodes = mutations.some(
-      (mutation) => mutation.addedNodes.length > 0,
-    );
+    const has_new_nodes = mutations.some((mutation) => mutation.addedNodes.length > 0);
     if (has_new_nodes) {
       add_marquee_to_paths();
     }
@@ -123,20 +84,18 @@ function create_marquee_for_truncated_paths() {
 
   function add_marquee_to_paths() {
     document
-      .querySelectorAll(
-        'summary[role="button"] a.text-mono.text-small.Link--primary.wb-break-all',
-      )
+      .querySelectorAll<HTMLElement>(`summary[role="button"] a.text-mono.text-small.Link--primary.wb-break-all`)
       .forEach((link) => {
-        const linkText = link.textContent;
-        if (!linkText || !linkText.startsWith("...")) {
+        const link_text = link.textContent;
+        if (!link_text || !link_text.startsWith("...")) {
           return;
         }
 
-        if (link.dataset.marqueeApplied) {
+        if (link.dataset["marquee-applied"]) {
           return;
         }
 
-        link.dataset.marqueeApplied = "true";
+        link.dataset["marquee-applied"] = "true";
 
         const wrapper = document.createElement("div");
         wrapper.style.overflow = "hidden";
@@ -148,7 +107,7 @@ function create_marquee_for_truncated_paths() {
         marquee.style.display = "inline-block";
         marquee.style.paddingLeft = "100%";
         marquee.style.animation = "marquee 15s linear infinite";
-        marquee.textContent = linkText;
+        marquee.textContent = link_text;
 
         link.textContent = "";
         link.appendChild(wrapper);
@@ -173,9 +132,7 @@ function remove_bad_pulls_ci_button() {
   delete_pulls_button();
 
   const observer = new MutationObserver((mutations) => {
-    const has_new_nodes = mutations.some(
-      (mutation) => mutation.addedNodes.length > 0,
-    );
+    const has_new_nodes = mutations.some((mutation) => mutation.addedNodes.length > 0);
     if (has_new_nodes) {
       delete_pulls_button();
     }
@@ -185,9 +142,7 @@ function remove_bad_pulls_ci_button() {
 
   function delete_pulls_button() {
     document
-      .querySelectorAll(
-        ".StatusCheckRowActionBar-module__statusCheckActionBar--Ipu3V",
-      )
+      .querySelectorAll(".StatusCheckRowActionBar-module__statusCheckActionBar--Ipu3V")
       .forEach((element) => element.remove());
   }
 }
@@ -202,8 +157,7 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, ({ tab_id }) => {
     `,
   });
 
-  // hints for PR file check boxes
-  glide.buf.keymaps.set("normal", "gm", 'hint -s ".js-reviewed-checkbox"');
+  glide.buf.keymaps.set("normal", "gm", `hint -s ".js-reviewed-checkbox"`, { description: "file reviewed checkbox" });
 
   glide.buf.keymaps.set("normal", "gr", async () => {
     glide.hints.show({
@@ -213,94 +167,82 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, ({ tab_id }) => {
   });
 
   glide.buf.keymaps.set("normal", "gcd", async () => {
-    await glide.content.execute(
-      async () => {
-        var close_button: HTMLButtonElement | undefined;
-        for (const button of document.querySelectorAll("button")) {
-          if (
-            button.textContent === "Close issue" ||
-            button.textContent === "Close with comment"
-          ) {
-            close_button = button;
-            console.log("found!!!!!!!", button);
-            break;
-          }
+    await glide.content.execute(async () => {
+      var close_button: HTMLButtonElement | undefined;
+      for (const button of document.querySelectorAll("button")) {
+        if (
+          button.textContent === "Close issue"
+          || button.textContent === "Close with comment"
+        ) {
+          close_button = button;
+          console.log("found!!!!!!!", button);
+          break;
         }
+      }
 
-        if (!close_button) {
-          throw new Error("no button found");
-        }
+      if (!close_button) {
+        throw new Error("no button found");
+      }
 
-        close_button.click();
-      },
-      { tab_id },
-    );
+      close_button.click();
+    }, { tab_id });
   });
 
   glide.buf.keymaps.set("normal", "gnp", async () => {
-    await glide.content.execute(
-      async () => {
-        function find_first<
-          Selector extends keyof HTMLElementTagNameMap | (string & {}),
-          Element extends
-            HTMLElement = Selector extends keyof HTMLElementTagNameMap
-            ? HTMLElementTagNameMap[Selector]
-            : HTMLElement,
-        >(props: {
-          selector?: Selector;
-          predicate?: (element: Element) => boolean;
-        }): Element | null {
-          for (const element of document.querySelectorAll<Element>(
-            props.selector ?? "*",
-          )) {
-            if (props.predicate) {
-              if (props.predicate(element)) {
-                return element;
-              }
-
-              continue;
+    await glide.content.execute(async () => {
+      function find_first<
+        Selector extends keyof HTMLElementTagNameMap | (string & {}),
+        Element extends HTMLElement = Selector extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[Selector]
+          : HTMLElement,
+      >(props: {
+        selector?: Selector;
+        predicate?: (element: Element) => boolean;
+      }): Element | null {
+        for (const element of document.querySelectorAll<Element>(props.selector ?? "*")) {
+          if (props.predicate) {
+            if (props.predicate(element)) {
+              return element;
             }
-            return element;
+
+            continue;
           }
-
-          return null;
+          return element;
         }
 
-        const close_button = find_first({
-          selector: "button",
-          predicate: (element) =>
-            element.textContent === "Close issue" ||
-            element.textContent === "Close with comment",
-        });
-        if (!close_button) {
-          throw new Error("no button found");
-        }
+        return null;
+      }
 
-        const dropdown = close_button.parentElement!.parentElement!.children[1]!
-          .children[0]! as HTMLElement;
-        dropdown.click();
-        console.log("clicking", dropdown);
+      const close_button = find_first({
+        selector: "button",
+        predicate: (element) =>
+          element.textContent === "Close issue"
+          || element.textContent === "Close with comment",
+      });
+      if (!close_button) {
+        throw new Error("no button found");
+      }
 
-        await new Promise((r) => requestAnimationFrame(r));
-        await new Promise((r) => requestAnimationFrame(r));
-        await new Promise((r) => requestAnimationFrame(r));
+      const dropdown = close_button.parentElement!.parentElement!.children[1]!
+        .children[0]! as HTMLElement;
+      dropdown.click();
+      console.log("clicking", dropdown);
 
-        const span = find_first({
-          selector: "span",
-          predicate: (element) =>
-            element.textContent === "Close as not planned",
-        });
-        // assert(span);
-        console.log("clicking", span.parentElement);
-        span.parentElement!.click();
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
 
-        await new Promise((r) => requestAnimationFrame(r));
-        await new Promise((r) => requestAnimationFrame(r));
-        await new Promise((r) => requestAnimationFrame(r));
+      const span = ensure(find_first({
+        selector: "span",
+        predicate: (element) => element.textContent === "Close as not planned",
+      }));
+      console.log("clicking", span.parentElement);
+      span.parentElement!.click();
 
-        close_button.click();
-      },
-      { tab_id },
-    );
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
+
+      close_button.click();
+    }, { tab_id });
   });
 });

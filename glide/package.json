@@ -10,7 +10,10 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "dprint": "^0.50.2"
+  },
+  "packageManager": "pnpm@10.17.0"
 }

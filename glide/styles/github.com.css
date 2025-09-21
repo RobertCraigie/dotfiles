@@ -1,0 +1,5 @@
+/* remove annoying copilot shit */
+.copilotPreview__suggestionButton, .copilotPreview, .copilotPreview__container,
+#copilot-dashboard-entrypoint-textarea {
+  display: none !important;
+}

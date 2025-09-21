@@ -1,0 +1,20 @@
+/**
+  1. display days in a vertical list instead of horizontal
+  2. add padding so that the days don't overlap
+  3. patch the "toggle todo status" label to make sure it's always shown so hints can work with it
+*/
+
+/* first content child */
+._root_13lvv_2 {
+  display: unset !important;
+}
+
+/* day entry */
+._list_13lvv_22 {
+  padding-bottom: 100px;
+}
+
+._toggle_1wvuv_70 {
+  opacity: unset !important;
+  visibility: unset !important;
+}

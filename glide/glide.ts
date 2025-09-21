@@ -43,36 +43,32 @@ async function go_to_tab(url: string) {
   await browser.tabs.update(tab.id, { active: true });
 }
 
-glide.autocmds.create("UrlEnter", { hostname: "tweek.so" }, async () => {
-  // 1. display days in a vertical list instead of horizontal
-  //
-  // 2. add padding so that the days don't overlap
-  //
-  // 3. patch the "toggle todo status" label to make sure it's always shown so hints can work with it
-  browser.tabs.insertCSS((await glide.tabs.active()).id, {
-    code: css`
-      /* first content child */
-      ._root_13lvv_2 {
-        display: unset !important;
-      }
-
-      /* day entry */
-      ._list_13lvv_22 {
-        padding-bottom: 100px;
-      }
-
-      ._toggle_1wvuv_70 {
-        opacity: unset !important;
-        visibility: unset !important;
-      }
-    `,
+// ---------------- styles ----------------
+glide.autocmds.create("ConfigLoaded", async () => {
+  await browser.contentScripts.register({
+    matches: ["*://tweek.so/*"],
+    runAt: "document_start",
+    css: [{ code: await glide.fs.read("styles/tweek.so.css", "utf8") }],
+  }).catch((err) => { // TODO: there's a weird return value cloning error
+    console.error(err);
   });
 
-  glide.buf.keymaps.set("normal", "f", "hint --include=\"svg\"");
+  await browser.contentScripts.register({
+    matches: ["*://github.com/*"],
+    runAt: "document_start",
+    css: [{ code: await glide.fs.read("styles/github.com.css", "utf8") }],
+  }).catch((err) => { // TODO: there's a weird return value cloning error
+    console.error(err);
+  });
+});
+// ---------------- /styles ----------------
+
+glide.autocmds.create("UrlEnter", { hostname: "tweek.so" }, async () => {
+  glide.buf.keymaps.set("normal", "f", `hint --include="svg"`);
   glide.buf.keymaps.set(
     "normal",
     "<leader>l",
-    "hint -s '[d=\"m14.903 9.482-4.421 4.421c-.346.345-.864.345-1.175 0l-2.21-2.21a.756.756 0 0 1 0-1.14c.31-.346.829-.346 1.174 0l1.624 1.623 3.834-3.834c.31-.345.829-.345 1.174 0 .31.311.31.83 0 1.14Z\"]'",
+    `hint -s '[d="m14.903 9.482-4.421 4.421c-.346.345-.864.345-1.175 0l-2.21-2.21a.756.756 0 0 1 0-1.14c.31-.346.829-.346 1.174 0l1.624 1.623 3.834-3.834c.31-.345.829-.345 1.174 0 .31.311.31.83 0 1.14Z"]'`,
   );
 });
 
