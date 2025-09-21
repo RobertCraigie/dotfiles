@@ -44,22 +44,19 @@ async function go_to_tab(url: string) {
 }
 
 // ---------------- styles ----------------
-glide.autocmds.create("ConfigLoaded", async () => {
+async function register_styles(domain: string) {
   await browser.contentScripts.register({
-    matches: ["*://tweek.so/*"],
+    matches: [`*://${domain}/*`],
     runAt: "document_start",
-    css: [{ code: await glide.fs.read("styles/tweek.so.css", "utf8") }],
+    css: [{ code: await glide.fs.read(`styles/${domain}.css`, "utf8") }],
   }).catch((err) => { // TODO: there's a weird return value cloning error
     console.error(err);
   });
+}
 
-  await browser.contentScripts.register({
-    matches: ["*://github.com/*"],
-    runAt: "document_start",
-    css: [{ code: await glide.fs.read("styles/github.com.css", "utf8") }],
-  }).catch((err) => { // TODO: there's a weird return value cloning error
-    console.error(err);
-  });
+glide.autocmds.create("ConfigLoaded", async () => {
+  await register_styles('tweek.so');
+  await register_styles('github.com');
 });
 // ---------------- /styles ----------------
 
