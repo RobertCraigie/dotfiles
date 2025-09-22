@@ -55,8 +55,9 @@ async function register_styles(domain: string) {
 }
 
 glide.autocmds.create("ConfigLoaded", async () => {
-  await register_styles('tweek.so');
-  await register_styles('github.com');
+  await register_styles("tweek.so");
+  await register_styles("github.com");
+  await register_styles("news.ycombinator.com");
 });
 // ---------------- /styles ----------------
 
