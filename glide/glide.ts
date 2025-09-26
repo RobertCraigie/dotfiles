@@ -13,6 +13,7 @@ glide.keymaps.set("normal", ";", "commandline_show");
 
 glide.unstable.include("glide.slack.ts");
 glide.unstable.include("glide.github.ts");
+glide.unstable.include("glide.bearblog.ts");
 
 // useful for sideberry
 glide.keymaps.set("normal", "<C-t>", async ({ tab_id }) => {
