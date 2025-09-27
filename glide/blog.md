@@ -1,4 +1,4 @@
-TLDR; [Glide](glide-browser.app) is a Firefox-based, [modal](#modes), and [malleable](https://glide-browser.app/config)[^1] web browser for the motivated tinkerer.
+TL;DR: [Glide](glide-browser.app) is a Firefox fork with a TypeScript [config](https://glide-browser.app/config), aimed at the motivated tinkerer.
 
 ##### invisible-heading
 
@@ -8,7 +8,7 @@ TLDR; [Glide](glide-browser.app) is a Firefox-based, [modal](#modes), and [malle
 
 <br>
 
-I believe browsers should be hackable, just like your editor.
+Browsers should be hackable, just like your editor.
 
 ```typescript
 glide.keymaps.set("normal", "gC", async () => {
@@ -19,36 +19,39 @@ glide.keymaps.set("normal", "gC", async () => {
   // * clone the current github repo to ~/github.com/$owner/$repo
   // * start kitty with neovim open at the cloned repo
   const repo_path = glide.path.join(glide.path.home_dir, "github.com", owner, repo);
-  await glide.process.execute("gh", [ "repo", "clone", glide.ctx.url, repo_path]);
+  await glide.process.execute("gh", ["repo", "clone", glide.ctx.url, repo_path]);
   await glide.process.execute("kitty", ["-d", repo_path, "nvim"], { cwd: repo_path });
 }, { description: "open the GitHub repo in the focused tab in Neovim" });
 ```
 
-> Example Glide keymapping to clone the GitHub repo in the current tab and open it in [Kitty](https://sw.kovidgoyal.net/kitty/) + [Neovim](https://neovim.io/).
+> Example Glide keymapping to clone the GitHub repo in the current tab and open it in [kitty](https://sw.kovidgoyal.net/kitty/) + [neovim](https://neovim.io/).
 
-This snippet captures exactly the kind of functionality I personally want from a browser; extreme customisability so that I can make my daily workflows a joy.
+This snippet captures the customizability I expect from my browser so that I can make my daily workflows a joy.
 
-### What's wrong with the status quo?
+<!-- TODO: more here? -->
 
-Most browsers only allow you to customise shortcuts for certain predefined actions, and do not allow you to define your own entirely custom keymappings without going through a web extension; and even then support for writing your own code is very limited.
+### Why I built Glide
 
-Existing web extensions[^2] do offer similar functionality to Glide but are artificially restricted in scope by security constraints[^3] imposed on all web extensions.
+I was using [tridactyl](https://tridactyl.xyz) within Firefox and generally enjoying it, but occasionally I would run into frustrating issues due to security constraints imposed by Firefox on web extensions. For example, extensions are completely disabled on [addons.mozilla.org](https://addons.mozilla.org), so all of my mappings could break depending on the website I had open.
 
-For example, extensions are completely disabled on certain URIs, e.g. [addons.mozilla.org](https://addons.mozilla.org), the json file viewer, etc. Which means that relying on extension defined mappings on those pages will not work.
+There are also _many_ useful APIs I wanted to use that are not accessible[^1] through tridactyl, such as arbitrary file writes, spawning processes, and setting prefs.
 
-There are also *many* useful APIs that are not provided to web extensions, such as arbitrary file writes, spawning processes, and setting prefs.
+These restrictions are necessary to protect users from extension writers, but what if you wanted to write your own extension for personal use? What's the benefit in restricting what the extension can do then?
+
+That's when I realised that the level of flexibility I desired would never be possible through a web extension.
 
 ### How is Glide different?
 
-Glide holistically solves these usability issues by introducing [modes](#modes), and a TypeScript [config](https://glide-browser.app/config) that lets you do _anything_[^4] you'd like to.
+Glide holistically solves these usability issues by supporting a TypeScript [config](https://glide-browser.app/config) that lets you do _anything_[^2] you'd like to.
 
 You can define custom [key mappings](https://glide-browser.app/keys), access the [web extensions API](https://glide-browser.app/extensions), spawn arbitrary [processes](https://glide-browser.app/api#glide.process), define [macros](https://glide-browser.app/api#glide.keys) and more.
 
-Glide can support APIs and functionality that will never be supported in web extensions as the security model is flipped. You - the end user - are responsible for writing the config code, so there is no reason to restrict what you can do.
+Glide can support APIs and functionality that will never be supported in web extensions as the security model is flipped. You—the end user—are responsible for writing the config code, so there is no reason to restrict what you can do.
 
-Here's a small example that adds g + c as a key mapping to switch to the calendar tab:
+Here's a small example that adds <kbd>g</kbd>+<kbd>c</kbd> as a key mapping to switch to the calendar tab:
 
 ```typescript
+// ~/.config/glide/glide.ts
 glide.keymaps.set("normal", "gc", async () => {
   const tab = await glide.tabs.get_first({
     url: "https://calendar.google.com/*",
@@ -70,7 +73,7 @@ Glide borrows the concept of modes from (neo)vim, every key mapping you define w
 
 The default mode is `normal`, where most key mappings are defined. When you click or focus on an input element, Glide will automatically switch to `insert` mode, so that key mappings don't interfere with entering text.
 
-If a website doesn't play well with your key mappings you can switch to `ignore` mode by holding Shift and pressing Escape, in this mode the only default key mapping is Shift + Escape to exit ignore mode.
+If a website doesn't play well with your key mappings you can switch to `ignore` mode by pressing <kbd>Shift</kbd>+<kbd>Escape</kbd>, in this mode the only default key mapping is <kbd>Shift</kbd>+<kbd>Escape</kbd> to exit ignore mode.
 
 ### Navigating
 
@@ -96,7 +99,7 @@ See it in action in the [demo video](https://glide-browser.app/#demo-video).
 
 <br>
 
-I've been daily driving Glide for ~6 months now and while I'm biased, I love it. It's still in a very early alpha stage but if you'd like to try it out, you can download it on macOS / Linux [here](https://glide-browser.app/#download). I'd recommend checking out the tutorial with `:tutor` to get some bearings, although it's not fully complete yet.
+I've been daily driving Glide for ~6 months now and while I'm biased, I love it. It's still in a very early alpha stage but if you'd like to try it out, you can download it on macOS / Linux [here](https://glide-browser.app/#download). I'd recommend checking out the tutorial with `:tutor` to get some bearings, although it's far from complete yet.
 
 p.s. sorry Linux folks, Glide isn't in any package repositories yet, so you'll have to untar it and add set up Glide manually for now.
 
@@ -104,44 +107,6 @@ p.s. sorry Linux folks, Glide isn't in any package repositories yet, so you'll h
 
 ---
 
-[^1]: Glide doesn't try to accomplish all the goals outlined in this [Ink & Switch essay](https://www.inkandswitch.com/essay/malleable-software/), but it is heavily inspired by the same philosophy.
+[^1]: You can accomplish some things through the [native messenger](https://github.com/tridactyl/tridactyl#extra-features-through-native-messaging).
 
-[^2]: Some of Glides main inspirations are [tridactyl](https://tridactyl.xyz/) and [vimium](https://vimium.github.io/).
-
-[^3]: Note that I do think the web extensions security constraints are reasonable in that context. e.g. you wouldn't want want a malicious extension to run on addons.mozilla.org and prevent itself from being uninstalled.
-
-[^4]: As Glide is in very early alpha there are missing APIs so you can't literally do _everything_ yet, but enabling full control is one of the main goals.
-
-<!-- ### How is Glide different? -->
-<!---->
-<!-- Foo -->
-
-<!-- So, what's lacking from current mainstream browsers? -->
-
-<!-- I want to be able to do *anything* I'd like, not just be limited to the security restrictions imposed on the Web Extensions APIs. -->
-<!---->
-<!-- ---- -->
-<!---->
-<!-- So, what are current mainstream browsers lacking in this area? -->
-<!---->
-<!-- Web extensions let you accomplish a *lot*  -->
-
-
-<!-- I should be able to deeply integrate it with the rest of my system, instead of the walled garden it is today. -->
-
-<!-- For a long time I've been frustrated by the extensibility of web browsers. I want the software I use the most to be [malleable](https://www.inkandswitch.com/malleable-software/) to my preferences so that it is a _joy_ to use. -->
-
-<!-- <br> -->
-<!-- <br> -->
-<!-- <br> -->
-<!-- <br> -->
-<!-- <br> -->
-<!---->
-<!---->
-<!-- One of the main aspects of the browser that I want to configure is key mappings, so that it can be pleasant to mostly operate using just my keyboard. I started off using [Tridactyl](https://github.com/tridactyl/tridactyl) as my daily driver for a while and it was generally very good, however I ran into many minor annoyances due to restrictions that Firefox imposes on extensions. -->
-<!---->
-<!-- For example, extensions are completely disabled on certain URIs, e.g. [addons.mozilla.org](https://addons.mozilla.org), the json file viewer, etc. Which meant that using Tridactyl mappings to scroll through my open tabs would stop working if any of the tabs I had open were restricted. -->
-<!---->
-<!-- There generally are workarounds for these issues, however having to fight against my browser to get this to work didn't seem particularly appealing to me. -->
-<!---->
-<!-- --- -->
+[^2]: As Glide is in very early alpha there are missing APIs so you can't literally do _everything_ yet, but enabling full control is one of the main goals.
