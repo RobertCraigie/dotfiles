@@ -26,19 +26,17 @@ glide.keymaps.set("normal", "gC", async () => {
 
 > Example Glide keymapping to clone the GitHub repo in the current tab and open it in [kitty](https://sw.kovidgoyal.net/kitty/) + [neovim](https://neovim.io/).
 
-This snippet captures the customizability I expect from my browser so that I can make my daily workflows a joy.
+For my job, I have to clone many different repos. This saves me a couple seconds each time, which happens multiple times a day.
 
-<!-- TODO: more here? -->
+All things considered, it probably doesn't save me much time but adding this mapping only took a couple of minutes and using it just makes me happy.
 
 ### Why I built Glide
 
-I was using [tridactyl](https://tridactyl.xyz) within Firefox and generally enjoying it, but occasionally I would run into frustrating issues due to security constraints imposed by Firefox on web extensions. For example, extensions are completely disabled on [addons.mozilla.org](https://addons.mozilla.org), so all of my mappings could break depending on the website I had open.
+I was using [tridactyl](https://tridactyl.xyz) within Firefox and generally enjoying it, but occasionally I would run into frustrating issues due to security constraints imposed by Firefox on web extensions. For example, extensions are completely disabled on [addons.mozilla.org](https://addons.mozilla.org), so all of my mappings could break depending on the website I had open. Additionally tridactyl wouldn't work with a custom homepage.
 
-There are also _many_ useful APIs I wanted to use that are not accessible[^1] through tridactyl, such as arbitrary file writes, spawning processes, and setting prefs.
+These security constraints imposed on tridactyl, and every other extension, are fundamental to how extensions operate. For example, it would be very bad if an extension could prevent itself from being uninstalled by modifying [addons.mozilla.org](https://addons.mozilla.org), so browsers have to protect users from potentially malicious extension writers.
 
-These restrictions are necessary to protect users from extension writers, but what if you wanted to write your own extension for personal use? What's the benefit in restricting what the extension can do then?
-
-That's when I realised that the level of flexibility I desired would never be possible through a web extension.
+At that point, I realised there was an opportunity here to make a browser that's *truly* customisable at its core, with no restrictions on what you can accomplish. From customising the browser UI itself, to calling out to other tools — anything should be possible.
 
 ### How is Glide different?
 
