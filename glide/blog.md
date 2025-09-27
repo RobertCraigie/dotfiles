@@ -40,11 +40,11 @@ At that point, I realised there was an opportunity here to make a browser that's
 
 ### How is Glide different?
 
-Glide holistically solves these usability issues by supporting a TypeScript [config](https://glide-browser.app/config) that lets you do _anything_[^2] you'd like to.
+Glide holistically solves these usability issues by supporting a TypeScript [config](https://glide-browser.app/config) that lets you do _anything_[^1] you'd like to.
 
-You can define custom [key mappings](https://glide-browser.app/keys), access the [web extensions API](https://glide-browser.app/extensions), spawn arbitrary [processes](https://glide-browser.app/api#glide.process), define [macros](https://glide-browser.app/api#glide.keys) and more.
+We can support APIs and functionality that will never be supported in web extensions as the security model is flipped. You—the end user—are responsible for writing the config code, so there is no reason to restrict what you can do.
 
-Glide can support APIs and functionality that will never be supported in web extensions as the security model is flipped. You—the end user—are responsible for writing the config code, so there is no reason to restrict what you can do.
+In the Glide config you can define custom [key mappings](https://glide-browser.app/keys), access the [web extensions API](https://glide-browser.app/extensions), spawn arbitrary [processes](https://glide-browser.app/api#glide.process), define [macros](https://glide-browser.app/api#glide.keys) and more.
 
 Here's a small example that adds <kbd>g</kbd>+<kbd>c</kbd> as a key mapping to switch to the calendar tab:
 
@@ -63,7 +63,7 @@ glide.keymaps.set("normal", "gc", async () => {
 
 For more examples, see the [cookbook](https://glide-browser.app/cookbook) or my own [dotfiles](https://github.com/RobertCraigie/dotfiles/tree/main/glide).
 
-The cherry on top is that all of this is built on _top_ of Firefox, meaning that, if you already use Firefox, then your existing extensions and workflows will still work in Glide.
+The cherry on top is that all of this is built on _top_ of Firefox. If you already use Firefox, then your existing extensions and workflows will still work in Glide.
 
 ### Modes
 
@@ -105,6 +105,4 @@ p.s. sorry Linux folks, Glide isn't in any package repositories yet, so you'll h
 
 ---
 
-[^1]: You can accomplish some things through the [native messenger](https://github.com/tridactyl/tridactyl#extra-features-through-native-messaging).
-
-[^2]: As Glide is in very early alpha there are missing APIs so you can't literally do _everything_ yet, but enabling full control is one of the main goals.
+[^1]: As Glide is in very early alpha there are missing APIs so you can't literally do _everything_ yet, but enabling full control is one of the main goals.
