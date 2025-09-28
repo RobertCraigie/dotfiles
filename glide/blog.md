@@ -39,25 +39,25 @@ glide.keymaps.set("normal", "gC", async () => {
 
 > Glide keymapping to clone the GitHub repo in the current tab and open it in [kitty](https://sw.kovidgoyal.net/kitty/) + [neovim](https://neovim.io/).
 
-For my job, I have to clone many different repos. This saves me a couple seconds each time, which happens multiple times a day.
+For my job, I have to clone many different repos. This keymapping saves me a couple seconds each time, multiple times a day.
 
-All things considered, it probably doesn't save me much time but adding this mapping only took a couple of minutes and using it just makes me happy.
+Although it probably doesn't save me much time, adding this mapping only took a couple of minutes and using it makes me happy
 
 ### Why I built Glide
 
-I was using [tridactyl](https://addons.mozilla.org/en-US/firefox/addon/tridactyl-vim/) within Firefox and generally enjoying it, but occasionally I would run into frustrating issues due to security constraints imposed by Firefox on web extensions. For example, extensions are completely disabled on [addons.mozilla.org](https://addons.mozilla.org), so all of my mappings could break depending on the website I had open. Additionally tridactyl wouldn't work with a custom homepage.
+I was using [tridactyl](https://addons.mozilla.org/en-US/firefox/addon/tridactyl-vim/) within Firefox and generally enjoying it, but occasionally I would run into frustrating issues due to security constraints imposed by Firefox on web extensions. For example, extensions are completely disabled on [addons.mozilla.org](https://addons.mozilla.org), so all of my mappings could break depending on the website I had open. Additionally, tridactyl wouldn't work with a custom homepage.
 
 These security constraints imposed on tridactyl, and every other extension, are fundamental to how extensions operate. For example, it would be very bad if an extension could prevent itself from being uninstalled by modifying [addons.mozilla.org](https://addons.mozilla.org), so browsers have to protect users from potentially malicious extension writers.
 
-At that point, I realised there was an opportunity here to make a browser that's *truly* customisable at its core, with no restrictions on what you can accomplish. From customising the browser UI itself, to calling out to other tools — anything should be possible.
+At that point, I realised there was an opportunity to make a browser that's *truly* customisable at its core, with no restrictions on what you can accomplish. From customising the browser UI itself, to calling out to other tools—anything should be possible.
 
-### How is Glide different?
+### How Glide is different
 
-Glide holistically solves these usability issues by supporting a TypeScript [config](https://glide-browser.app/config) that lets you do _anything_[^1] you'd like to.
+Glide holistically solves these usability issues by supporting a TypeScript [config](https://glide-browser.app/config) that lets you do _anything_[^1].
 
-We can support APIs and functionality that will never be supported in web extensions as the security model is flipped. You—the end user—are responsible for writing the config code, so there's no reason to restrict what you can do.
+Glide can support APIs and functionality that will never be supported in web extensions as the security model is fundamentally different. You—the end user—are responsible for the config, so there's no reason to restrict what you can do.
 
-In the Glide config you can define custom [key mappings](https://glide-browser.app/keys), access the [web extensions API](https://glide-browser.app/extensions), spawn arbitrary [processes](https://glide-browser.app/api#glide.process), define [macros](https://glide-browser.app/api#glide.keys) and more.
+In the Glide config you can define custom [key mappings](https://glide-browser.app/keys), access the [web extensions API](https://glide-browser.app/extensions), spawn arbitrary [processes](https://glide-browser.app/api#glide.process), define [macros](https://glide-browser.app/api#glide.keys), and more.
 
 Here's a small example that adds <kbd>g</kbd>+<kbd>c</kbd> as a key mapping to switch to the calendar tab:
 
@@ -76,7 +76,7 @@ The cherry on top is that all of this is built on _top_ of Firefox. If you alrea
 
 ### Modes
 
-Glide borrows the concept of modes from (neo)vim, every key mapping you define will be attached to a specific mode.
+Glide borrows the concept of modes from (neo)vim; every key mapping you define will be attached to a specific mode.
 
 Glide switches between modes automatically when you interact with the browser. For example, in the default mode, `normal`, if you click on an `<input>` element, Glide will switch to `insert` mode, so that key mappings don't interfere with entering text.
 
@@ -116,7 +116,7 @@ Press `f` to enter `hint` mode and Glide will overlay text [labels](https://glid
 
 <br>
 
-I've been daily driving Glide for ~6 months now and while I'm biased, I love it. It's still in a very early alpha stage but if you'd like to try it out, you can download it on macOS / Linux [here](https://glide-browser.app/#download). I'd recommend checking out the tutorial with `:tutor` to get some bearings, although it's far from complete yet.
+I've been daily driving Glide for ~6 months now and while I'm biased, I love it. It's still in a very early alpha stage but if you'd like to try it out, you can [download](https://glide-browser.app/#download) it for macOS / Linux today. I'd recommend checking out the tutorial with `:tutor` to get your bearings, although it's far from complete yet.
 
 p.s. sorry Linux folks, Glide isn't in any package repositories yet, so you'll have to untar it and set up Glide manually for now.
 
