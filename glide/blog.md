@@ -11,7 +11,7 @@
 }
 </style>
 
-TL;DR: [Glide](glide-browser.app) is a Firefox fork with a TypeScript [config](https://glide-browser.app/config), aimed at the motivated tinkerer.
+TL;DR: [Glide](https://glide-browser.app) is a Firefox fork with a TypeScript [config](https://glide-browser.app/config) that lets you build *anything* you can dream of.
 
 ##### invisible-heading
 
@@ -78,7 +78,7 @@ The cherry on top is that all of this is built on _top_ of Firefox. If you alrea
 
 Glide borrows the concept of modes from (neo)vim, every key mapping you define will be attached to a specific mode.
 
-Glide switches between modes automatically when you interact with the browser, for example, in the default mode, `normal`, if you click on an `<input>` element, Glide will automatically switch to `insert` mode, so that key mappings don't interfere with entering text.
+Glide switches between modes automatically when you interact with the browser. For example, in the default mode, `normal`, if you click on an `<input>` element, Glide will switch to `insert` mode, so that key mappings don't interfere with entering text.
 
 If a website doesn't play well with your key mappings you can switch to `ignore` mode by pressing <kbd>Shift</kbd>+<kbd>Escape</kbd>, in this mode the only default key mapping is <kbd>Shift</kbd>+<kbd>Escape</kbd> to exit ignore mode.
 
