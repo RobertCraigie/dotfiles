@@ -1,3 +1,16 @@
+<style>
+#demo-video {
+  border: 2px solid #7f7474;
+  border-radius: 8px;
+}
+@media screen and (max-width: 768px) {
+  #demo-video {
+    max-width: 100%;
+    height: auto;
+  }
+}
+</style>
+
 TL;DR: [Glide](glide-browser.app) is a Firefox fork with a TypeScript [config](https://glide-browser.app/config), aimed at the motivated tinkerer.
 
 ##### invisible-heading
@@ -24,7 +37,7 @@ glide.keymaps.set("normal", "gC", async () => {
 }, { description: "open the GitHub repo in the focused tab in Neovim" });
 ```
 
-> Example Glide keymapping to clone the GitHub repo in the current tab and open it in [kitty](https://sw.kovidgoyal.net/kitty/) + [neovim](https://neovim.io/).
+> Glide keymapping to clone the GitHub repo in the current tab and open it in [kitty](https://sw.kovidgoyal.net/kitty/) + [neovim](https://neovim.io/).
 
 For my job, I have to clone many different repos. This saves me a couple seconds each time, which happens multiple times a day.
 
@@ -32,7 +45,7 @@ All things considered, it probably doesn't save me much time but adding this map
 
 ### Why I built Glide
 
-I was using [tridactyl](https://tridactyl.xyz) within Firefox and generally enjoying it, but occasionally I would run into frustrating issues due to security constraints imposed by Firefox on web extensions. For example, extensions are completely disabled on [addons.mozilla.org](https://addons.mozilla.org), so all of my mappings could break depending on the website I had open. Additionally tridactyl wouldn't work with a custom homepage.
+I was using [tridactyl](https://addons.mozilla.org/en-US/firefox/addon/tridactyl-vim/) within Firefox and generally enjoying it, but occasionally I would run into frustrating issues due to security constraints imposed by Firefox on web extensions. For example, extensions are completely disabled on [addons.mozilla.org](https://addons.mozilla.org), so all of my mappings could break depending on the website I had open. Additionally tridactyl wouldn't work with a custom homepage.
 
 These security constraints imposed on tridactyl, and every other extension, are fundamental to how extensions operate. For example, it would be very bad if an extension could prevent itself from being uninstalled by modifying [addons.mozilla.org](https://addons.mozilla.org), so browsers have to protect users from potentially malicious extension writers.
 
@@ -42,7 +55,7 @@ At that point, I realised there was an opportunity here to make a browser that's
 
 Glide holistically solves these usability issues by supporting a TypeScript [config](https://glide-browser.app/config) that lets you do _anything_[^1] you'd like to.
 
-We can support APIs and functionality that will never be supported in web extensions as the security model is flipped. You—the end user—are responsible for writing the config code, so there is no reason to restrict what you can do.
+We can support APIs and functionality that will never be supported in web extensions as the security model is flipped. You—the end user—are responsible for writing the config code, so there's no reason to restrict what you can do.
 
 In the Glide config you can define custom [key mappings](https://glide-browser.app/keys), access the [web extensions API](https://glide-browser.app/extensions), spawn arbitrary [processes](https://glide-browser.app/api#glide.process), define [macros](https://glide-browser.app/api#glide.keys) and more.
 
@@ -51,14 +64,10 @@ Here's a small example that adds <kbd>g</kbd>+<kbd>c</kbd> as a key mapping to s
 ```typescript
 // ~/.config/glide/glide.ts
 glide.keymaps.set("normal", "gc", async () => {
-  const tab = await glide.tabs.get_first({
-    url: "https://calendar.google.com/*",
-  });
+  const tab = await glide.tabs.get_first({ url: "https://calendar.google.com/*" });
   assert(tab && tab.id);
   await browser.tabs.update(tab.id, { active: true });
-}, {
-  description: "[g]o to [c]alendar.google.com",
-});
+}, { description: "[g]o to [c]alendar.google.com" });
 ```
 
 For more examples, see the [cookbook](https://glide-browser.app/cookbook) or my own [dotfiles](https://github.com/RobertCraigie/dotfiles/tree/main/glide).
@@ -67,9 +76,9 @@ The cherry on top is that all of this is built on _top_ of Firefox. If you alrea
 
 ### Modes
 
-Glide borrows the concept of modes from (neo)vim, every key mapping you define will be attached to a specific mode. Glide will then switch between modes automatically but you can always switch modes manually with custom key mappings.
+Glide borrows the concept of modes from (neo)vim, every key mapping you define will be attached to a specific mode.
 
-The default mode is `normal`, where most key mappings are defined. When you click or focus on an input element, Glide will automatically switch to `insert` mode, so that key mappings don't interfere with entering text.
+Glide switches between modes automatically when you interact with the browser, for example, in the default mode, `normal`, if you click on an `<input>` element, Glide will automatically switch to `insert` mode, so that key mappings don't interfere with entering text.
 
 If a website doesn't play well with your key mappings you can switch to `ignore` mode by pressing <kbd>Shift</kbd>+<kbd>Escape</kbd>, in this mode the only default key mapping is <kbd>Shift</kbd>+<kbd>Escape</kbd> to exit ignore mode.
 
@@ -79,7 +88,17 @@ Glide supports a `hint` mode that lets you operate web pages entirely using the 
 
 Press `f` to enter `hint` mode and Glide will overlay text [labels](https://glide-browser.app/hints#label-generation) over every [hintable](https://glide-browser.app/hints#hintable-elements) element, e.g. links and buttons. Typing the [label](https://glide-browser.app/hints#label-generation) for a hint will then focus and click the element.
 
-See it in action in the [demo video](https://glide-browser.app/#demo-video).
+<video
+  id="demo-video"
+  width="690"
+  height="497"
+  controls
+  autoplay
+  loop
+  title="Demo video showing Glides support for hints"
+
+  <source src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/craigie/demo-hints.mp4" type="video/mp4" />
+</video>
 
 ### Personal favourite features
 
@@ -99,7 +118,7 @@ See it in action in the [demo video](https://glide-browser.app/#demo-video).
 
 I've been daily driving Glide for ~6 months now and while I'm biased, I love it. It's still in a very early alpha stage but if you'd like to try it out, you can download it on macOS / Linux [here](https://glide-browser.app/#download). I'd recommend checking out the tutorial with `:tutor` to get some bearings, although it's far from complete yet.
 
-p.s. sorry Linux folks, Glide isn't in any package repositories yet, so you'll have to untar it and add set up Glide manually for now.
+p.s. sorry Linux folks, Glide isn't in any package repositories yet, so you'll have to untar it and set up Glide manually for now.
 
 <br>
 
