@@ -5,7 +5,7 @@
   "cmp_luasnip": { "branch": "master", "commit": "98d9cb5c2c38532bd9bdb481067b20fea8f32e90" },
   "conform.nvim": { "branch": "master", "commit": "b4aab989db276993ea5dcb78872be494ce546521" },
   "dropbar.nvim": { "branch": "master", "commit": "596f95e98a21e8fccf3db91fec481129eb82ff61" },
-  "fff.nvim": { "branch": "main", "commit": "a9cac80ea99eeb5882d11bdb3747b7dad8c92040" },
+  "fff.nvim": { "branch": "main", "commit": "2df06289c9a20545d9d060ceb26cc0cffd53ab9e" },
   "fidget.nvim": { "branch": "main", "commit": "4d5858bd4c471c895060e1b9f3575f1551184dc5" },
   "git-blame.nvim": { "branch": "master", "commit": "8503b199edf9a666fe7b1a989cf14e3c26b2eb03" },
   "gitlinker.nvim": { "branch": "master", "commit": "cc59f732f3d043b626c8702cb725c82e54d35c25" },
