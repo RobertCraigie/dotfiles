@@ -2,5 +2,5 @@
 
 ```bash
 ./bootstrap
-./install
+./configure
 ```

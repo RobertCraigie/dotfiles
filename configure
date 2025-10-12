@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+symlink() {
+    local src="$1"
+    local dest="$2"
+    local create_parent="$3"
+
+    if [ "$create_parent" = "true" ]; then
+        mkdir -p "$(dirname "$dest")"
+    fi
+
+    if [ -L "$dest" ] || [ -e "$dest" ]; then
+        echo "Skipping $dest (already exists)"
+    else
+        ln -s "$src" "$dest"
+        echo "Linked $dest -> $src"
+    fi
+}
+
+symlink "$DOTFILES_DIR/nvim" ~/.config/nvim true
+symlink "$DOTFILES_DIR/karabiner" ~/.config/karabiner true
+symlink "$DOTFILES_DIR/kitty" ~/.config/kitty true
+symlink "$DOTFILES_DIR/nvmrc" ~/.nvmrc true
+symlink "$DOTFILES_DIR/zellij" ~/.config/zellij true
+symlink "$DOTFILES_DIR/profile" ~/.profile false
+symlink "$DOTFILES_DIR/gitconfig" ~/.gitconfig false
+symlink "$DOTFILES_DIR/gitignore" ~/.gitignore false
+symlink "$DOTFILES_DIR/zprofile" ~/.zprofile false
+symlink "$DOTFILES_DIR/zshenv" ~/.zshenv false
+symlink "$DOTFILES_DIR/zshrc" ~/.zshrc false
+symlink "$DOTFILES_DIR/hammerspoon" ~/.hammerspoon false
+symlink "$DOTFILES_DIR/wezterm.lua" ~/.wezterm.lua false
+symlink "$DOTFILES_DIR/glide" ~/.config/glide true
+symlink "$DOTFILES_DIR/wezterm_utils.lua" ~/.config/wezterm/wezterm_utils.lua true
+symlink "$DOTFILES_DIR/p10k.zsh" ~/.p10k.zsh false
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    symlink "$DOTFILES_DIR/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty" true
+    symlink "$DOTFILES_DIR/lazygit/config.yml" "$HOME/Library/Application Support/lazygit/config.yml" true
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    symlink "$DOTFILES_DIR/lazygit/config.yml" ~/.config/lazygit/config.yml true
+fi
