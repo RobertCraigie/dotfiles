@@ -251,6 +251,7 @@ return {
   -- fix the terrible errors
   {
     "youyoumu/pretty-ts-errors.nvim",
+    enabled = false,
     lazy = false,
     dir = "~/github.com/youyoumu/pretty-ts-errors.nvim",
     opts = {
