@@ -104,6 +104,7 @@
                     },
                     {
                         "description": "Command + Shift + C to copy URL with delay",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
