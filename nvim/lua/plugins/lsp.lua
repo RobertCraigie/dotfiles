@@ -60,6 +60,7 @@ local servers = {
   clangd = {
     cmd = { vim.fn.expand("~/.mozbuild/clang/bin/clangd") },
   },
+  nil_ls = {},
   jsonls = {
     settings = {
       doValidation = false,
