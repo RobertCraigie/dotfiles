@@ -1,0 +1,4 @@
+div > header > div > div > div:nth-child(1) {
+  /* fix logo text overlapping with search box */
+  margin-right: 5em;
+}

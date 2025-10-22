@@ -1,10 +1,8 @@
 /// <reference path="./glide.d.ts" />
 
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, ({ tab_id }) => {
-  if (
-    !(glide.ctx.url.includes("/pull/") || glide.ctx.url.includes("/commit/") || glide.ctx.url.includes("/commits/")
-      || glide.ctx.url.includes("/compare/"))
-  ) {
+  const url = glide.ctx.url.toString();
+  if (!(url.includes("/pull/") || url.includes("/commit/") || url.includes("/commits/") || url.includes("/compare/"))) {
     return;
   }
 
@@ -231,10 +229,10 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, ({ tab_id }) => {
       await new Promise((r) => requestAnimationFrame(r));
       await new Promise((r) => requestAnimationFrame(r));
 
-      const span = ensure(find_first({
+      const span = find_first({
         selector: "span",
         predicate: (element) => element.textContent === "Close as not planned",
-      }));
+      })!;
       console.log("clicking", span.parentElement);
       span.parentElement!.click();
 

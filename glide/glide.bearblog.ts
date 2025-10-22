@@ -1,7 +1,7 @@
 // keymapping to start automatically updating a draft blog post on a bearblog site
 // assumes a tab is open with the post editor and that the current tab is the draft preview
 
-const local_blog_path = glide.path.join(glide.path.home_dir, "code", "glide-browser", "blog.md");
+const local_blog_path = glide.path.join(glide.path.home_dir, ".dotfiles", "glide", "blog.md");
 var proc: glide.Process | null = null;
 
 glide.autocmds.create("UrlEnter", /https:\/\/blog\.craigie\.dev\/.*\?token\=.*/, () => {

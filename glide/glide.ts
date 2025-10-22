@@ -11,6 +11,8 @@ glide.prefs.set("media.videocontrols.picture-in-picture.audio-toggle.enabled", t
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("normal", ";", "commandline_show");
 
+glide.keymaps.set("normal", "<D-S-c>", "url_yank");
+
 glide.unstable.include("glide.slack.ts");
 glide.unstable.include("glide.github.ts");
 glide.unstable.include("glide.bearblog.ts");
@@ -58,7 +60,8 @@ async function register_styles(domain: string) {
 glide.autocmds.create("ConfigLoaded", async () => {
   await register_styles("tweek.so");
   await register_styles("github.com");
-  await register_styles("news.ycombinator.com");
+  // await register_styles("news.ycombinator.com");
+  await register_styles("marginalia-search.com");
 });
 // ---------------- /styles ----------------
 
