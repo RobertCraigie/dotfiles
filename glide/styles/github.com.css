@@ -3,3 +3,8 @@
 #copilot-dashboard-entrypoint-textarea {
   display: none !important;
 }
+
+/* very ugly underlines for every CI job */
+[data-component="listview-title-link"] {
+  text-decoration: none !important;
+}
