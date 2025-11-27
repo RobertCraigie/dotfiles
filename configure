@@ -37,11 +37,12 @@ symlink "$DOTFILES_DIR/wezterm.lua" ~/.wezterm.lua false
 symlink "$DOTFILES_DIR/glide" ~/.config/glide true
 symlink "$DOTFILES_DIR/wezterm_utils.lua" ~/.config/wezterm/wezterm_utils.lua true
 symlink "$DOTFILES_DIR/p10k.zsh" ~/.p10k.zsh false
-symlink "$DOTFILES_DIR/nushell" ~/.config/nushell false
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     symlink "$DOTFILES_DIR/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty" true
     symlink "$DOTFILES_DIR/lazygit/config.yml" "$HOME/Library/Application Support/lazygit/config.yml" true
+    symlink "$DOTFILES_DIR/nushell" "$HOME/Library/Application Support/nushell" false
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     symlink "$DOTFILES_DIR/lazygit/config.yml" ~/.config/lazygit/config.yml true
+    symlink "$DOTFILES_DIR/nushell" ~/.config/nushell false
 fi
