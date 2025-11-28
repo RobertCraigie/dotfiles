@@ -155,7 +155,7 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, ({ tab_id }) => {
     `,
   });
 
-  glide.buf.keymaps.set("normal", "gm", `hint -s ".js-reviewed-checkbox"`, { description: "file reviewed checkbox" });
+  glide.buf.keymaps.set("normal", "gm", `hint -s ".MarkAsViewedButton-module__iconOnly--tQ1ah"`, { description: "file reviewed checkbox" });
 
   glide.buf.keymaps.set("normal", "gr", async () => {
     glide.hints.show({

@@ -18,7 +18,7 @@ glide.unstable.include("glide.github.ts");
 glide.unstable.include("glide.bearblog.ts");
 
 // useful for sideberry
-glide.keymaps.set("normal", "<C-t>", async ({ tab_id }) => {
+glide.keymaps.set(["normal", "insert"], "<C-t>", async ({ tab_id }) => {
   await browser.tabs.create({
     active: true,
     index: (await browser.tabs.get(tab_id)).index + 1,
@@ -92,11 +92,8 @@ glide.keymaps.set("normal", "<leader>gr", async () => {
 const surprise = glide.excmds.create({ name: "surprise", description: "" }, () => {
   browser.tabs.create({ active: true, url: "https://wiby.me/surprise/" });
 });
-declare global {
-  interface ExcmdRegistry {
-    surprise: typeof surprise;
-  }
-}
+/* dprint-ignore */
+declare global { interface ExcmdRegistry { surprise: typeof surprise; } }
 
 const shrug = glide.excmds.create({ name: "shrug", description: "" }, async () => {
   const curr_mode = glide.ctx.mode;
@@ -108,11 +105,8 @@ const shrug = glide.excmds.create({ name: "shrug", description: "" }, async () =
 
   await glide.excmds.execute(`mode_change ${curr_mode}`);
 });
-declare global {
-  interface ExcmdRegistry {
-    shrug: typeof shrug;
-  }
-}
+/* dprint-ignore */
+declare global { interface ExcmdRegistry { shrug: typeof shrug; } }
 
 glide.keymaps.set("normal", "<leader>ts", "shrug");
 glide.keymaps.set("normal", "<leader>\\", "surprise");
