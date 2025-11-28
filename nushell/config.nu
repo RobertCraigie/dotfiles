@@ -53,6 +53,8 @@ $env.path ++= [
   "/Users/robert/bin",
   "/Users/robert/.local/bin",
   "/Users/robert/.local/share/bob/nvim-bin",
+  "/opt/homebrew/bin",
+  "/nix/var/nix/profiles/default/bin",
 
   "/opt/homebrew/opt/capstone/lib",
   "/opt/homebrew/opt/libxslt/bin",
