@@ -120,3 +120,7 @@ fi
 if [ ! -d "/Applications/Mullvad VPN.app" ]; then
   brew install --cask mullvadvpn
 fi
+
+if ! which nu > /dev/null 2>&1; then
+  brew install nushell
+fi
