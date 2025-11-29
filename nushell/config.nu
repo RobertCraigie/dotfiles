@@ -55,9 +55,10 @@ $env.path ++= [
   "/Users/robert/bin",
   "/Users/robert/.local/bin",
   "/Users/robert/.local/share/bob/nvim-bin",
-  "/opt/homebrew/bin",
+  "/Users/robert/Library/pnpm",
   "/nix/var/nix/profiles/default/bin",
 
+  "/opt/homebrew/bin",
   "/opt/homebrew/opt/capstone/lib",
   "/opt/homebrew/opt/libxslt/bin",
   "/opt/homebrew/opt/ruby@3.1/bin",
