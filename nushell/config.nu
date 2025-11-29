@@ -49,6 +49,8 @@ def fcp [] {
 
 alias p = pnpm
 
+$env.DIRENV_LOG_FORMAT = ""
+
 $env.path ++= [
   "/Users/robert/bin",
   "/Users/robert/.local/bin",
