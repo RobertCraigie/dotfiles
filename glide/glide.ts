@@ -110,3 +110,100 @@ declare global { interface ExcmdRegistry { shrug: typeof shrug; } }
 
 glide.keymaps.set("normal", "<leader>ts", "shrug");
 glide.keymaps.set("normal", "<leader>\\", "surprise");
+
+// ---------------- stainless ----------------
+
+type StainlessProjects = Array<{ project: string }>;
+
+glide.keymaps.set("normal", "<leader>ss", async () => {
+  const data = JSON.parse(
+    await glide.fs.read(glide.path.join(glide.path.home_dir, ".dotfiles", "stl-projects.json"), "utf8"),
+  ) as StainlessProjects;
+
+  glide.commandline.show({
+    title: "stainless projects",
+    options: data.map(({ project }) => ({
+      label: project,
+      async execute() {
+        const url = `https://app.stainless.com/${project}/studio`;
+
+        const tab = await glide.tabs.get_first({ url: `${url}*` });
+        if (tab) {
+          await browser.tabs.update(tab.id, { active: true });
+        } else {
+          await browser.tabs.create({ active: true, url });
+        }
+      },
+    })),
+  });
+}, { description: "open a stainless project in the studio" });
+// ---------------- /stainless ----------------
+
+type GitHubRepoIndex = Record<string, boolean>;
+
+glide.autocmds.create("ConfigLoaded", async () => {
+  const index_path = glide.path.join(glide.path.home_dir, ".cache", "glide-github-repos.json");
+  if (!(await glide.fs.exists(index_path))) {
+    await glide.fs.write(index_path, "{}");
+  }
+
+  const index = await glide.fs.read(index_path, "utf8").then((contents) => JSON.parse(contents) as GitHubRepoIndex);
+  let write_id: number | null = null;
+
+  function add_to_index(item: Browser.History.HistoryItem) {
+    if (!item.url) return;
+
+    const url = new URL(item.url);
+    if (url.hostname !== "github.com") return;
+
+    const parts = url.pathname.split("/").slice(1);
+    if (parts.length < 2) return;
+
+    const [owner, repo] = parts as [string, string];
+    const key = `${owner}/${repo}`;
+    if (index[key]) {
+      return;
+    }
+
+    if (write_id) {
+      clearTimeout(write_id);
+    }
+
+    index[key] = true;
+    write_id = setTimeout(() => {
+      glide.fs.write(index_path, JSON.stringify(index, null, 2));
+    }, 5000);
+  }
+
+  browser.history.onVisited.addListener(add_to_index);
+
+  glide.excmds.create({ name: "start_github_repo_index" }, () => {
+    (async () => {
+      const items = await browser.history.search({
+        text: "",
+        startTime: 0,
+        maxResults: 100000,
+      });
+      for (const item of items) {
+        add_to_index(item);
+      }
+    })();
+  });
+
+  glide.keymaps.set("normal", "<leader>sg", () =>
+    glide.commandline.show({
+      title: "github repos",
+      options: Object.keys(index).map((repo): glide.CommandLineCustomOption => ({
+        label: repo,
+        async execute() {
+          const url = `https://github.com/${repo}`;
+          const tab = await glide.tabs.get_first({ url: `${url}*` });
+          if (tab) {
+            await browser.tabs.update(tab.id, { active: true });
+          } else {
+            await browser.tabs.create({ active: true, url });
+          }
+        },
+      })),
+    }), { description: "Search GitHub repos" });
+});
