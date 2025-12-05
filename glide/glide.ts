@@ -7,6 +7,7 @@ glide.keymaps.set("normal", "<leader>r", "config_reload");
 glide.prefs.set("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 glide.prefs.set("devtools.debugger.prompt-connection", false);
 glide.prefs.set("media.videocontrols.picture-in-picture.audio-toggle.enabled", true);
+glide.prefs.set("browser.uidensity", 1); // compact mode
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("normal", ";", "commandline_show");
