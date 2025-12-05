@@ -140,7 +140,7 @@ glide.keymaps.set("normal", "<leader>ss", async () => {
 }, { description: "open a stainless project in the studio" });
 // ---------------- /stainless ----------------
 
-type GitHubRepoIndex = Record<string, boolean>;
+type GitHubRepoIndex = Record<string, number>;
 
 glide.autocmds.create("ConfigLoaded", async () => {
   const index_path = glide.path.join(glide.path.home_dir, ".cache", "glide-github-repos.json");
@@ -162,17 +162,19 @@ glide.autocmds.create("ConfigLoaded", async () => {
 
     const [owner, repo] = parts as [string, string];
     const key = `${owner}/${repo}`;
-    if (index[key]) {
-      return;
-    }
+
+    index[key] ??= 0;
+    index[key] += 1;
 
     if (write_id) {
       clearTimeout(write_id);
     }
 
-    index[key] = true;
     write_id = setTimeout(() => {
-      glide.fs.write(index_path, JSON.stringify(index, null, 2));
+      glide.fs.write(
+        index_path,
+        JSON.stringify(Object.fromEntries(Object.entries(index).sort(([_, a], [__, b]) => b - a)), null, 2),
+      );
     }, 5000);
   }
 
@@ -194,7 +196,7 @@ glide.autocmds.create("ConfigLoaded", async () => {
   glide.keymaps.set("normal", "<leader>sg", () =>
     glide.commandline.show({
       title: "github repos",
-      options: Object.keys(index).map((repo): glide.CommandLineCustomOption => ({
+      options: Object.entries(index).sort(([_, a], [__, b]) => b - a).map(([repo]): glide.CommandLineCustomOption => ({
         label: repo,
         async execute() {
           const url = `https://github.com/${repo}`;
