@@ -8,6 +8,7 @@ glide.prefs.set("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 glide.prefs.set("devtools.debugger.prompt-connection", false);
 glide.prefs.set("media.videocontrols.picture-in-picture.audio-toggle.enabled", true);
 glide.prefs.set("browser.uidensity", 1); // compact mode
+glide.prefs.set("browser.tabs.insertAfterCurrent", true);
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("normal", ";", "commandline_show");
@@ -34,6 +35,9 @@ glide.keymaps.set("normal", "gt", () => go_to_tab("https://tweek.so/"), {
 glide.keymaps.set("normal", "gm", () => go_to_tab("https://messages.google.com/web/*"), {
   description: "[g]o to [m]essages.google.com",
 });
+glide.keymaps.set("normal", "gw", () => go_to_tab("https://vault.bitwarden.com/*"), {
+  description: "[g]o to vault.bit[w]arden.com",
+});
 glide.keymaps.set("normal", "gl", () => go_to_tab("https://linear.app/*"), {
   description: "[g]o to [l]inear.app",
 });
@@ -42,9 +46,14 @@ glide.keymaps.set("normal", "gcc", () => go_to_tab("https://calendar.google.com/
 });
 
 async function go_to_tab(url: string) {
-  const tab = await glide.tabs.get_first({ url });
-  assert(tab && tab.id);
-  await browser.tabs.update(tab.id, { active: true });
+  const tab = await glide.tabs.get_first({ url, currentWindow: true });
+  if (tab) {
+    assert(tab.id);
+    await browser.tabs.update(tab.id, { active: true });
+  } else {
+    const tab_url = url.endsWith("*") ? url.slice(0, -1) : url;
+    await browser.tabs.create({ url: tab_url, active: true });
+  }
 }
 
 // ---------------- styles ----------------
