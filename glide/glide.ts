@@ -29,9 +29,6 @@ glide.keymaps.set(["normal", "insert"], "<C-t>", async ({ tab_id }) => {
 }, { description: "open a new tab from to the current one" });
 
 // tabs
-glide.keymaps.set("normal", "gt", () => go_to_tab("https://tweek.so/"), {
-  description: "[g]o to [t]week.so",
-});
 glide.keymaps.set("normal", "gm", () => go_to_tab("https://messages.google.com/web/*"), {
   description: "[g]o to [m]essages.google.com",
 });
@@ -43,6 +40,9 @@ glide.keymaps.set("normal", "gl", () => go_to_tab("https://linear.app/*"), {
 });
 glide.keymaps.set("normal", "gcc", () => go_to_tab("https://calendar.google.com/*"), {
   description: "[g]o to [c]alendar.google.com",
+});
+glide.keymaps.set("normal", "gz", () => go_to_tab("https://glide.zulipchat.com/*"), {
+  description: "[g]o to glide.[z]ulipchat.com",
 });
 
 async function go_to_tab(url: string) {
@@ -74,15 +74,6 @@ glide.autocmds.create("ConfigLoaded", async () => {
   await register_styles("marginalia-search.com");
 });
 // ---------------- /styles ----------------
-
-glide.autocmds.create("UrlEnter", { hostname: "tweek.so" }, async () => {
-  glide.buf.keymaps.set("normal", "f", `hint --include="svg"`);
-  glide.buf.keymaps.set(
-    "normal",
-    "<leader>l",
-    `hint -s '[d="m14.903 9.482-4.421 4.421c-.346.345-.864.345-1.175 0l-2.21-2.21a.756.756 0 0 1 0-1.14c.31-.346.829-.346 1.174 0l1.624 1.623 3.834-3.834c.31-.345.829-.345 1.174 0 .31.311.31.83 0 1.14Z"]'`,
-  );
-});
 
 glide.keymaps.set("normal", "<leader>gr", async () => {
   const url = new URL((await glide.tabs.active()).url!);
@@ -121,31 +112,127 @@ declare global { interface ExcmdRegistry { shrug: typeof shrug; } }
 glide.keymaps.set("normal", "<leader>ts", "shrug");
 glide.keymaps.set("normal", "<leader>\\", "surprise");
 
+type GitHubRepoIndex = Record<string, number>;
+
+glide.autocmds.create("ConfigLoaded", async () => {
+  const index_path = glide.path.join(glide.path.home_dir, ".cache", "glide-github-repos.json");
+  if (!(await glide.fs.exists(index_path))) {
+    await glide.fs.write(index_path, "{}");
+  }
+
+  const index = await glide.fs.read(index_path, "utf8").then((contents) => JSON.parse(contents) as GitHubRepoIndex);
+  let write_id: number | null = null;
+
+  function add_to_index(item: Browser.History.HistoryItem) {
+    if (!item.url) return;
+
+    const url = new URL(item.url);
+    if (url.hostname !== "github.com") return;
+
+    const parts = url.pathname.split("/").slice(1);
+    if (parts.length < 2) return;
+
+    const [owner, repo] = parts as [string, string];
+    const key = `${owner}/${repo}`;
+
+    index[key] ??= 0;
+    index[key] += 1;
+
+    if (write_id) {
+      clearTimeout(write_id);
+    }
+
+    write_id = setTimeout(() => {
+      glide.fs.write(
+        index_path,
+        JSON.stringify(Object.fromEntries(Object.entries(index).sort(([_, a], [__, b]) => b - a)), null, 2),
+      );
+    }, 5000);
+  }
+
+  browser.history.onVisited.addListener(add_to_index);
+
+  glide.excmds.create({ name: "start_github_repo_index" }, () => {
+    (async () => {
+      const items = await browser.history.search({
+        text: "",
+        startTime: 0,
+        maxResults: 100000,
+      });
+      for (const item of items) {
+        add_to_index(item);
+      }
+    })();
+  });
+
+  glide.keymaps.set("normal", "<leader>sg", () =>
+    glide.commandline.show({
+      title: "github repos",
+      options: Object.entries(index).sort(([_, a], [__, b]) => b - a).map(([repo]): glide.CommandLineCustomOption => ({
+        label: repo,
+        async execute() {
+          const url = `https://github.com/${repo}`;
+          const tab = await glide.tabs.get_first({ url: `${url}*`, currentWindow: true });
+          if (tab) {
+            await browser.tabs.update(tab.id, { active: true });
+          } else {
+            await browser.tabs.create({ active: true, url });
+          }
+        },
+      })),
+    }), { description: "Search GitHub repos" });
+});
+
 // ---------------- stainless ----------------
 
-type StainlessProjects = Array<{ project: string }>;
+glide.unstable.include("~/.config/glide/plugins/stainless.glide/stainless.glide.ts");
+glide.keymaps.set("normal", "<leader>ss", "stl_pick_studio");
+glide.keymaps.set("normal", "<leader>gs", "stl_go_to_studio");
 
-glide.keymaps.set("normal", "<leader>ss", async () => {
-  const data = JSON.parse(
-    await glide.fs.read(glide.path.join(glide.path.home_dir, ".dotfiles", "stl-projects.json"), "utf8"),
-  ) as StainlessProjects;
-
-  glide.commandline.show({
-    title: "stainless projects",
-    options: data.map(({ project }) => ({
-      label: project,
-      async execute() {
-        const url = `https://app.stainless.com/${project}/studio`;
-
-        const tab = await glide.tabs.get_first({ url: `${url}*` });
-        if (tab) {
-          await browser.tabs.update(tab.id, { active: true });
-        } else {
-          await browser.tabs.create({ active: true, url });
-        }
-      },
-    })),
-  });
-}, { description: "open a stainless project in the studio" });
 // ---------------- /stainless ----------------
 
+glide.keymaps.set("normal", "p", "keys <D-v>");
+
+glide.keymaps.set("normal", "<leader>tt", () => {
+  const id = "hide-toolbox";
+  if (!glide.styles.has(id)) {
+    glide.styles.add(
+      css`
+        #navigator-toolbox {
+          display: none !important;
+        }
+      `,
+      { id: "hide-toolbox" },
+    );
+  } else {
+    glide.styles.remove("hide-toolbox");
+  }
+});
+
+// How much to change the UI text scale each time (in percent)
+const UI_SCALE_STEP = 10;
+const UI_SCALE_MIN = 50;
+const UI_SCALE_MAX = 250;
+
+function get_ui_scale(): number {
+  const current = glide.prefs.get("ui.textScaleFactor");
+  return typeof current === "number" ? current : 100;
+}
+
+function set_ui_scale(next: number) {
+  const clamped = Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, next));
+  glide.prefs.set("ui.textScaleFactor", clamped);
+  console.log(`ui.textScaleFactor set to ${clamped}`);
+}
+
+glide.keymaps.set("normal", "<leader>=", () => {
+  set_ui_scale(get_ui_scale() + UI_SCALE_STEP);
+}, { description: "font go small" });
+
+glide.keymaps.set("normal", "<leader>-" as string, () => {
+  set_ui_scale(get_ui_scale() - UI_SCALE_STEP);
+}, { description: "font go small" });
+
+glide.keymaps.set("normal", "<leader>zz", () => {
+  glide.prefs.clear("ui.textScaleFactor");
+}, { description: "font go normal" });
