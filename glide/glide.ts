@@ -209,7 +209,6 @@ glide.keymaps.set("normal", "<leader>tt", () => {
   }
 });
 
-// How much to change the UI text scale each time (in percent)
 const UI_SCALE_STEP = 10;
 const UI_SCALE_MIN = 50;
 const UI_SCALE_MAX = 250;
@@ -227,7 +226,7 @@ function set_ui_scale(next: number) {
 
 glide.keymaps.set("normal", "<leader>=", () => {
   set_ui_scale(get_ui_scale() + UI_SCALE_STEP);
-}, { description: "font go small" });
+}, { description: "font go big" });
 
 glide.keymaps.set("normal", "<leader>-" as string, () => {
   set_ui_scale(get_ui_scale() - UI_SCALE_STEP);
