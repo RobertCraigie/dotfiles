@@ -56,6 +56,7 @@ local servers = {
       end,
     },
   },
+  oxlint = {},
   ruff = {},
   clangd = {
     cmd = { vim.fn.expand("~/.mozbuild/clang/bin/clangd") },
