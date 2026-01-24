@@ -1,0 +1,95 @@
+# Halloy config.
+#
+# For a complete list of available options,
+# please visit https://halloy.chat/configuration/
+
+theme = "Kanagawa"
+
+[font]
+family = "Berkeley Mono"
+
+[actions.sidebar]
+buffer = "replace-pane"
+focused_buffer = "close-pane"
+
+[actions.buffer]
+click_channel_name = "replace-pane"
+click_username = "replace-pane"
+
+[buffer.timestamp]
+# format = "%H:%M:%S.%f"
+format = "%R"
+
+[servers.tilde]
+realname = "Robert"
+nickname = "probablyrobert"
+server = "localhost"
+port = 6667
+use_tls = false
+chathistory = true
+channels = [
+  "#tildetown",
+]
+
+[servers.libera]
+realname = "Robert"
+nickname = "probablyrobert"
+username = "robert/irc.libera.chat@mac"
+server = "irctoday.com"
+port = 6697
+password_file = "~/.dotfiles/halloy/libera.chat.txt"
+chathistory = true
+channels = [
+  "#halloy",
+  "#voidlinux", 
+  "#lobsters",
+  "#neovim",
+  "#nixos",
+  "#soju",
+  "#firefox",
+  "#edinhacklab",
+]
+
+[notifications.highlight]
+show_toast   = true
+show_content = true
+
+[notifications.channel."#glide"]
+show_toast   = true
+show_content = true
+sound        = "dong"
+
+[preview.card]
+exclude = ["*"]
+
+[buffer.chathistory]
+infinite_scroll = true
+
+[buffer.server_messages.join]
+smart = 180
+
+[buffer.server_messages.part]
+smart = 180
+
+[buffer.server_messages.quit]
+smart = 180
+
+[buffer.server_messages.change_nick]
+smart = 180
+
+[buffer.server_messages.change_host]
+enabled = false
+
+[buffer.server_messages.topic]
+# just use the topic button in the top right pane toolbar
+enabled = false
+exclude = ["#glide"]
+
+[buffer.channel.topic]
+enabled = true
+
+# super annoying for low activity channels
+[buffer.internal_messages.error]
+enabled = false
+[buffer.internal_messages.success]
+enabled = false
