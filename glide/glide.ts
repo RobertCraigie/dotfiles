@@ -15,9 +15,9 @@ glide.keymaps.set("normal", ";", "commandline_show");
 
 glide.keymaps.set("normal", "<D-S-c>", "url_yank");
 
-glide.unstable.include("glide.slack.ts");
-glide.unstable.include("glide.github.ts");
-glide.unstable.include("glide.bearblog.ts");
+glide.include("glide.slack.ts");
+glide.include("glide.github.ts");
+glide.include("glide.bearblog.ts");
 
 // useful for sideberry
 glide.keymaps.set(["normal", "insert"], "<C-t>", async ({ tab_id }) => {
