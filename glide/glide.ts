@@ -56,6 +56,12 @@ async function go_to_tab(url: string) {
   }
 }
 
+glide.autocmds.create("UrlEnter", { hostname: "nixos.wiki" }, ({ tab_id }) => {
+  glide.content.execute(() => {
+    window.alert("this site is evil!!");
+  }, { tab_id });
+});
+
 // ---------------- styles ----------------
 async function register_styles(domain: string) {
   await browser.contentScripts.register({
