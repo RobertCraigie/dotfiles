@@ -62,8 +62,6 @@ async function register_styles(domain: string) {
     matches: [`*://${domain}/*`],
     runAt: "document_start",
     css: [{ code: await glide.fs.read(`styles/${domain}.css`, "utf8") }],
-  }).catch((err) => { // TODO: there's a weird return value cloning error
-    console.error(err);
   });
 }
 
