@@ -1,5 +1,7 @@
 /// <reference path="./glide.d.ts" />
 
+glide.env.set("PATH", "/usr/local/bin");
+
 glide.g.mapleader = "<Space>";
 
 glide.keymaps.set("normal", "<leader>r", "config_reload");
@@ -92,6 +94,15 @@ glide.keymaps.set("normal", "<leader>gr", async () => {
     url: `https://stainlessapi.retool.com/app/customers?search=${org}`,
   });
 });
+
+glide.keymaps.set("normal", "ys", () =>
+  glide.hints.show({
+    selector: "[href]",
+    async action({ content }) {
+      const href = await content.execute((target) => (target as HTMLAnchorElement).href);
+      await navigator.clipboard.writeText(href);
+    },
+  }));
 
 // excmds
 const surprise = glide.excmds.create({ name: "surprise", description: "" }, () => {
@@ -317,3 +328,5 @@ glide.o.hint_label_generator = async ({ content }) => {
   const haystack = texts.map(([text, label]) => strip(text) || strip(label || ""));
   return labels(haystack);
 };
+
+glide.prefs.set("browser.fixup.domainwhitelist.go", true);
