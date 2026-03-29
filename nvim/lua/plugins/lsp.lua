@@ -90,6 +90,7 @@ local servers = {
       },
     },
   },
+  omnisharp = {},
 }
 
 if vim.env.DEBUG_LSP then

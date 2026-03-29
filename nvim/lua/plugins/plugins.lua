@@ -9,6 +9,8 @@ local M = {
 local terminal_opts = {}
 
 local plugins = {
+  { 'glacambre/firenvim', build = ":call firenvim#install(0)" },
+
   ---------------- theme
   {
     "folke/tokyonight.nvim",
@@ -62,6 +64,72 @@ local plugins = {
         topdelete = { text = "‾" },
         changedelete = { text = "~" },
       },
+      on_attach = function(bufnr)
+        local gitsigns = require('gitsigns')
+
+        local function map(mode, l, r, opts)
+          opts = opts or {}
+          opts.buffer = bufnr
+          vim.keymap.set(mode, l, r, opts)
+        end
+
+        -- Navigation
+        map('n', ']c', function()
+          if vim.wo.diff then
+            vim.cmd.normal({ ']c', bang = true })
+          else
+            gitsigns.nav_hunk('next')
+          end
+        end)
+
+        map('n', '[c', function()
+          if vim.wo.diff then
+            vim.cmd.normal({ '[c', bang = true })
+          else
+            gitsigns.nav_hunk('prev')
+          end
+        end)
+
+        -- Actions
+        -- undo_stage_hunk
+        map('n', '<leader>hs', gitsigns.stage_hunk)
+        map('n', '<leader>hu', gitsigns.undo_stage_hunk)
+        map('n', '<leader>hr', gitsigns.reset_hunk)
+
+        map('v', '<leader>hs', function()
+          gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+        end)
+
+        map('v', '<leader>hr', function()
+          gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+        end)
+
+        map('n', '<leader>hS', gitsigns.stage_buffer)
+        map('n', '<leader>hR', gitsigns.reset_buffer)
+        map('n', '<leader>hp', gitsigns.preview_hunk)
+        map('n', '<leader>hi', gitsigns.preview_hunk_inline)
+
+        map('n', '<leader>hb', function()
+          gitsigns.blame_line({ full = true })
+        end)
+
+        -- todo how to exit?
+        map('n', '<leader>hd', gitsigns.diffthis)
+
+        map('n', '<leader>hD', function()
+          gitsigns.diffthis('~')
+        end)
+
+        map('n', '<leader>hQ', function() gitsigns.setqflist('all') end)
+        map('n', '<leader>hq', gitsigns.setqflist)
+
+        -- Toggles
+        map('n', '<leader>tb', gitsigns.toggle_current_line_blame)
+        map('n', '<leader>tw', gitsigns.toggle_word_diff)
+
+        -- Text object
+        map({ 'o', 'x' }, 'ih', gitsigns.select_hunk)
+      end
     },
   },
 
@@ -116,8 +184,7 @@ local plugins = {
         "query",
       },
 
-      -- TODO: vet & understand these options
-      highlight = { enable = true },
+      highlight = { enable = true, disable = { "terminal" } },
       indent = { enable = true, disable = { "python" } },
       incremental_selection = {
         enable = true,
@@ -319,20 +386,40 @@ local plugins = {
   },
 
   {
-    "dmtrKovalenko/fff.nvim",
+    'dmtrKovalenko/fff.nvim',
     build = function()
       require("fff.download").download_or_build_binary()
     end,
-    opts = {},
+    opts = {
+      debug = {
+        enabled = true,
+        show_scores = false,
+      },
+    },
+    lazy = false,
     keys = {
       {
         "ff",
-        function()
-          require("fff").find_files()
-        end,
-        desc = "Open file picker",
+        function() require('fff').find_files() end,
+        desc = 'FFFind files',
       },
-    },
+      {
+        "fg",
+        function() require('fff').live_grep() end,
+        desc = 'LiFFFe grep',
+      },
+      {
+        "fz",
+        function()
+          require('fff').live_grep({
+            grep = {
+              modes = { 'fuzzy', 'plain' }
+            }
+          })
+        end,
+        desc = 'Live fffuzy grep',
+      }
+    }
   },
 
   {
@@ -372,6 +459,8 @@ local plugins = {
             M.claude_terminal:toggle()
           elseif M.lazygit_terminal ~= nil and not M.lazygit_terminal.closed then
             M.lazygit_terminal:toggle()
+          elseif M.codex_terminal ~= nil and not M.codex_terminal.closed then
+            M.codex_terminal:toggle()
           else
             Snacks.terminal.toggle(vim.o.shell, terminal_opts)
           end
@@ -403,6 +492,13 @@ local plugins = {
           M.claude_terminal, _ = Snacks.terminal({ "claude", "--dangerously-skip-permissions" }, terminal_opts)
         end,
         desc = "Claude with all the permissions"
+      },
+      {
+        "<leader>CC",
+        function()
+          M.codex_terminal, _ = Snacks.terminal({ "codex" }, terminal_opts)
+        end,
+        desc = "Codex"
       },
     }
   },
@@ -496,7 +592,6 @@ local plugins = {
           lualine_a = { "mode" },
           lualine_b = { "diagnostics" },
           lualine_c = { "%f" },
-          lualine_x = { terminal_status },
         },
         inactive_sections = {
           lualine_c = { "%f" },
@@ -573,6 +668,11 @@ local plugins = {
       vim.o.timeoutlen = 300
       require("which-key").setup({ preset = "helix" })
     end,
+  },
+
+  {
+    "davidmh/mdx.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter" }
   },
 
   -- JSON Path helpers

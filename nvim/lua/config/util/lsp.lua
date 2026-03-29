@@ -40,7 +40,7 @@ M.on_attach = function(client, bufnr)
   nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
   nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
 
-  nmap("<ldeader>ds", function()
+  nmap("<leader>ss", function()
     require("telescope.builtin").lsp_document_symbols()
   end, "[D]ocument [S]ymbols")
   nmap("gm", function()
