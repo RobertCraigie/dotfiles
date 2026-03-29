@@ -278,6 +278,13 @@ local plugins = {
 
   {
     "MagicDuck/grug-far.nvim",
+    opts = {
+      engines = {
+        ripgrep = {
+          extraArgs = "--hidden",
+        },
+      },
+    },
     config = function(_, opts)
       require("grug-far").setup(opts)
     end,
