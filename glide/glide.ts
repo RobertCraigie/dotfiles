@@ -379,3 +379,12 @@ glide.autocmds.create("UrlEnter", /https:\/\/addons\.mozilla\.org\/.*\/firefox\/
     }
   }, { tab_id });
 });
+
+glide.autocmds.create("UrlEnter", /https:\/\/github\.com\/.*\/\/.*blob\//, async (props) => {
+  const url = new URL(props.url);
+  const fixed = url.pathname.replace(/\/{2,}/g, "/");
+  if (fixed !== url.pathname) {
+    url.pathname = fixed;
+    await browser.tabs.update(props.tab_id, { url: url.href });
+  }
+});
