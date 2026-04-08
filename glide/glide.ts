@@ -330,3 +330,52 @@ glide.o.hint_label_generator = async ({ content }) => {
 };
 
 glide.prefs.set("browser.fixup.domainwhitelist.go", true);
+
+glide.autocmds.create("UrlEnter", /https:\/\/addons\.mozilla\.org\/.*\/firefox\/addon\/.*/, async ({ tab_id }) => {
+  await glide.content.execute(async () => {
+    const state = await resolve_state();
+    if (!state) {
+      console.error("could not resolve redux state");
+      return;
+    }
+
+    const addons = Object.values(state.addons.byID).map((a: any) => a.guid) as string[];
+    if (addons.length < 1) {
+      console.error("no addon IDs found");
+      return;
+    }
+
+    const parent = document.querySelector(".AddonBadges")!;
+    if (parent.getAttribute("$glide-added-id")) {
+      return;
+    }
+
+    for (const id of addons) {
+      parent.appendChild(DOM.create_element("div", {
+        className: "Badge",
+        children: [
+          DOM.create_element("span", {
+            className: "Badge-content Badge-content--large",
+            children: [`ID: ${id}`],
+          }),
+        ],
+      }));
+    }
+
+    parent.setAttribute("$glide-added-id", "dummy");
+
+    async function resolve_state(): Promise<{ addons: { byID: Record<string, { guid: string }> } } | null> {
+      let checks = 0;
+      while (checks < 50) {
+        checks++;
+        const element = document.getElementById("redux-store-state");
+        if (!element) {
+          await new Promise((r) => requestAnimationFrame(r));
+          continue;
+        }
+        return JSON.parse(element.textContent);
+      }
+      return null;
+    }
+  }, { tab_id });
+});
