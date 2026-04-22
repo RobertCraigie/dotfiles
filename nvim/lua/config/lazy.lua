@@ -33,5 +33,3 @@ require("lazy").setup({
     notify = false,
   },
 })
-
-require("oil").setup()
