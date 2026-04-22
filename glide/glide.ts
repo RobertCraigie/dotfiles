@@ -314,3 +314,10 @@ glide.autocmds.create("UrlEnter", /https:\/\/github\.com\/.*\/\/.*blob\//, async
     await browser.tabs.update(props.tab_id, { url: url.href });
   }
 });
+
+glide.autocmds.create("UrlEnter", /https:\/\/framed\.wtf\/archive/, (props) => {
+  const url = new URL(props.url);
+  const current_day = parseInt(url.searchParams.get("day") || "");
+  glide.bo.go_previous_patterns = [`${current_day - 1}`];
+  glide.bo.go_next_patterns = [`${current_day + 1}`];
+});
