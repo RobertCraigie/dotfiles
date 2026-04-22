@@ -540,6 +540,20 @@ local plugins = {
           return false
         end,
       },
+      keymaps = {
+        ["gd"] = {
+          callback = function()
+            local oil = require("oil")
+            local config = require("oil.config")
+            if #config.columns == 1 then
+              oil.set_columns({ "icon", { "size", highlight = "Comment" }, { "mtime", highlight = "Comment" }, { "permissions", highlight = "Comment" } })
+            else
+              oil.set_columns({ "icon" })
+            end
+          end,
+          desc = "Toggle detailed view",
+        },
+      },
     },
   },
 
