@@ -149,3 +149,13 @@ $env.config.menus ++= [{
   }
 }]
 
+def retry-until-success [cmd: closure, delay = 1sec] {
+  loop {
+    try {
+      do $cmd
+      break
+    } catch {|e|
+      sleep $delay
+    }
+  }
+}
