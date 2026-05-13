@@ -2,13 +2,29 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      inputs.direnv-instant.nixosModules.direnv-instant
     ];
+
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+  programs.direnv-instant.enable = true;
+
+  # Replace interactive bash with nushell, keeping bash as the POSIX login shell.
+  programs.bash.interactiveShellInit = ''
+    if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "nu" && -z ''${BASH_EXECUTION_STRING} ]]
+    then
+      shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
+      exec ${pkgs.nushell}/bin/nu $LOGIN_OPTION
+    fi
+  '';
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -95,11 +111,32 @@
       git
       gh
       lazygit
+      fzf
+      ripgrep
+      delta
+      gnupg
+      yq
+      go
+      deno
+      pnpm
+      nodejs_24
+      python314
+      uv
+      docker
+      jetbrains-mono
+      cmake
+      gcc
+      gnumake
+      cargo
+      unzip
     ];
   };
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  # Set kitty as the default terminal.
+  environment.sessionVariables.TERMINAL = "kitty";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
