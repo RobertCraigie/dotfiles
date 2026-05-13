@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # update all "open in editor" functionality to use my custom app that forwards to the terminal
 
