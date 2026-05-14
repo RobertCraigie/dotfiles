@@ -52,6 +52,9 @@
     "nix-command"
     "flakes"
   ];
+  # Silence "Git tree is dirty" — nix-direnv re-runs `nix print-dev-env`
+  # on every change, so this warning fires on every prompt during dev.
+  nix.settings.warn-dirty = false;
 
   # Set your time zone.
   time.timeZone = "Europe/London";
@@ -85,6 +88,16 @@
     options = "ctrl:nocaps";
   };
   console.useXkbConfig = true;
+
+  # Caps Lock: hold = Ctrl, tap = Esc (keyd intercepts below xkb, so this
+  # supersedes ctrl:nocaps when running; xkb remains a fallback.)
+  services.keyd = {
+    enable = true;
+    keyboards.default = {
+      ids = [ "*" ];
+      settings.main.capslock = "overload(control, esc)";
+    };
+  };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -227,6 +240,7 @@
       partOf = [ "graphical-session.target" ];
       after = [ "graphical-session.target" ];
       wantedBy = [ "graphical-session.target" ];
+      path = with pkgs; [ bash coreutils ];
       serviceConfig = {
         ExecStart = "${pkgs.noctalia-shell}/bin/noctalia-shell";
         Restart = "always";
