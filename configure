@@ -53,6 +53,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     symlink "$DOTFILES_DIR/hypr" ~/.config/hypr false
+    symlink "$DOTFILES_DIR/noctalia" ~/.config/noctalia false
     symlink "$DOTFILES_DIR/nushell" ~/.config/nushell false
     symlink "$DOTFILES_DIR/lazygit/config.yml" ~/.config/lazygit/config.yml true
 fi
