@@ -74,14 +74,7 @@
     LC_TIME = "en_GB.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the XFCE Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.xfce.enable = true;
-
-  # Configure keymap in X11
+  # Keyboard layout (also used by the console via console.useXkbConfig).
   services.xserver.xkb = {
     layout = "us";
     variant = "";
@@ -161,11 +154,48 @@
 
   # Set kitty as the default terminal.
   environment.sessionVariables.TERMINAL = "kitty";
-  # XFCE picks the preferred terminal from helpers.rc, not $TERMINAL.
-  environment.etc."xdg/xfce4/helpers.rc".text = "TerminalEmulator=kitty\n";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  # Hyprland desktop (default). UWSM gives us proper graphical-session.target
+  # activation, which the noctalia user service below depends on.
+  programs.hyprland.enable = true;
+  programs.uwsm.enable = true;
+
+  # Run ssh-agent for the user session so signing keys stay unlocked,
+  # and use a Wayland-friendly askpass for the initial passphrase prompt
+  # (default is x11_ssh_askpass, which only works under XWayland).
+  programs.ssh.startAgent = true;
+  programs.ssh.askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
+
+  # greetd launches the UWSM Hyprland session straight from the TTY —
+  # works more reliably with Wayland than lightdm.
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd 'uwsm start hyprland-uwsm.desktop'";
+      user = "greeter";
+    };
+  };
+
+  # Run noctalia-shell as a supervised user service so a crash doesn't
+  # leave the session without a bar/launcher/lock screen.
+  systemd.user.services.noctalia-shell = {
+    description = "Noctalia desktop shell";
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    wantedBy = [ "graphical-session.target" ];
+    path = with pkgs; [ bash coreutils ];
+    serviceConfig = {
+      ExecStart = "${pkgs.noctalia-shell}/bin/noctalia-shell";
+      Restart = "always";
+      RestartSec = "1";
+    };
+  };
+
+  # Native Wayland for Electron/Chromium apps.
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -174,6 +204,16 @@
     nushell
     neovim
     claude-code
+    # Hyprland desktop bits:
+    noctalia-shell
+    wl-clipboard
+    fuzzel
+    libnotify
+    grim
+    slurp
+    brightnessctl
+    kdePackages.breeze-icons
+    adw-gtk3
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
@@ -205,62 +245,30 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  # Tag the default (XFCE) boot entry so it's distinguishable in systemd-boot.
-  system.nixos.tags = [ "xfce" ];
+  # Tag the default (Hyprland) boot entry so it's distinguishable in systemd-boot.
+  system.nixos.tags = [ "hyprland" ];
 
-  # Hyprland + Noctalia as a specialisation: separate boot menu entry, no
-  # impact on the XFCE default unless explicitly selected at boot.
-  specialisation.hyprland.configuration = {
-    system.nixos.tags = lib.mkForce [ "hyprland" ];
+  # XFCE + lightdm as a specialisation: separate boot menu entry, safe
+  # fallback if Hyprland breaks. No impact on the default unless selected
+  # at boot.
+  specialisation.xfce.configuration = {
+    system.nixos.tags = lib.mkForce [ "xfce" ];
 
-    # Take XFCE/X11/lightdm out of this profile.
-    services.xserver.enable = lib.mkForce false;
-    services.xserver.desktopManager.xfce.enable = lib.mkForce false;
-    services.xserver.displayManager.lightdm.enable = lib.mkForce false;
+    # Take Hyprland/greetd/noctalia out of this profile.
+    programs.hyprland.enable = lib.mkForce false;
+    programs.uwsm.enable = lib.mkForce false;
+    services.greetd.enable = lib.mkForce false;
+    systemd.user.services.noctalia-shell.enable = lib.mkForce false;
 
-    # UWSM gives us proper graphical-session.target activation, which the
-    # noctalia user service below depends on.
-    programs.hyprland.enable = true;
-    programs.uwsm.enable = true;
+    # Electron/Chromium apps shouldn't try Wayland under X11.
+    environment.sessionVariables.NIXOS_OZONE_WL = lib.mkForce "";
 
-    # greetd launches the UWSM Hyprland session straight from the TTY —
-    # works more reliably with Wayland than lightdm.
-    services.greetd = {
-      enable = true;
-      settings.default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd 'uwsm start hyprland-uwsm.desktop'";
-        user = "greeter";
-      };
-    };
+    # Enable XFCE + lightdm + X11.
+    services.xserver.enable = true;
+    services.xserver.displayManager.lightdm.enable = true;
+    services.xserver.desktopManager.xfce.enable = true;
 
-    # Run noctalia-shell as a supervised user service so a crash doesn't
-    # leave the session without a bar/launcher/lock screen.
-    systemd.user.services.noctalia-shell = {
-      description = "Noctalia desktop shell";
-      partOf = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      wantedBy = [ "graphical-session.target" ];
-      path = with pkgs; [ bash coreutils ];
-      serviceConfig = {
-        ExecStart = "${pkgs.noctalia-shell}/bin/noctalia-shell";
-        Restart = "always";
-        RestartSec = "1";
-      };
-    };
-
-    environment.systemPackages = with pkgs; [
-      noctalia-shell
-      wl-clipboard
-      fuzzel
-      libnotify
-      grim
-      slurp
-      brightnessctl
-      kdePackages.breeze-icons
-      adw-gtk3
-    ];
-
-    # Native Wayland for Electron/Chromium apps.
-    environment.sessionVariables.NIXOS_OZONE_WL = "1";
+    # XFCE picks the preferred terminal from helpers.rc, not $TERMINAL.
+    environment.etc."xdg/xfce4/helpers.rc".text = "TerminalEmulator=kitty\n";
   };
 }
