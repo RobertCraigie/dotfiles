@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
   imports =
@@ -192,4 +192,61 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
+  # Tag the default (XFCE) boot entry so it's distinguishable in systemd-boot.
+  system.nixos.tags = [ "xfce" ];
+
+  # Hyprland + Noctalia as a specialisation: separate boot menu entry, no
+  # impact on the XFCE default unless explicitly selected at boot.
+  specialisation.hyprland.configuration = {
+    system.nixos.tags = lib.mkForce [ "hyprland" ];
+
+    # Take XFCE/X11/lightdm out of this profile.
+    services.xserver.enable = lib.mkForce false;
+    services.xserver.desktopManager.xfce.enable = lib.mkForce false;
+    services.xserver.displayManager.lightdm.enable = lib.mkForce false;
+
+    # UWSM gives us proper graphical-session.target activation, which the
+    # noctalia user service below depends on.
+    programs.hyprland.enable = true;
+    programs.uwsm.enable = true;
+
+    # greetd launches the UWSM Hyprland session straight from the TTY —
+    # works more reliably with Wayland than lightdm.
+    services.greetd = {
+      enable = true;
+      settings.default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd 'uwsm start hyprland-uwsm.desktop'";
+        user = "greeter";
+      };
+    };
+
+    # Run noctalia-shell as a supervised user service so a crash doesn't
+    # leave the session without a bar/launcher/lock screen.
+    systemd.user.services.noctalia-shell = {
+      description = "Noctalia desktop shell";
+      partOf = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      wantedBy = [ "graphical-session.target" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.noctalia-shell}/bin/noctalia-shell";
+        Restart = "always";
+        RestartSec = "1";
+      };
+    };
+
+    environment.systemPackages = with pkgs; [
+      noctalia-shell
+      wl-clipboard
+      fuzzel
+      libnotify
+      grim
+      slurp
+      brightnessctl
+      kdePackages.breeze-icons
+      adw-gtk3
+    ];
+
+    # Native Wayland for Electron/Chromium apps.
+    environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  };
 }
