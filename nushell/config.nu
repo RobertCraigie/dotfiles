@@ -28,7 +28,9 @@ $env.config.cursor_shape = {
   vi_normal:  block         # <── solid block when you hit <Esc>
 }
 
-source /run/current-system/sw/share/direnv-instant/nushell.nu
+source /etc/direnv-instant/nushell.nu
+
+alias rebuild = sudo nixos-rebuild switch --flake /home/robert/.dotfiles/nixos#nixos
 
 def fcp [] {
   fzf | tr -d '\n' | xclip -selection clipboard

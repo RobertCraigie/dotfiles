@@ -1,13 +1,13 @@
 [user]
 	email = robert@craigie.dev
 	name = Robert Craigie
-	signingkey = 37AC7132F25857D1
-[credential]
-	helper = /usr/local/share/gcm-core/git-credential-manager
+	signingkey = ~/.ssh/id_rsa_github.pub
+# [credential]
+#	helper = /usr/local/share/gcm-core/git-credential-manager
 [credential "https://dev.azure.com"]
 	useHttpPath = true
 [core]
-	excludesfile = /Users/robert/.gitignore
+	excludesfile = ~/.gitignore
 	pager = delta --dark
 [url "https://github.com/"]
 	insteadOf = git@github.com:
@@ -15,6 +15,12 @@
 	enabled = true
 [credential "https://github.com"]
 	username = RobertCraigie
+[credential "https://github.com"]
+	helper = 
+	helper = !/etc/profiles/per-user/robert/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/etc/profiles/per-user/robert/bin/gh auth git-credential
 [push]
 	autoSetupRemote = true
 [fetch]
@@ -30,11 +36,13 @@
 	diffFilter = delta --color-only
 [cinnabar]
 	version-check = 1747696892
-# [gpg]
-# 	program = /opt/homebrew/bin/gpg
-# [commit]
-#	gpgsign = true
-# [tag]
-#	gpgSign = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.config/git/allowed_signers
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
 [alias]
   lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit

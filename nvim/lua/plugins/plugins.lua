@@ -711,7 +711,13 @@ local plugins = {
       },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+        build = function(plugin)
+          vim.system({
+            "bash",
+            "-c",
+            "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+          }, { cwd = plugin.dir }):wait()
+        end,
       },
     },
     cmd = "Telescope",

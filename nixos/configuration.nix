@@ -16,6 +16,11 @@
     nix-direnv.enable = true;
   };
   programs.direnv-instant.enable = true;
+  # The NixOS module's wrapped output only ships bin/, so expose the
+  # nushell hook (shipped in share/ of the unwrapped package) at a
+  # stable path for the nushell config to source.
+  environment.etc."direnv-instant/nushell.nu".source =
+    "${config.programs.direnv-instant.package}/share/direnv-instant/nushell.nu";
 
   # Replace interactive bash with nushell, keeping bash as the POSIX login shell.
   programs.bash.interactiveShellInit = ''
@@ -77,7 +82,9 @@
   services.xserver.xkb = {
     layout = "us";
     variant = "";
+    options = "ctrl:nocaps";
   };
+  console.useXkbConfig = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -129,14 +136,20 @@
       gnumake
       cargo
       unzip
+      sublime-merge
     ];
   };
 
   # Install firefox.
   programs.firefox.enable = true;
 
+  # Run unpatched dynamically-linked binaries (e.g. prebuilt node_modules tools like dprint).
+  programs.nix-ld.enable = true;
+
   # Set kitty as the default terminal.
   environment.sessionVariables.TERMINAL = "kitty";
+  # XFCE picks the preferred terminal from helpers.rc, not $TERMINAL.
+  environment.etc."xdg/xfce4/helpers.rc".text = "TerminalEmulator=kitty\n";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
