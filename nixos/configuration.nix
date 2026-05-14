@@ -260,6 +260,10 @@
     services.greetd.enable = lib.mkForce false;
     systemd.user.services.noctalia-shell.enable = lib.mkForce false;
 
+    # XFCE pulls in gnome's gcr-ssh-agent; defer to it instead of starting
+    # our own ssh-agent here (only one ssh-agent can be active).
+    programs.ssh.startAgent = lib.mkForce false;
+
     # Electron/Chromium apps shouldn't try Wayland under X11.
     environment.sessionVariables.NIXOS_OZONE_WL = lib.mkForce "";
 
