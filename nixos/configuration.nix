@@ -95,6 +95,10 @@
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
+  # UPower exposes battery/AC state over D-Bus — Noctalia's Battery widget
+  # uses it for detection (without it, hideIfNotDetected hides the widget).
+  services.upower.enable = true;
+
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
