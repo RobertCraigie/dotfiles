@@ -7,6 +7,9 @@
         }
     ],
     "states": {
+        "screen-toolkit": {
+            "enabled": true
+        }
     },
     "version": 2
 }
