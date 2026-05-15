@@ -150,6 +150,7 @@
       signal-desktop
       obsidian
       poppler-utils
+      spotify
     ];
   };
 
