@@ -374,7 +374,11 @@ local plugins = {
       disabled_modes = { "t", "nt", "vt" },
     },
     config = function(_, opts)
-      vim.o.scrolloff = 10
+      if vim.env.NVIM_NOTES == "1" then
+        vim.o.scrolloff = 2
+      else
+        vim.o.scrolloff = 10
+      end
       require("scrollEOF").setup(opts)
     end,
   },
@@ -559,6 +563,7 @@ local plugins = {
 
   {
     "Bekaboo/dropbar.nvim",
+    enabled = function() return vim.env.NVIM_NOTES ~= "1" end,
     -- optional, but required for fuzzy finder support
     dependencies = {
       "nvim-telescope/telescope-fzf-native.nvim",
@@ -588,6 +593,7 @@ local plugins = {
   -- Fancier statusline
   {
     "nvim-lualine/lualine.nvim",
+    enabled = function() return vim.env.NVIM_NOTES ~= "1" end,
     dependencies = {
       "f-person/git-blame.nvim",
     },
@@ -711,7 +717,13 @@ local plugins = {
       },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+        build = function(plugin)
+          vim.system({
+            "bash",
+            "-c",
+            "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+          }, { cwd = plugin.dir }):wait()
+        end,
       },
     },
     cmd = "Telescope",
