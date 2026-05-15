@@ -1,6 +1,8 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
+  imports = [ inputs.glide.homeModules.default ];
+
   home.username = "robert";
   home.homeDirectory = "/home/robert";
   home.stateVersion = "25.11";
@@ -20,4 +22,6 @@
     color-scheme = "prefer-dark";
     gtk-theme = "adw-gtk3-dark";
   };
+
+  programs.glide-browser.enable = true;
 }
