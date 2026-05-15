@@ -24,4 +24,18 @@
   };
 
   programs.glide-browser.enable = true;
+
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = "glide-browser.desktop";
+      "x-scheme-handler/http" = "glide-browser.desktop";
+      "x-scheme-handler/https" = "glide-browser.desktop";
+      "x-scheme-handler/about" = "glide-browser.desktop";
+      "x-scheme-handler/unknown" = "glide-browser.desktop";
+      "x-scheme-handler/gemini" = "glide-browser.desktop";
+      "application/xhtml+xml" = "glide-browser.desktop";
+      "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
+    };
+  };
 }
