@@ -559,6 +559,7 @@ local plugins = {
 
   {
     "Bekaboo/dropbar.nvim",
+    enabled = function() return vim.env.NVIM_NOTES ~= "1" end,
     -- optional, but required for fuzzy finder support
     dependencies = {
       "nvim-telescope/telescope-fzf-native.nvim",
@@ -588,6 +589,7 @@ local plugins = {
   -- Fancier statusline
   {
     "nvim-lualine/lualine.nvim",
+    enabled = function() return vim.env.NVIM_NOTES ~= "1" end,
     dependencies = {
       "f-person/git-blame.nvim",
     },
