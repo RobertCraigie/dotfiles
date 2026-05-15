@@ -1,7 +1,7 @@
 [user]
 	email = robert@craigie.dev
 	name = Robert Craigie
-	signingkey = ~/.ssh/id_rsa_github.pub
+	signingkey = key::ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDhArSMWdKhZ32GbwR/gSTNWI2nsS0nbY8SfAF35hTWPWUqiyBh/s6e83pNPvha7ZtA3z9Bz7WI1YHS6tT6KXQzvLtRmIaHq88ElbK6G/ylsk2Fv82l1tmtEP5qNXYUiWWxoyFzauBgHe8Ixn4bPARBkMUn132UvnNW0HqOSSL8mYahNFaciZbg+hpiu4VDOHqzEDz6CPnGr8DjcBby4o8LPz2+gd7QORgjRGNYmAHNMeMZ1L+ahDuv10yrRSf+ycAJCQDr6MzmF/s7xoRPrLVX6YURuUf0ZHW1egOWjJDHq/ju+3ShOs4ej/QPZ1wNrcUuvgOjFfB7XwQZ2Jo77xshMS1vxdo/JW0MS6qGxFKHFycCvYx7eyB68zPmFTrjy0DstM4XbpLzq7S4FCNZrloYdQ4vAE168og6/2z3iyl6RqTZUF0PlbBlrlHPf3QTTh27gWQdJPylfIcwwromLGoWwyiD/Ms8r2ePNmlHGUO7IwxI0psC9WH6kr2AlwfdW1X/O1iAEMAd9uNSiYdXhWw3jPaJMYKHvust7efyL7t17ABxZQsn2Y/sWAyF+h9By4kgLK9R8whaFzP6NwsDS6M0+ptvGEPrpiMBtpaZeczVISBHd0U35OHqM5rJ5Fh6f9iwGY7u4LpuI2FqTCgnGgR0PyIVFCwPdwezpiu/IQkYLQ== robert@craigie.dev
 # [credential]
 #	helper = /usr/local/share/gcm-core/git-credential-manager
 [credential "https://dev.azure.com"]

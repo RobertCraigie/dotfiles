@@ -168,11 +168,10 @@
   programs.hyprland.enable = true;
   programs.uwsm.enable = true;
 
-  # Run ssh-agent for the user session so signing keys stay unlocked,
-  # and use a Wayland-friendly askpass for the initial passphrase prompt
-  # (default is x11_ssh_askpass, which only works under XWayland).
-  programs.ssh.startAgent = true;
+  services.gnome.gnome-keyring.enable = true;
+
   programs.ssh.askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
+  programs.ssh.enableAskPassword = true;
 
   # greetd launches the UWSM Hyprland session straight from the TTY —
   # works more reliably with Wayland than lightdm.
@@ -183,6 +182,8 @@
       user = "greeter";
     };
   };
+
+  security.pam.services.greetd.enableGnomeKeyring = true;
 
   # Run noctalia-shell as a supervised user service so a crash doesn't
   # leave the session without a bar/launcher/lock screen.
@@ -261,10 +262,6 @@
     programs.uwsm.enable = lib.mkForce false;
     services.greetd.enable = lib.mkForce false;
     systemd.user.services.noctalia-shell.enable = lib.mkForce false;
-
-    # XFCE pulls in gnome's gcr-ssh-agent; defer to it instead of starting
-    # our own ssh-agent here (only one ssh-agent can be active).
-    programs.ssh.startAgent = lib.mkForce false;
 
     # Electron/Chromium apps shouldn't try Wayland under X11.
     environment.sessionVariables.NIXOS_OZONE_WL = lib.mkForce "";
