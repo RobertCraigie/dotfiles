@@ -192,7 +192,14 @@
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
     wantedBy = [ "graphical-session.target" ];
-    path = with pkgs; [ bash coreutils ];
+    path = with pkgs; [
+      bash coreutils
+      # screen-toolkit dependencies:
+      hyprpicker slurp grim wl-clipboard
+      tesseract imagemagick zbar curl
+      translate-shell wl-screenrec ffmpeg gifski jq
+      python3 python3Packages.pygobject3
+    ];
     serviceConfig = {
       ExecStart = "${pkgs.noctalia-shell}/bin/noctalia-shell";
       Restart = "always";
@@ -206,6 +213,7 @@
     after = [ "graphical-session.target" ];
     requires = [ "dbus.socket" ];
     wantedBy = [ "graphical-session.target" ];
+    path = with pkgs; [ noctalia-shell ];
     serviceConfig = {
       ExecStart = "${pkgs.vicinae}/bin/vicinae server --replace";
       ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
