@@ -570,6 +570,7 @@
             },
             {
                 "action": "logout",
+                "command": "loginctl terminate-user $USER",
                 "enabled": true,
                 "keybind": "5"
             },
