@@ -28,18 +28,24 @@ $env.config.cursor_shape = {
   vi_normal:  block         # <── solid block when you hit <Esc>
 }
 
-$env.config = {
-  hooks: {
-    pre_prompt: [{ ||
-      if (which direnv | is-empty) {
-        return
-      }
+if (sys host | get name) == "Linux" {
+  source /etc/direnv-instant/nushell.nu
 
-      direnv export json | from json | default {} | load-env
-      if 'ENV_CONVERSIONS' in $env and 'PATH' in $env.ENV_CONVERSIONS {
-        $env.PATH = do $env.ENV_CONVERSIONS.PATH.from_string $env.PATH
-      }
-    }]
+  alias rebuild = sudo nixos-rebuild switch --flake /home/robert/.dotfiles/nixos#nixos
+} else if (sys host | get name) == "Darwin" {
+  $env.config = {
+    hooks: {
+      pre_prompt: [{ ||
+        if (which direnv | is-empty) {
+          return
+        }
+
+        direnv export json | from json | default {} | load-env
+        if 'ENV_CONVERSIONS' in $env and 'PATH' in $env.ENV_CONVERSIONS {
+          $env.PATH = do $env.ENV_CONVERSIONS.PATH.from_string $env.PATH
+        }
+      }]
+    }
   }
 }
 
