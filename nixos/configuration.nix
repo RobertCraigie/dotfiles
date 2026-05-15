@@ -149,6 +149,7 @@
       sublime-merge
       signal-desktop
       obsidian
+      poppler-utils
     ];
   };
 
