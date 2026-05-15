@@ -28,10 +28,10 @@ $env.config.cursor_shape = {
   vi_normal:  block         # <── solid block when you hit <Esc>
 }
 
+alias rebuild = sudo nixos-rebuild switch --flake /home/robert/.dotfiles/nixos#nixos
+
 if (sys host | get name) == "NixOS" {
   source /etc/direnv-instant/nushell.nu
-
-  alias rebuild = sudo nixos-rebuild switch --flake /home/robert/.dotfiles/nixos#nixos
 } else if (sys host | get name) == "Darwin" {
   $env.config = {
     hooks: {
