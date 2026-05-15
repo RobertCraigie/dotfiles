@@ -200,6 +200,21 @@
     };
   };
 
+  systemd.user.services.vicinae = {
+    description = "Vicinae launcher daemon";
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    requires = [ "dbus.socket" ];
+    wantedBy = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.vicinae}/bin/vicinae server --replace";
+      ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
+      Restart = "always";
+      RestartSec = "60";
+      KillMode = "process";
+    };
+  };
+
   # Native Wayland for Electron/Chromium apps.
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
@@ -225,6 +240,7 @@
     claude-code
     # Hyprland desktop bits:
     noctalia-shell
+    vicinae
     wl-clipboard
     fuzzel
     libnotify
