@@ -12,6 +12,9 @@ glide.prefs.set("media.videocontrols.picture-in-picture.audio-toggle.enabled", t
 glide.prefs.set("browser.uidensity", 1); // compact mode
 glide.prefs.set("browser.tabs.insertAfterCurrent", true);
 
+glide.keymaps.set(['normal', 'insert'], '<D-{>', 'tab_prev');
+glide.keymaps.set(['normal', 'insert'], '<D-}>', 'tab_next');
+
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("normal", ";", "commandline_show");
 
