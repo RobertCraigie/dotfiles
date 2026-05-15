@@ -148,6 +148,7 @@
       unzip
       sublime-merge
       signal-desktop
+      obsidian
     ];
   };
 
