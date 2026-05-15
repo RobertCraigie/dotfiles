@@ -15,6 +15,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    # not in dotfiles as its licensed
+    berkeley-mono = {
+      url = "path:/home/robert/.fonts/berkeley-mono";
+      flake = false;
+    };
   };
 
   outputs = inputs@{ self, nixpkgs, ... }: {

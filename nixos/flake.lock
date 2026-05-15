@@ -1,5 +1,18 @@
 {
   "nodes": {
+    "berkeley-mono": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778858226,
+        "narHash": "sha256-fMQ0Iy51a/QdbWrdxO7ZjU7uBvnnCIFmiq8NfLB2UZk=",
+        "path": "/home/robert/.fonts/berkeley-mono",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/robert/.fonts/berkeley-mono",
+        "type": "path"
+      }
+    },
     "direnv-instant": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -104,6 +117,7 @@
     },
     "root": {
       "inputs": {
+        "berkeley-mono": "berkeley-mono",
         "direnv-instant": "direnv-instant",
         "glide": "glide",
         "home-manager": "home-manager",

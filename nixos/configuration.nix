@@ -203,6 +203,19 @@
   # Native Wayland for Electron/Chromium apps.
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
+  fonts.packages = [
+    (pkgs.stdenvNoCC.mkDerivation {
+      pname = "berkeley-mono";
+      version = "1.0";
+      src = inputs.berkeley-mono;
+      dontUnpack = true;
+      installPhase = ''
+        mkdir -p $out/share/fonts/opentype
+        cp $src/*.otf $out/share/fonts/opentype/
+      '';
+    })
+  ];
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
