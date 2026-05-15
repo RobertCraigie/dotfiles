@@ -27,7 +27,6 @@ symlink "$DOTFILES_DIR/kitty" ~/.config/kitty true
 symlink "$DOTFILES_DIR/nvmrc" ~/.nvmrc true
 symlink "$DOTFILES_DIR/zellij" ~/.config/zellij true
 symlink "$DOTFILES_DIR/profile" ~/.profile false
-symlink "$DOTFILES_DIR/gitconfig" ~/.gitconfig false
 symlink "$DOTFILES_DIR/gitignore" ~/.gitignore false
 symlink "$DOTFILES_DIR/zprofile" ~/.zprofile false
 symlink "$DOTFILES_DIR/zshenv" ~/.zshenv false
@@ -40,6 +39,8 @@ symlink "$DOTFILES_DIR/p10k.zsh" ~/.p10k.zsh false
 symlink "$DOTFILES_DIR/direnv" ~/.config/direnv false
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
+    symlink "$DOTFILES_DIR/gitconfig.darwin" ~/.gitconfig false
+
     symlink "$DOTFILES_DIR/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty" true
     symlink "$DOTFILES_DIR/lazygit/config.yml" "$HOME/Library/Application Support/lazygit/config.yml" true
     symlink "$DOTFILES_DIR/nushell" "$HOME/Library/Application Support/nushell" false
@@ -52,6 +53,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         chsh -s "$nupath"
     fi
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    symlink "$DOTFILES_DIR/gitconfig.linux" ~/.gitconfig false
+
     symlink "$DOTFILES_DIR/hypr" ~/.config/hypr false
     symlink "$DOTFILES_DIR/noctalia" ~/.config/noctalia false
     symlink "$DOTFILES_DIR/nushell" ~/.config/nushell false

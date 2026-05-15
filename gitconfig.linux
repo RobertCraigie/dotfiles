@@ -1,0 +1,48 @@
+[user]
+	email = robert@craigie.dev
+	name = Robert Craigie
+	signingkey = ~/.ssh/id_rsa_github.pub
+# [credential]
+#	helper = /usr/local/share/gcm-core/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+[core]
+	excludesfile = ~/.gitignore
+	pager = delta --dark
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+[rerere]
+	enabled = true
+[credential "https://github.com"]
+	username = RobertCraigie
+[credential "https://github.com"]
+	helper = 
+	helper = !/etc/profiles/per-user/robert/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/etc/profiles/per-user/robert/bin/gh auth git-credential
+[push]
+	autoSetupRemote = true
+[fetch]
+	prune = true
+
+[alias]
+	prcreate = "!sh -c 'git push origin $@ && gh pr create --fill --draft --template=~/stainless/stainless/.github/PULL_REQUEST_TEMPLATE.md --head \"$1\"'"
+[diff]
+	tool = smerge
+[difftool "smerge"]
+	cmd = smerge difftool \"$LOCAL\" \"$REMOTE\"
+[interactive]
+	diffFilter = delta --color-only
+[cinnabar]
+	version-check = 1747696892
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.config/git/allowed_signers
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
+[alias]
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
