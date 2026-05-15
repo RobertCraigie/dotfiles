@@ -2,3 +2,6 @@
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot
 	ignore = dirty
+[submodule "noctalia/plugins/_noctalia-plugins"]
+	path = noctalia/plugins/_noctalia-plugins
+	url = https://github.com/noctalia-dev/noctalia-plugins

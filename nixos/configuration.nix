@@ -221,6 +221,20 @@
     kdePackages.breeze-icons
     kdePackages.dolphin
     adw-gtk3
+    # Noctalia screen-toolkit plugin deps:
+    hyprpicker
+    tesseract
+    imagemagick
+    zbar
+    curl
+    translate-shell
+    wl-screenrec
+    ffmpeg
+    gifski
+    jq
+    python3
+    python3Packages.pygobject3
+    xdg-desktop-portal
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
