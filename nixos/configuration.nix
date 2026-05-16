@@ -194,6 +194,7 @@
     wantedBy = [ "graphical-session.target" ];
     path = with pkgs; [
       bash coreutils
+      networkmanager
       # screen-toolkit dependencies:
       hyprpicker slurp grim wl-clipboard
       tesseract imagemagick zbar curl
