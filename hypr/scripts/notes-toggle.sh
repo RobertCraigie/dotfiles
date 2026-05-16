@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-NOTES_FILE="$HOME/notes.md"
+NOTES_FILE="$HOME/Documents/Obsidian/notes.md"
 
 has_notes_window() {
     hyprctl clients -j | grep -q '"class": "notes"'
