@@ -265,7 +265,16 @@ local plugins = {
     "numToStr/Comment.nvim",
     lazy = false,
     config = function()
-      require("Comment").setup()
+      require("Comment").setup({
+        -- Comment.nvim's treesitter-based detection crashes when no parser is installed,
+        -- so skip it unless a parser actually exists.
+        pre_hook = function()
+          local ok, parser = pcall(vim.treesitter.get_parser, 0)
+          if not ok or not parser then
+            return vim.bo.commentstring
+          end
+        end,
+      })
 
       local ft = require("Comment.ft")
       ft.set("typespec", { "//%s", "/*%s*/" })
