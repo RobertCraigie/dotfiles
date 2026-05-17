@@ -14,6 +14,8 @@ glide.prefs.set("browser.tabs.insertAfterCurrent", true);
 
 glide.keymaps.set(['normal', 'insert'], '<D-{>', 'tab_prev');
 glide.keymaps.set(['normal', 'insert'], '<D-}>', 'tab_next');
+glide.keymaps.set(['normal', 'insert'], '<D-[>', 'back');
+glide.keymaps.set(['normal', 'insert'], '<D-]>', 'forward');
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("normal", ";", "commandline_show");
