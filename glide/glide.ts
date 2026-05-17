@@ -1,6 +1,6 @@
 /// <reference path="./glide.d.ts" />
 
-glide.env.set("PATH", "/usr/local/bin");
+add_to_path("/usr/local/bin", "/run/current-system/sw/bin");
 
 glide.g.mapleader = "<Space>";
 
@@ -328,3 +328,11 @@ glide.autocmds.create("UrlEnter", /https:\/\/framed\.wtf\/archive/, (props) => {
   glide.bo.go_previous_patterns = [`${current_day - 1}`];
   glide.bo.go_next_patterns = [`${current_day + 1}`];
 });
+
+function add_to_path(...entries: string[]) {
+  const existing = (glide.env.get("PATH") ?? "").split(":").filter(Boolean);
+  const missing = entries.filter(e => !existing.includes(e));
+  if (missing.length) {
+    glide.env.set("PATH", [...missing, ...existing].join(":"));
+  }
+}
