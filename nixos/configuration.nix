@@ -49,6 +49,9 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
@@ -195,6 +198,7 @@
     path = with pkgs; [
       bash coreutils
       networkmanager
+      bluez
       # screen-toolkit dependencies:
       hyprpicker slurp grim wl-clipboard
       tesseract imagemagick zbar curl
@@ -247,6 +251,7 @@
     nushell
     neovim
     claude-code
+    bluez
     # Hyprland desktop bits:
     noctalia-shell
     vicinae
