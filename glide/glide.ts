@@ -13,11 +13,12 @@ glide.prefs.set("browser.uidensity", 1); // compact mode
 glide.prefs.set("browser.tabs.insertAfterCurrent", true);
 
 // remaps to make some things consistent between darwin/linux
-glide.keymaps.set(['normal', 'insert'], '<D-{>', 'tab_prev');
-glide.keymaps.set(['normal', 'insert'], '<D-}>', 'tab_next');
-glide.keymaps.set(['normal', 'insert'], '<D-[>', 'back');
-glide.keymaps.set(['normal', 'insert'], '<D-]>', 'forward');
-glide.keymaps.set(['normal', 'insert'], '<D-t>', 'tab_new');
+const all_modes = glide.modes.list();
+glide.keymaps.set(all_modes, '<D-{>', 'tab_prev');
+glide.keymaps.set(all_modes, '<D-}>', 'tab_next');
+glide.keymaps.set(all_modes, '<D-[>', 'back');
+glide.keymaps.set(all_modes, '<D-]>', 'forward');
+glide.keymaps.set(all_modes, '<D-t>', 'tab_new');
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("normal", ";", "commandline_show");
