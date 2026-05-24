@@ -154,6 +154,8 @@
       obsidian
       poppler-utils
       spotify
+      neomutt
+      zoxide
     ];
   };
 
@@ -250,6 +252,7 @@
     kitty
     nushell
     neovim
+    tree-sitter
     claude-code
     bluez
     # Hyprland desktop bits:
