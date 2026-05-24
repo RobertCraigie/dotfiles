@@ -89,6 +89,25 @@ glide.autocmds.create("ConfigLoaded", async () => {
 });
 // ---------------- /styles ----------------
 
+// ---------------- hyprland mode borders ----------------
+const DEFAULT_BORDER = "rgba(33ccffee) rgba(00ff99ee) 45deg";
+const MODE_BORDER: Record<GlideMode, string> = {
+  normal: DEFAULT_BORDER,
+  insert: "rgb(a6e3a1)",
+  visual: "rgb(f9e2af)",
+  command: "rgb(cba6f7)",
+  ignore: "rgb(f38ba8)",
+  "op-pending": "rgb(fab387)",
+  hint: "rgb(89b4fa)",
+};
+
+if (glide.ctx.os === "linux") {
+  glide.autocmds.create("ModeChanged", "*", async ({ new_mode }) => {
+    await glide.process.execute("hyprctl", ["keyword", "general:col.active_border", MODE_BORDER[new_mode]]);
+  });
+}
+// ---------------- /hyprland mode borders ----------------
+
 glide.keymaps.set("normal", "<leader>gr", async () => {
   const url = new URL((await glide.tabs.active()).url!);
   const path_segments = url.pathname.split("/").filter(Boolean);
