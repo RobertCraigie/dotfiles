@@ -30,6 +30,8 @@ $env.config.cursor_shape = {
 
 alias rebuild = sudo nixos-rebuild switch --flake /home/robert/.dotfiles/nixos#nixos
 
+$env.DIRENV_LOG_FORMAT = ""
+
 if (sys host | get name) == "NixOS" {
   source /etc/direnv-instant/nushell.nu
 } else if (sys host | get name) == "Darwin" {
@@ -61,8 +63,6 @@ def idea [] {
   let logfile = $"~/.idea-(date now | format date '%Y%m%d-%H%M%S').log"
   job spawn { ^'/Applications/IntelliJ IDEA CE.app/Contents/MacOS/idea' . out+err>| save $logfile }
 }
-
-$env.DIRENV_LOG_FORMAT = ""
 
 $env.path ++= [
   "/Users/robert/bin",

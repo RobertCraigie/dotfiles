@@ -154,10 +154,9 @@ declare global { interface ExcmdRegistry { shrug: typeof shrug; } }
 glide.keymaps.set("normal", "<leader>ts", "shrug");
 glide.keymaps.set("normal", "<leader>\\", "surprise");
 
-glide.include("~/code/github.glide/github.glide.ts");
-
-glide.keymaps.set("normal", "<leader>sg", "github_search_repo");
-glide.keymaps.set("normal", "go", "github_open_repo");
+// glide.include("~/code/github.glide/github.glide.ts");
+// glide.keymaps.set("normal", "<leader>sg", "github_search_repo");
+// glide.keymaps.set("normal", "go", "github_open_repo");
 
 glide.keymaps.set("normal", "p", "keys <D-v>");
 
