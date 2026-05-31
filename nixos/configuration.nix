@@ -52,6 +52,8 @@
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
+  hardware.keyboard.zsa.enable = true;
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
@@ -125,7 +127,7 @@
   users.users.robert = {
     isNormalUser = true;
     description = "robert";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "plugdev" ];
     packages = with pkgs; [
       restic
       git
@@ -148,6 +150,7 @@
       gcc
       gnumake
       cargo
+      keymapp
       unzip
       sublime-merge
       signal-desktop
