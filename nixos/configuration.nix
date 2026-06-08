@@ -101,6 +101,13 @@
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
+  # Enable Avahi (mDNS) so network/Wi-Fi printers are auto-discovered.
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
   # UPower exposes battery/AC state over D-Bus.
   services.upower.enable = true;
 
@@ -129,6 +136,7 @@
     description = "robert";
     extraGroups = [ "networkmanager" "wheel" "plugdev" ];
     packages = with pkgs; [
+      chromium
       restic
       git
       gh
