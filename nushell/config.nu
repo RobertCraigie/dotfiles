@@ -64,6 +64,25 @@ def idea [] {
   job spawn { ^'/Applications/IntelliJ IDEA CE.app/Contents/MacOS/idea' . out+err>| save $logfile }
 }
 
+def clone [url: string] {
+  let parts = $url
+    | str replace --regex '^(https?://|git@)' ''
+    | str replace --regex '^github\.com[:/]' ''
+    | str replace --regex '\.git$' ''
+    | split row '/'
+
+  if ($parts | length) < 2 {
+    error make { msg: $"not a github.com URL: ($url)" }
+  }
+
+  let owner = $parts | get 0
+  let repo = $parts | get 1
+  let dest = $"($env.HOME)/github.com/($owner)/($repo)"
+
+  ^git clone $"https://github.com/($owner)/($repo).git" $dest
+  cd $dest
+}
+
 $env.path ++= [
   "/Users/robert/bin",
   "/Users/robert/.local/bin",
