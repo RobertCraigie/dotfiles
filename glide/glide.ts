@@ -19,6 +19,7 @@ glide.keymaps.set(all_modes, '<D-}>', 'tab_next');
 glide.keymaps.set(all_modes, '<D-[>', 'back');
 glide.keymaps.set(all_modes, '<D-]>', 'forward');
 glide.keymaps.set(all_modes, '<D-t>', 'tab_new');
+glide.keymaps.set(all_modes, '<D-w>', 'tab_close');
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("normal", ";", "commandline_show");
@@ -154,9 +155,9 @@ declare global { interface ExcmdRegistry { shrug: typeof shrug; } }
 glide.keymaps.set("normal", "<leader>ts", "shrug");
 glide.keymaps.set("normal", "<leader>\\", "surprise");
 
-// glide.include("~/code/github.glide/github.glide.ts");
-// glide.keymaps.set("normal", "<leader>sg", "github_search_repo");
-// glide.keymaps.set("normal", "go", "github_open_repo");
+glide.include('~/.config/glide/plugins/github.glide/github.glide.ts');
+glide.keymaps.set("normal", "<leader>sg", "github_search_repo");
+glide.keymaps.set("normal", "go", "github_open_repo");
 
 glide.keymaps.set("normal", "p", "keys <D-v>");
 
@@ -355,3 +356,10 @@ function add_to_path(...entries: string[]) {
     glide.env.set("PATH", [...missing, ...existing].join(":"));
   }
 }
+
+glide.autocmds.create('UrlEnter', { hostname: 'mail.google.com' }, () => {
+  glide.excmds.execute('mode_change ignore');
+  return () => {
+    glide.excmds.execute('mode_change normal');
+  }
+})
