@@ -9,6 +9,8 @@
 
   programs.home-manager.enable = true;
 
+  home.packages = [ pkgs.sccache ];
+
   gtk = {
     enable = true;
     theme = {

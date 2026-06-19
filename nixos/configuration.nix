@@ -244,6 +244,16 @@
   # Native Wayland for Electron/Chromium apps.
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
+  environment.sessionVariables = {
+    SCCACHE_DIR = "/home/robert/.cache/sccache";
+    SCCACHE_CACHE_SIZE = "60G";
+    SCCACHE_BASEDIRS = lib.concatStringsSep ":" (
+      [ "/home/robert/code/glide-browser" ]
+      ++ map (n: "/home/robert/code/wt-glide-browser-${toString n}") (lib.range 1 10)
+    );
+    SCCACHE_IDLE_TIMEOUT = "0";
+  };
+
   fonts.packages = [
     (pkgs.stdenvNoCC.mkDerivation {
       pname = "berkeley-mono";
