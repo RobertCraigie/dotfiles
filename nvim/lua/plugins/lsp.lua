@@ -56,7 +56,33 @@ local servers = {
       end,
     },
   },
-  oxlint = {},
+  oxlint = {
+    -- swallow oxlint's harmless null-id `-32700` parse errors that Neovim drops but still echoes as noise
+    cmd = function(dispatchers, config)
+      local on_error = dispatchers.on_error
+      dispatchers.on_error = function(code, err)
+        if
+          code == vim.lsp.rpc.client_errors.INVALID_SERVER_MESSAGE
+          and type(err) == "table"
+          and type(err.error) == "table"
+          and err.error.code == -32700
+        then
+          vim.lsp.log.debug("oxlint", "swallowed parse error", err)
+          return
+        end
+        return on_error(code, err)
+      end
+
+      local cmd = "oxlint"
+      if (config or {}).root_dir then
+        local local_cmd = vim.fs.joinpath(config.root_dir, "node_modules/.bin", cmd)
+        if vim.fn.executable(local_cmd) == 1 then
+          cmd = local_cmd
+        end
+      end
+      return vim.lsp.rpc.start({ cmd, "--lsp" }, dispatchers)
+    end,
+  },
   ruff = {},
   clangd = {
     cmd = { vim.fn.expand("~/.mozbuild/clang/bin/clangd") },
