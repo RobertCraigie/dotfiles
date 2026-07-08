@@ -363,3 +363,21 @@ glide.autocmds.create("UrlEnter", { hostname: "mail.google.com" }, () => {
     glide.excmds.execute("mode_reset");
   };
 });
+
+glide.autocmds.create("UrlEnter", /mail\.google\.com\/.*rfc822msgid/, ({ tab_id }) => {
+  glide.content.execute(() => {
+    const opened = () => location.hash.replace(/^#/, "").split("/").length >= 3;
+    if (opened()) return;
+    let tries = 0;
+    const timer = setInterval(() => {
+      if (opened() || tries > 100) {
+        clearInterval(timer);
+        return;
+      }
+      if (document.readyState !== "complete") return;
+      tries++;
+      const row = document.querySelector<HTMLElement>("tr.zA");
+      if (row) row.click();
+    }, 100);
+  }, { tab_id });
+});

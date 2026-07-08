@@ -191,6 +191,7 @@
       aerc
       libsecret
       chafa
+      elinks
       zoxide
     ];
   };

@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+import sys
+import json
+import time
+import subprocess
+import urllib.parse
+import email
+from email import policy
+
+
+def focus_glide():
+    for _ in range(50):
+        out = subprocess.run(
+            ["hyprctl", "clients", "-j"], capture_output=True, text=True
+        ).stdout
+        try:
+            clients = json.loads(out or "[]")
+        except json.JSONDecodeError:
+            clients = []
+        if any(c.get("class") == "glide" for c in clients):
+            subprocess.run(["hyprctl", "dispatch", "focuswindow", "class:glide"])
+            return
+        time.sleep(0.1)
+
+
+msg = email.message_from_binary_file(sys.stdin.buffer, policy=policy.default)
+mid = (msg["Message-ID"] or "").strip().strip("<>")
+if not mid:
+    sys.exit("no Message-ID header")
+
+q = urllib.parse.quote(mid, safe="")
+url = f"https://mail.google.com/mail/u/0/#search/rfc822msgid:{q}"
+subprocess.Popen(["xdg-open", url])
+focus_glide()

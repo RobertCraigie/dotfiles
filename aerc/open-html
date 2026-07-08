@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+import sys
+import os
+import json
+import time
+import tempfile
+import subprocess
+import email
+from email import policy
+
+
+def focus_glide():
+    for _ in range(50):
+        out = subprocess.run(
+            ["hyprctl", "clients", "-j"], capture_output=True, text=True
+        ).stdout
+        try:
+            clients = json.loads(out or "[]")
+        except json.JSONDecodeError:
+            clients = []
+        if any(c.get("class") == "glide" for c in clients):
+            subprocess.run(["hyprctl", "dispatch", "focuswindow", "class:glide"])
+            return
+        time.sleep(0.1)
+
+
+msg = email.message_from_binary_file(sys.stdin.buffer, policy=policy.default)
+part = msg.get_body(preferencelist=("html",))
+if part is None:
+    sys.exit("no HTML part")
+
+fd, path = tempfile.mkstemp(prefix="aerc-", suffix=".html")
+with os.fdopen(fd, "w", encoding="utf-8") as f:
+    f.write(part.get_content())
+
+subprocess.Popen(["xdg-open", path])
+focus_glide()
