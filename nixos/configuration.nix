@@ -188,6 +188,9 @@
       poppler-utils
       spotify
       neomutt
+      aerc
+      libsecret
+      chafa
       zoxide
     ];
   };
