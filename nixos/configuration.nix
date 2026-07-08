@@ -24,13 +24,16 @@
     "${config.programs.direnv-instant.package}/share/direnv-instant/nushell.nu";
 
   # Replace interactive bash with nushell, keeping bash as the POSIX login shell.
-  programs.bash.interactiveShellInit = ''
-    if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "nu" && -z ''${BASH_EXECUTION_STRING} ]]
-    then
-      shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
-      exec ${pkgs.nushell}/bin/nu $LOGIN_OPTION
-    fi
-  '';
+  programs.bash.interactiveShellInit = lib.mkMerge [
+    (lib.mkBefore "export DIRENV_INSTANT_SHELL=bash")
+    ''
+      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "nu" && -z ''${BASH_EXECUTION_STRING} ]]
+      then
+        shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
+        exec ${pkgs.nushell}/bin/nu $LOGIN_OPTION
+      fi
+    ''
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -110,6 +113,13 @@
 
   # UPower exposes battery/AC state over D-Bus.
   services.upower.enable = true;
+
+  services.geoclue2 = {
+    enable = true;
+    enableDemoAgent = true;
+    geoProviderUrl = "https://api.beacondb.net/v1/geolocate";
+    submitData = false;
+  };
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -286,7 +296,13 @@
     nushell
     neovim
     tree-sitter
-    claude-code
+    (claude-code.overrideAttrs (_: rec {
+      version = "2.1.195";
+      src = fetchurl {
+        url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${version}/linux-x64/claude";
+        sha256 = "8323e70125063147a4478b957745d835a87e5e72ffd25b838ea9a841c03e6a37";
+      };
+    }))
     bluez
     # Hyprland desktop bits:
     noctalia-shell
