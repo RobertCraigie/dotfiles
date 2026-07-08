@@ -1,0 +1,95 @@
+@namespace html url("http://www.w3.org/1999/xhtml");
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tn-bg: #1a1b26;
+    --tn-bg-dark: #16161e;
+    --tn-bg-alt: #1f2335;
+    --tn-bg2: #24283b;
+    --tn-bg3: #292e42;
+    --tn-border: #3b4261;
+    --tn-comment: #565f89;
+    --tn-fg: #c0caf5;
+    --tn-fg-dark: #a9b1d6;
+    --tn-fg-muted: #737aa2;
+    --tn-blue: #7aa2f7;
+    --tn-cyan: #7dcfff;
+    --tn-magenta: #bb9af7;
+    --tn-green: #9ece6a;
+    --tn-yellow: #e0af68;
+    --tn-orange: #ff9e64;
+    --tn-red: #f7768e;
+    --tn-teal: #73daca;
+
+    --color-gray-90: var(--tn-bg);
+    --color-gray-80: var(--tn-bg-alt);
+    --color-gray-70: var(--tn-bg2);
+    --color-gray-60: var(--tn-bg3);
+    --color-gray-50: var(--tn-comment);
+    --color-gray-40: var(--tn-border);
+    --color-gray-30: var(--tn-fg-dark);
+    --color-gray-20: var(--tn-fg);
+    --color-gray-10: var(--tn-fg);
+    --color-gray-05: var(--tn-fg);
+    --color-black: var(--tn-bg);
+    --color-neutral-200: var(--tn-border);
+
+    --tree-view-bg: var(--tn-bg);
+    --tree-pane-background: var(--tn-bg-dark);
+    --tree-card-background: var(--tn-bg-alt);
+    --row-grouped-header-bg-color: var(--tn-bg2);
+
+    --selected-item-color: var(--tn-blue);
+    --selected-item-text-color: var(--tn-bg);
+
+    --color-surface-base-dark: var(--tn-bg);
+    --color-surface-raised-dark: var(--tn-bg-alt);
+    --color-surface-subtle-dark: var(--tn-bg-alt);
+    --color-surface-lower-dark: var(--tn-bg-dark);
+    --color-surface-deep-dark: var(--tn-bg3);
+    --color-surface-border-dark: var(--tn-border);
+    --color-surface-border-intense-dark: var(--tn-comment);
+
+    --color-text-base-dark: var(--tn-fg);
+    --color-text-secondary-dark: var(--tn-fg-dark);
+    --color-text-muted-dark: var(--tn-fg-muted);
+    --color-text-highlight-dark: var(--tn-blue);
+    --color-text-warning-dark: var(--tn-yellow);
+    --color-text-critical-dark: var(--tn-red);
+    --color-text-success-dark: var(--tn-green);
+
+    --color-primary-soft-dark: var(--tn-bg2);
+    --color-primary-default-dark: var(--tn-blue);
+    --color-primary-hover-dark: var(--tn-cyan);
+    --color-primary-pressed-dark: var(--tn-blue);
+
+    --color-accent-blue-dark: var(--tn-blue);
+    --color-accent-teal-dark: var(--tn-teal);
+    --color-accent-purple-dark: var(--tn-magenta);
+    --color-accent-orange-dark: var(--tn-orange);
+    --color-accent-pink-dark: var(--tn-magenta);
+
+    --color-success-default-dark: var(--tn-green);
+    --color-warning-default-dark: var(--tn-yellow);
+    --color-critical-default-dark: var(--tn-red);
+  }
+}
+
+@-moz-document url-prefix("chrome://nostalgy/") {
+  :root {
+    color-scheme: light !important;
+    background-color: Canvas !important;
+    color: CanvasText !important;
+  }
+
+  richlistbox,
+  tree,
+  html|input,
+  html|textarea,
+  html|select,
+  .autocomplete-richlistbox {
+    color-scheme: light !important;
+    background-color: Field !important;
+    color: FieldText !important;
+  }
+}

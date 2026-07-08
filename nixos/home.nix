@@ -11,6 +11,12 @@
 
   home.packages = [ pkgs.sccache ];
 
+  home.file = {
+    ".thunderbird/28ga8wbb.default/chrome/userChrome.css".source =
+      ./thunderbird/userChrome.css;
+    ".thunderbird/28ga8wbb.default/user.js".source = ./thunderbird/user.js;
+  };
+
   gtk = {
     enable = true;
     theme = {

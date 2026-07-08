@@ -162,6 +162,18 @@
       unzip
       sublime-merge
       signal-desktop
+      (thunderbird.override {
+        extraPolicies.ExtensionSettings = {
+          "nostalgy@opto.one" = {
+            installation_mode = "force_installed";
+            install_url = "https://addons.thunderbird.net/thunderbird/downloads/latest/nostalgy_ng/latest.xpi";
+          };
+          "tbkeys-lite@addons.thunderbird.net" = {
+            installation_mode = "force_installed";
+            install_url = "https://addons.thunderbird.net/thunderbird/downloads/latest/tbkeys-lite/latest.xpi";
+          };
+        };
+      })
       obsidian
       poppler-utils
       spotify
