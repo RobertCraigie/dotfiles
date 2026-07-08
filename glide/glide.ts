@@ -358,12 +358,8 @@ function add_to_path(...entries: string[]) {
 }
 
 glide.autocmds.create("UrlEnter", { hostname: "mail.google.com" }, () => {
-  // glide.excmds.execute("mode_change minimal");
   glide.excmds.execute("mode_change ignore");
   return () => {
-    glide.excmds.execute("mode_change normal");
+    glide.excmds.execute("mode_reset");
   };
 });
-
-  }
-})
