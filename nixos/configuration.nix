@@ -170,6 +170,7 @@
       cargo
       keymapp
       unzip
+      difftastic
       sublime-merge
       signal-desktop
       (thunderbird.override {
