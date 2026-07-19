@@ -52,6 +52,9 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  services.tailscale.enable = true;
+  networking.firewall.trustedInterfaces = [ "tailscale0" ];
+
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
@@ -66,7 +69,7 @@
   nix.settings.warn-dirty = false;
 
   # Set your time zone.
-  time.timeZone = "Europe/London";
+  time.timeZone = "America/Los_Angeles";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_GB.UTF-8";
@@ -135,6 +138,12 @@
     # use the example session manager (no others are packaged yet so this is enabled by default,
     # no need to redefine it in your config for now)
     #media-session.enable = true;
+
+    wireplumber.extraConfig."51-airpods-no-autoswitch" = {
+      "monitor.bluez.properties" = {
+        "bluez5.autoswitch-to-headset-profile" = false;
+      };
+    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
