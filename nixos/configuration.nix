@@ -60,6 +60,8 @@
 
   hardware.keyboard.zsa.enable = true;
 
+  services.fwupd.enable = true;
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
@@ -116,6 +118,8 @@
 
   # UPower exposes battery/AC state over D-Bus.
   services.upower.enable = true;
+
+  services.udisks2.enable = true;
 
   services.geoclue2 = {
     enable = true;
@@ -197,6 +201,7 @@
       obsidian
       poppler-utils
       spotify
+      wealthfolio
       neomutt
       aerc
       libsecret
@@ -211,6 +216,11 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  hardware.logitech.wireless = {
+    enable = true;
+    enableGraphical = true;
+  };
 
   environment.sessionVariables.TERMINAL = "kitty";
   nixpkgs.config.allowUnfree = true;
@@ -309,12 +319,13 @@
     kitty
     nushell
     neovim
+    inputs.sift.packages.x86_64-linux.default
     tree-sitter
     (claude-code.overrideAttrs (_: rec {
-      version = "2.1.195";
+      version = "2.1.257";
       src = fetchurl {
         url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${version}/linux-x64/claude";
-        sha256 = "8323e70125063147a4478b957745d835a87e5e72ffd25b838ea9a841c03e6a37";
+        sha256 = "9a64bda9d8722a1fa05bef9a5961d07e0331b99597eda9e2f6a732f3a0ff7f05";
       };
     }))
     bluez
@@ -341,6 +352,8 @@
     ffmpeg
     gifski
     jq
+    visidata
+    gnumeric
     python3
     python3Packages.pygobject3
     xdg-desktop-portal
