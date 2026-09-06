@@ -44,6 +44,7 @@
       "x-scheme-handler/gemini" = "glide.desktop";
       "application/xhtml+xml" = "glide.desktop";
       "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
+      "x-scheme-handler/sift" = "sift.desktop";
     };
   };
 }
