@@ -202,11 +202,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1788791635,
-        "narHash": "sha256-xyZFrxsL1kdLdZiSlxqjdnw/85LCcFP+fLchcfZl5E0=",
+        "lastModified": 1788792040,
+        "narHash": "sha256-TTsT6s0m0Rpb4EADYvtdtMQATKFVwqzd7xWs6ODKqm4=",
         "ref": "refs/heads/master",
-        "rev": "2fcd828819586b3e6fc65110feb6ed443970c03a",
-        "revCount": 96,
+        "rev": "f4846b6a70f80b4cd133c3b4e1a8685e57f7d9fa",
+        "revCount": 97,
         "type": "git",
         "url": "file:///home/robert/code/email"
       },
