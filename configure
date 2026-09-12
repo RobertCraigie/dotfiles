@@ -39,6 +39,13 @@ symlink "$DOTFILES_DIR/p10k.zsh" ~/.p10k.zsh false
 symlink "$DOTFILES_DIR/direnv" ~/.config/direnv false
 symlink "$DOTFILES_DIR/aerc" ~/.config/aerc false
 
+if [ -d "$DOTFILES_DIR/private" ]; then
+    while IFS= read -r file; do
+        rel="${file#"$DOTFILES_DIR/private/"}"
+        symlink "$file" "$DOTFILES_DIR/$rel" true
+    done < <(find "$DOTFILES_DIR/private" -type f -not -path '*/.git/*')
+fi
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
     symlink "$DOTFILES_DIR/gitconfig.darwin" ~/.gitconfig false
 

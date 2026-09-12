@@ -30,6 +30,11 @@ glide.include("glide.slack.ts");
 glide.include("glide.github.ts");
 glide.include("glide.bearblog.ts");
 
+const myelin = `${glide.path.home_dir}/.config/glide/myelin.private.ts`;
+glide.fs.exists(myelin).then(exists => {
+  if (exists) glide.include(myelin);
+});
+
 // useful for sideberry
 glide.keymaps.set(["normal", "insert"], "<C-t>", async ({ tab_id }) => {
   await browser.tabs.create({

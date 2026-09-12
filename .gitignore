@@ -3,4 +3,8 @@ nvim/plugin/packer_compiled.lua
 
 **/node_modules/
 /glide/glide.d.ts
+/glide/glide
 /glide/plugins/
+
+/private/
+**/*.private.*
