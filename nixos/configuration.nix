@@ -340,6 +340,7 @@
     brightnessctl
     kdePackages.breeze-icons
     kdePackages.dolphin
+    discord
     adw-gtk3
     # Noctalia screen-toolkit plugin deps:
     hyprpicker
