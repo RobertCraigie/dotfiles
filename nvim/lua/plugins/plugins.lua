@@ -161,7 +161,7 @@ local plugins = {
       local parsers = {
         "c", "cpp", "kdl", "go", "lua", "vim", "python", "rust", "bash",
         "regex", "markdown", "markdown_inline", "typescript", "javascript",
-        "graphql", "prisma", "kotlin", "yaml", "query",
+        "graphql", "prisma", "kotlin", "yaml", "query", "diff",
       }
 
       require("nvim-treesitter").install(parsers)
