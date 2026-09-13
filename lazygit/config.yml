@@ -15,3 +15,9 @@ customCommands:
     command: "git fetch --prune {{.SelectedRemote.Name}}"
     output: log
     loadingText: "Fetching & pruning…"
+os:
+  editPreset: nvim-remote
+  edit: "[ -z \"$NVIM\" ] && (nvim -- {{filename}}) || nvim --server \"$NVIM\" --remote-expr 'v:lua.lazygit_edit({{filename}})'"
+  editAtLine: "[ -z \"$NVIM\" ] && (nvim +{{line}} -- {{filename}}) || nvim --server \"$NVIM\" --remote-expr 'v:lua.lazygit_edit({{filename}}, {{line}})'"
+  editAtLineAndWait: "nvim +{{line}} {{filename}}"
+  openDirInEditor: "[ -z \"$NVIM\" ] && (nvim -- {{dir}}) || nvim --server \"$NVIM\" --remote-expr 'v:lua.lazygit_edit({{dir}})'"

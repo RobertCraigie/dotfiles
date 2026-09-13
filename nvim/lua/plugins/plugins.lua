@@ -8,6 +8,17 @@ local M = {
 
 local terminal_opts = {}
 
+function _G.lazygit_edit(file, line)
+  if M.lazygit_terminal ~= nil and not M.lazygit_terminal.closed then
+    M.lazygit_terminal:hide()
+  end
+  vim.cmd.edit(vim.fn.fnameescape(file))
+  if line ~= nil and line > 0 then
+    vim.api.nvim_win_set_cursor(0, { line, 0 })
+  end
+  return true
+end
+
 local plugins = {
   { 'glacambre/firenvim', build = ":call firenvim#install(0)" },
 
