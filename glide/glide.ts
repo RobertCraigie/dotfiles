@@ -35,6 +35,11 @@ glide.fs.exists(myelin).then(exists => {
   if (exists) glide.include(myelin);
 });
 
+const garmin_merge = `${glide.path.home_dir}/code/server/glide/garmin-merge.glide.ts`;
+glide.fs.exists(garmin_merge).then(exists => {
+  if (exists) glide.include(garmin_merge);
+});
+
 // useful for sideberry
 glide.keymaps.set(["normal", "insert"], "<C-t>", async ({ tab_id }) => {
   await browser.tabs.create({
@@ -385,4 +390,9 @@ glide.autocmds.create("UrlEnter", /mail\.google\.com\/.*rfc822msgid/, ({ tab_id 
       if (row) row.click();
     }, 100);
   }, { tab_id });
+});
+
+const shh_glide = `${glide.path.home_dir}/code/server/glide/shh.glide.ts`;
+glide.fs.exists(shh_glide).then(exists => {
+  if (exists) glide.include(shh_glide);
 });
