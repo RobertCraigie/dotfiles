@@ -63,6 +63,9 @@
 
   services.fwupd.enable = true;
 
+  services.udev.packages = [ pkgs.python3Packages.openant ];
+  users.groups.plugdev = { };
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
@@ -158,7 +161,7 @@
   users.users.robert = {
     isNormalUser = true;
     description = "robert";
-    extraGroups = [ "networkmanager" "wheel" "plugdev" ];
+    extraGroups = [ "networkmanager" "wheel" "plugdev" "dialout" ];
     packages = with pkgs; [
       chromium
       restic
@@ -175,6 +178,7 @@
       pnpm
       nodejs_24
       python314
+      python3Packages.openant
       uv
       docker
       jetbrains-mono
