@@ -8,14 +8,60 @@ local M = {
 
 local terminal_opts = {}
 
+local function goto_first_hunk(buf)
+  local deadline = vim.uv.now() + 3000
+
+  local function try()
+    if vim.api.nvim_get_current_buf() ~= buf then
+      return
+    end
+    local bcache = require("gitsigns.cache").cache[buf]
+    if bcache == nil or bcache.hunks == nil then
+      if vim.uv.now() < deadline then
+        vim.defer_fn(try, 30)
+      end
+      return
+    end
+    if #bcache.hunks > 0 or #(bcache.hunks_staged or {}) > 0 then
+      require("gitsigns").nav_hunk("first", { target = "all", navigation_message = false })
+    end
+  end
+
+  try()
+end
+
 function _G.lazygit_edit(file, line)
-  if M.lazygit_terminal ~= nil and not M.lazygit_terminal.closed then
-    M.lazygit_terminal:hide()
-  end
-  vim.cmd.edit(vim.fn.fnameescape(file))
-  if line ~= nil and line > 0 then
-    vim.api.nvim_win_set_cursor(0, { line, 0 })
-  end
+  local term = M.lazygit_terminal
+  vim.schedule(function()
+    if term ~= nil and term:valid() then
+      term:hide()
+    end
+
+    local function is_normal(win)
+      return vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_config(win).relative == ""
+    end
+
+    local target = vim.api.nvim_get_current_win()
+    if not is_normal(target) then
+      target = vim.fn.win_getid(vim.fn.winnr("#"))
+    end
+    if not is_normal(target) then
+      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        if is_normal(win) then
+          target = win
+          break
+        end
+      end
+    end
+
+    vim.api.nvim_set_current_win(target)
+    vim.cmd.edit(vim.fn.fnameescape(file))
+    if line ~= nil and line > 0 then
+      vim.api.nvim_win_set_cursor(0, { line, 0 })
+    else
+      goto_first_hunk(vim.api.nvim_get_current_buf())
+    end
+  end)
   return true
 end
 
