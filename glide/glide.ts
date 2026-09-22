@@ -396,3 +396,7 @@ const shh_glide = `${glide.path.home_dir}/code/server/glide/shh.glide.ts`;
 glide.fs.exists(shh_glide).then(exists => {
   if (exists) glide.include(shh_glide);
 });
+
+if (glide.ctx.os === "linux") {
+  glide.o.keymaps_use_physical_layout = "force";
+}
