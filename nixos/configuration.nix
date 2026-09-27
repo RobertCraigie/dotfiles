@@ -344,11 +344,12 @@
     neovim
     inputs.server.packages.x86_64-linux.desktop-apps
     tree-sitter
+    rclone
     (claude-code.overrideAttrs (_: rec {
-      version = "2.1.257";
+      version = "2.1.283";
       src = fetchurl {
         url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${version}/linux-x64/claude";
-        sha256 = "9a64bda9d8722a1fa05bef9a5961d07e0331b99597eda9e2f6a732f3a0ff7f05";
+        sha256 = "1859583ce32920595c61ef868bee52e1b1594f7486db209935e01f1e5e804ae2";
       };
     }))
     bluez
