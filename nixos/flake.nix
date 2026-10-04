@@ -21,7 +21,7 @@
       url = "path:/home/robert/.fonts/berkeley-mono";
       flake = false;
     };
-    sift.url = "git+file:///home/robert/code/email";
+    server.url = "git+file:///home/robert/code/server";
   };
 
   outputs = inputs@{ self, nixpkgs, ... }: {

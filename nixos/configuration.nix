@@ -56,6 +56,18 @@
   services.tailscale.extraSetFlags = [ "--operator=robert" ];
   networking.firewall.trustedInterfaces = [ "tailscale0" ];
 
+  services.tinyproxy = {
+    enable = true;
+    settings = {
+      Port = 8888;
+      Listen = "0.0.0.0";
+      Allow = [ "100.64.0.0/10" ];
+      DisableViaHeader = true;
+      ConnectPort = [ 443 563 ];
+      LogLevel = "Warning";
+    };
+  };
+
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
@@ -324,7 +336,7 @@
     kitty
     nushell
     neovim
-    inputs.sift.packages.x86_64-linux.default
+    inputs.server.packages.x86_64-linux.desktop-apps
     tree-sitter
     (claude-code.overrideAttrs (_: rec {
       version = "2.1.257";
