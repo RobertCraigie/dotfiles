@@ -376,6 +376,7 @@
     wl-screenrec
     ffmpeg
     gifski
+    ghostscript
     jq
     visidata
     gnumeric

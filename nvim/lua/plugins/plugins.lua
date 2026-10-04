@@ -530,6 +530,9 @@ local plugins = {
           border = "none",
         }
       },
+      image = {
+        enabled = true,
+      },
       terminal = {
         enabled = true,
         win = {
