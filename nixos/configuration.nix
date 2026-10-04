@@ -53,6 +53,7 @@
   networking.networkmanager.enable = true;
 
   services.tailscale.enable = true;
+  services.tailscale.extraSetFlags = [ "--operator=robert" ];
   networking.firewall.trustedInterfaces = [ "tailscale0" ];
 
   hardware.bluetooth.enable = true;
