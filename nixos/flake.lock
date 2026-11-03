@@ -144,11 +144,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788676465,
-        "narHash": "sha256-Wx+LGg3ABsyqdkZiy+X+B7Oo9Y0qLKtBY0CaP9aFwko=",
+        "lastModified": 1792621440,
+        "narHash": "sha256-e4MNi8eB64VPnCRAcDziSSFdyVOzpgi4vPa6Tbc8ii8=",
         "owner": "glide-browser",
         "repo": "glide.nix",
-        "rev": "1a23691614d3335c57577a75f67a67915072e1ae",
+        "rev": "d5725b07982374282336e29c9aa17157e477e5c8",
         "type": "github"
       },
       "original": {
@@ -295,11 +295,11 @@
         "system-manager": "system-manager"
       },
       "locked": {
-        "lastModified": 1791154506,
-        "narHash": "sha256-azDFOvqomJ6Yc104x1NNz5a/DP7s7YurfkAHlkXGsLg=",
+        "lastModified": 1793668105,
+        "narHash": "sha256-E4ZWbOpsP33DNRQZUEkipqrQG7+V9Pt/+9AWlDsZKmE=",
         "ref": "refs/heads/main",
-        "rev": "49508778b1ac90d07111266018e141557a04f296",
-        "revCount": 758,
+        "rev": "e30f3547eb883e7eb810fe9c833f125a88888cbd",
+        "revCount": 2002,
         "type": "git",
         "url": "file:///home/robert/code/server"
       },
