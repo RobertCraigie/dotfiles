@@ -11,6 +11,34 @@
       inputs.direnv-instant.nixosModules.direnv-instant
     ];
 
+  # Held at the June nixpkgs: noctalia-shell left nixpkgs in 2026-11
+  # (unmaintained, v5 is `noctalia`) and wealthfolio 3.11.0 fails to build
+  # there (aws-lc-sys finds no system AWS-LC). noctalia is built from the
+  # June package definitions against current nixpkgs, since a June glibc
+  # can't load the system's mesa driver; the patch backports quickshell's
+  # Qt 6.12 build fixes.
+  nixpkgs.overlays = [
+    (final: prev: {
+      noctalia-qs = (final.callPackage "${inputs.nixpkgs-held}/pkgs/by-name/no/noctalia-qs/package.nix" { }).overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./patches/noctalia-qs-qt612.patch ];
+      });
+      noctalia-shell = (final.callPackage "${inputs.nixpkgs-held}/pkgs/by-name/no/noctalia-shell/package.nix" { }).overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          mv Commons/Color.qml Commons/NColor.qml
+          find . \( -name '*.qml' -o -name '*.js' \) -exec sed -i -E \
+            -e "s/(^|[^A-Za-z0-9_.\"'\$-])Color\./\1NColor./g" \
+            -e 's/target: Color$/target: NColor/' {} +
+        '';
+      });
+      inherit (inputs.nixpkgs-held.legacyPackages.${prev.stdenv.hostPlatform.system}) wealthfolio;
+      claude-code =
+        let manifest = lib.importJSON ./claude-code-manifest.json;
+        in if lib.versionOlder prev.claude-code.version manifest.version
+          then prev.claude-code.override { inherit manifest; }
+          else prev.claude-code;
+    })
+  ];
+
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
@@ -61,13 +89,63 @@
   services.tailscale.enable = true;
   services.tailscale.extraSetFlags = [ "--operator=robert" ];
   networking.firewall.trustedInterfaces = [ "tailscale0" ];
+  networking.firewall.checkReversePath = "loose";
+
+  services.resolved.enable = true;
+  # LLMNR answers and asks for bare names on every network joined (cafe
+  # Wi-Fi included), where anyone can answer; mDNS (avahi) covers printers
+  services.resolved.settings.Resolve.LLMNR = false;
+
+  services.mullvad-vpn = {
+    enable = true;
+    # the daemon is pkgs.mullvad (the default) now; the desktop app comes separately
+    gui.enable = true;
+  };
+
+  systemd.services.mullvad-tailscale = {
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.nftables}/bin/nft -f ${pkgs.writeText "mullvad-tailscale.nft" ''
+        table inet mullvad-tailscale
+        delete table inet mullvad-tailscale
+        table inet mullvad-tailscale {
+          chain outgoing {
+            type route hook output priority 0; policy accept;
+            ip daddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+            ip6 daddr fd7a:115c:a1e0::/48 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+            # the relay foghorn and magpie fetch through (tinyproxy, below) has
+            # to leave from home: the sites that block the Hetzner box (roxie.com,
+            # sfrecpark.org, rickshawstop.com) turn a Mullvad exit away too
+            meta skuid "tinyproxy" ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+          }
+          # the relay only fetches public sites for the box: no new connections
+          # to this laptop, the LAN or the tailnet, or a peer could reach
+          # localhost-only services (dev servers, CUPS) through it
+          chain relay-egress {
+            type filter hook output priority 0; policy accept;
+            meta skuid "tinyproxy" ct state new ip daddr { 127.0.0.53, 127.0.0.54 } meta l4proto { tcp, udp } th dport 53 accept
+            meta skuid "tinyproxy" ct state new ip daddr { 0.0.0.0/8, 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16, 224.0.0.0/3 } reject
+            meta skuid "tinyproxy" ct state new ip6 daddr { ::/127, ::ffff:0:0/96, fc00::/7, fe80::/10, ff00::/8 } reject
+          }
+          chain incoming {
+            type filter hook input priority -100; policy accept;
+            iifname "tailscale0" ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+          }
+        }
+      ''}";
+      ExecStop = "${pkgs.nftables}/bin/nft delete table inet mullvad-tailscale";
+    };
+  };
 
   services.tinyproxy = {
     enable = true;
     settings = {
       Port = 8888;
       Listen = "0.0.0.0";
-      Allow = [ "100.64.0.0/10" ];
+      # only the box (foghorn, magpie, bower) uses it
+      Allow = [ "100.83.24.21" ];
       DisableViaHeader = true;
       ConnectPort = [ 443 563 ];
       LogLevel = "Warning";
@@ -170,6 +248,32 @@
         "bluez5.autoswitch-to-headset-profile" = false;
       };
     };
+
+    # Expose the speakers and a plugged-in HDMI display as outputs at the same
+    # time; by default the card's analog and HDMI profiles are exclusive and
+    # the speakers one always wins.
+    wireplumber.extraScripts."custom/select-plugged-hdmi-profile.lua" =
+      builtins.readFile ./wireplumber/select-plugged-hdmi-profile.lua;
+    wireplumber.extraConfig."52-hda-speakers-hdmi" = {
+      "monitor.alsa.rules" = [
+        {
+          matches = [ { "device.name" = "alsa_card.pci-0000_00_1f.3"; } ];
+          actions.update-props = {
+            "device.profile-set" = "${./wireplumber/hda-speakers-hdmi.conf}";
+            "session.select-plugged-hdmi" = true;
+          };
+        }
+      ];
+      "wireplumber.components" = [
+        {
+          name = "custom/select-plugged-hdmi-profile.lua";
+          type = "script/lua";
+          # hooks.* load before the device monitors (see wireplumber.conf)
+          provides = "hooks.device.profile.find-plugged-hdmi";
+        }
+      ];
+      "wireplumber.profiles".main."hooks.device.profile.find-plugged-hdmi" = "required";
+    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -182,6 +286,7 @@
     extraGroups = [ "networkmanager" "wheel" "plugdev" "dialout" ];
     packages = with pkgs; [
       chromium
+      google-chrome
       restic
       git
       gh
@@ -240,10 +345,8 @@
   # Install firefox.
   programs.firefox.enable = true;
 
-  hardware.logitech.wireless = {
-    enable = true;
-    enableGraphical = true;
-  };
+  hardware.logitech.wireless.enable = true;
+  programs.solaar.enable = true;
 
   environment.sessionVariables.TERMINAL = "kitty";
   nixpkgs.config.allowUnfree = true;
@@ -251,7 +354,7 @@
   # Hyprland desktop (default). UWSM gives us proper graphical-session.target
   # activation, which the noctalia user service below depends on.
   programs.hyprland.enable = true;
-  programs.uwsm.enable = true;
+  programs.hyprland.withUWSM = true;
 
   services.gnome.gnome-keyring.enable = true;
 
@@ -286,6 +389,8 @@
       tesseract imagemagick zbar curl
       translate-shell wl-screenrec ffmpeg gifski jq
       python3 python3Packages.pygobject3
+      "/etc/profiles/per-user/robert"
+      "/run/current-system/sw"
     ];
     serviceConfig = {
       ExecStart = "${pkgs.noctalia-shell}/bin/noctalia-shell";
@@ -345,13 +450,7 @@
     inputs.server.packages.x86_64-linux.desktop-apps
     tree-sitter
     rclone
-    (claude-code.overrideAttrs (_: rec {
-      version = "2.1.283";
-      src = fetchurl {
-        url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${version}/linux-x64/claude";
-        sha256 = "1859583ce32920595c61ef868bee52e1b1594f7486db209935e01f1e5e804ae2";
-      };
-    }))
+    claude-code
     bluez
     # Hyprland desktop bits:
     noctalia-shell

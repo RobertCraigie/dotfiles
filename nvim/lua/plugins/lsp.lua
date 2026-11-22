@@ -1,5 +1,28 @@
 local Util = require("config.util.lsp")
 
+-- TypeScript 7 no longer ships `tsserver.js` (ts_ls silently falls back to its bundled TypeScript),
+-- it has a native LSP instead, so projects on 7+ get `tsgo` and everything else gets `ts_ls`
+local function typescript_major(root)
+  local ok, lines = pcall(vim.fn.readfile, vim.fs.joinpath(root, "node_modules/typescript/package.json"))
+  if not ok then
+    return nil
+  end
+  local decoded, pkg = pcall(vim.json.decode, table.concat(lines, "\n"))
+  return decoded and tonumber((pkg.version or ""):match("^(%d+)")) or nil
+end
+
+local function ts_root_dir(native)
+  return function(bufnr, on_dir)
+    -- both servers share lspconfig's lockfile-based ts_ls root detection
+    local default = dofile(vim.api.nvim_get_runtime_file("lsp/ts_ls.lua", false)[1]).root_dir
+    default(bufnr, function(root)
+      if ((typescript_major(root) or 0) >= 7) == native then
+        on_dir(root)
+      end
+    end)
+  end
+end
+
 local servers = {
   -- ocamllsp = {},
   pyright = {
@@ -104,7 +127,19 @@ local servers = {
     },
   },
   rust_analyzer = {},
-  ts_ls = {},
+  ts_ls = {
+    root_dir = ts_root_dir(false),
+  },
+  -- not installed through mason, uses the project's own `tsc`
+  tsgo = {
+    cmd = function(dispatchers, config)
+      return vim.lsp.rpc.start(
+        { vim.fs.joinpath(config.root_dir, "node_modules/.bin/tsc"), "--lsp", "--stdio" },
+        dispatchers
+      )
+    end,
+    root_dir = ts_root_dir(true),
+  },
   lua_ls = {
     settings = {
       Lua = {
@@ -236,8 +271,7 @@ return {
     },
     opts = {
       ensure_installed = vim.tbl_filter(function(name)
-        return true
-        -- return name ~= "tsserver"
+        return name ~= "tsgo"
       end, vim.tbl_keys(servers)),
     },
     config = function(_, opts)
@@ -262,6 +296,9 @@ return {
       for name, conf in pairs(servers) do
         vim.lsp.config(name, vim.tbl_deep_extend("force", {}, defaults, conf))
       end
+
+      -- mason-lspconfig only enables the servers it installed
+      vim.lsp.enable("tsgo")
     end,
   },
 

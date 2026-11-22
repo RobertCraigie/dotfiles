@@ -40,6 +40,12 @@ glide.fs.exists(garmin_merge).then(exists => {
   if (exists) glide.include(garmin_merge);
 });
 
+// finishes the Bosch eBike Flow sign-in for spoke (:spoke_sign_in)
+const spoke_glide = `${glide.path.home_dir}/code/server/glide/spoke.glide.ts`;
+glide.fs.exists(spoke_glide).then(exists => {
+  if (exists) glide.include(spoke_glide);
+});
+
 // useful for sideberry
 glide.keymaps.set(["normal", "insert"], "<C-t>", async ({ tab_id }) => {
   await browser.tabs.create({
@@ -97,6 +103,30 @@ glide.autocmds.create("ConfigLoaded", async () => {
   await register_styles("github.com");
   // await register_styles("news.ycombinator.com");
   await register_styles("marginalia-search.com");
+  await register_styles("www.flickr.com");
+});
+
+glide.autocmds.create("ConfigLoaded", async () => {
+  await browser.contentScripts.register({
+    matches: ["*://www.flickr.com/*"],
+    runAt: "document_start",
+    js: [{
+      code: `
+        const reset_views = () => {
+          document.cookie = "fmvt=2." + Math.floor(Date.now() / 864e5) + ".0; domain=.flickr.com; path=/; secure";
+        };
+        let href = location.href;
+        reset_views();
+        new MutationObserver(() => {
+          if (location.href !== href) {
+            href = location.href;
+            reset_views();
+          }
+          document.querySelector(".modal:has(.upsell-modal) .close-x")?.click();
+        }).observe(document, { childList: true, subtree: true });
+      `,
+    }],
+  });
 });
 // ---------------- /styles ----------------
 
@@ -112,9 +142,17 @@ const MODE_BORDER: Record<GlideMode, string> = {
   hint: "rgb(89b4fa)",
 };
 
+const DEFAULT_BORDER_LUA = `{ colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 }`;
+
 if (glide.ctx.os === "linux") {
   glide.autocmds.create("ModeChanged", "*", async ({ new_mode }) => {
-    await glide.process.execute("hyprctl", ["keyword", "general:col.active_border", MODE_BORDER[new_mode]]);
+    const border = MODE_BORDER[new_mode];
+    const lua = border === DEFAULT_BORDER ? DEFAULT_BORDER_LUA : JSON.stringify(border);
+    // `eval` only works with a Lua config (Hyprland 0.57+) and `keyword` only with hyprlang
+    await glide.process.execute("hyprctl", [
+      "--batch",
+      `eval hl.config({ general = { col = { active_border = ${lua} } } }) ; keyword general:col.active_border ${border}`,
+    ]);
   });
 }
 // ---------------- /hyprland mode borders ----------------
@@ -161,6 +199,13 @@ const shrug = glide.excmds.create({ name: "shrug", description: "" }, async () =
 });
 /* dprint-ignore */
 declare global { interface ExcmdRegistry { shrug: typeof shrug; } }
+
+const copy_flickr_urls = glide.excmds.create({ name: "copy_flickr_urls", description: "Copy the URLs of all open flickr.com tabs" }, async () => {
+  const tabs = await browser.tabs.query({ url: "*://*.flickr.com/*" });
+  await navigator.clipboard.writeText(tabs.map((tab) => tab.url).join("\n"));
+});
+/* dprint-ignore */
+declare global { interface ExcmdRegistry { copy_flickr_urls: typeof copy_flickr_urls; } }
 
 glide.keymaps.set("normal", "<leader>ts", "shrug");
 glide.keymaps.set("normal", "<leader>\\", "surprise");
@@ -395,6 +440,12 @@ glide.autocmds.create("UrlEnter", /mail\.google\.com\/.*rfc822msgid/, ({ tab_id 
 const shh_glide = `${glide.path.home_dir}/code/server/glide/shh.glide.ts`;
 glide.fs.exists(shh_glide).then(exists => {
   if (exists) glide.include(shh_glide);
+});
+
+// the accounts no feed reaches, read into lode from their pages (:lode, :lode_sync, :lode_status)
+const lode_glide = `${glide.path.home_dir}/code/server/glide/lode.glide.ts`;
+glide.fs.exists(lode_glide).then(exists => {
+  if (exists) glide.include(lode_glide);
 });
 
 if (glide.ctx.os === "linux") {

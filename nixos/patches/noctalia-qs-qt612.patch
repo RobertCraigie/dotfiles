@@ -1,0 +1,1312 @@
+diff --git a/cmake/util.cmake b/cmake/util.cmake
+index 14fa7c2..7f4108a 100644
+--- a/cmake/util.cmake
++++ b/cmake/util.cmake
+@@ -21,8 +21,27 @@ endfunction()
+ # DEPENDENCIES introduces a cmake dependency which we don't need with static modules.
+ # This greatly improves comp speed by not introducing those dependencies.
+ function (qs_add_module_deps_light target)
+-	foreach (dep IN LISTS ARGN)
+-		string(APPEND qmldir_extra "depends ${dep}\n")
++	cmake_parse_arguments(PARSE_ARGV 1 arg "" "" "URIS")
++
++	set(uris)
++
++	# Add dep metatypes files to target so it picks up the dep type data
++	foreach (dep IN LISTS arg_UNPARSED_ARGUMENTS)
++		get_target_property(uri ${dep} QT_QML_MODULE_URI)
++		get_target_property(metatypes ${dep} INTERFACE_QT_META_TYPES_BUILD_FILE)
++
++		if (NOT uri OR NOT metatypes)
++			message(FATAL_ERROR "${dep} must be a qml module defined before ${target}")
++		endif()
++
++		list(APPEND uris ${uri})
++		target_sources(${target} PRIVATE ${metatypes})
++	endforeach()
++
++	list(APPEND uris ${arg_URIS})
++
++	foreach (uri IN LISTS uris)
++		string(APPEND qmldir_extra "depends ${uri}\n")
+ 	endforeach()
+ 
+ 	qs_append_qmldir(${target} "${qmldir_extra}")
+diff --git a/src/bluetooth/CMakeLists.txt b/src/bluetooth/CMakeLists.txt
+index 806ff04..53b3757 100644
+--- a/src/bluetooth/CMakeLists.txt
++++ b/src/bluetooth/CMakeLists.txt
+@@ -29,6 +29,8 @@ qt_add_qml_module(quickshell-bluetooth
+ 	DEPENDENCIES QtQml
+ )
+ 
++qs_add_module_deps_light(quickshell-bluetooth quickshell-core)
++
+ install_qml_module(quickshell-bluetooth)
+ 
+ # dbus headers
+diff --git a/src/bluetooth/adapter.hpp b/src/bluetooth/adapter.hpp
+index d7f21d7..62ff161 100644
+--- a/src/bluetooth/adapter.hpp
++++ b/src/bluetooth/adapter.hpp
+@@ -32,7 +32,7 @@ public:
+ 	};
+ 	Q_ENUM(Enum);
+ 
+-	Q_INVOKABLE static QString toString(BluetoothAdapterState::Enum state);
++	Q_INVOKABLE static QString toString(qs::bluetooth::BluetoothAdapterState::Enum state);
+ };
+ 
+ } // namespace qs::bluetooth
+@@ -64,7 +64,7 @@ class BluetoothAdapter: public QObject {
+ 	/// True if the adapter is currently enabled. More detailed state is available from @@state.
+ 	Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged);
+ 	/// Detailed power state of the adapter.
+-	Q_PROPERTY(BluetoothAdapterState::Enum state READ default NOTIFY stateChanged BINDABLE bindableState);
++	Q_PROPERTY(qs::bluetooth::BluetoothAdapterState::Enum state READ default NOTIFY stateChanged BINDABLE bindableState);
+ 	/// True if the adapter can be discovered by other bluetooth devices.
+ 	Q_PROPERTY(bool discoverable READ discoverable WRITE setDiscoverable NOTIFY discoverableChanged);
+ 	/// Timeout in seconds for how long the adapter stays discoverable after @@discoverable is set to true.
+diff --git a/src/bluetooth/bluez.hpp b/src/bluetooth/bluez.hpp
+index 9d7c93c..0a30b15 100644
+--- a/src/bluetooth/bluez.hpp
++++ b/src/bluetooth/bluez.hpp
+@@ -66,7 +66,7 @@ class BluezQml: public QObject {
+ 	QML_SINGLETON;
+ 	// clang-format off
+ 	/// The default bluetooth adapter. Usually there is only one.
+-	Q_PROPERTY(BluetoothAdapter* defaultAdapter READ default NOTIFY defaultAdapterChanged BINDABLE bindableDefaultAdapter);
++	Q_PROPERTY(qs::bluetooth::BluetoothAdapter* defaultAdapter READ default NOTIFY defaultAdapterChanged BINDABLE bindableDefaultAdapter);
+ 	QSDOC_TYPE_OVERRIDE(ObjectModel<qs::bluetooth::BluetoothAdapter>*);
+ 	/// A list of all bluetooth adapters. See @@defaultAdapter for the default.
+ 	Q_PROPERTY(UntypedObjectModel* adapters READ adapters CONSTANT);
+diff --git a/src/bluetooth/device.hpp b/src/bluetooth/device.hpp
+index 23f230f..77123be 100644
+--- a/src/bluetooth/device.hpp
++++ b/src/bluetooth/device.hpp
+@@ -29,7 +29,7 @@ public:
+ 	};
+ 	Q_ENUM(Enum);
+ 
+-	Q_INVOKABLE static QString toString(BluetoothDeviceState::Enum state);
++	Q_INVOKABLE static QString toString(qs::bluetooth::BluetoothDeviceState::Enum state);
+ };
+ 
+ struct BatteryPercentage {};
+@@ -70,7 +70,7 @@ class BluetoothDevice: public QObject {
+ 	/// System icon representing the device type. Use @@Quickshell.Quickshell.iconPath() to display this in an image.
+ 	Q_PROPERTY(QString icon READ default NOTIFY iconChanged BINDABLE bindableIcon);
+ 	/// Connection state of the device.
+-	Q_PROPERTY(BluetoothDeviceState::Enum state READ default NOTIFY stateChanged BINDABLE bindableState);
++	Q_PROPERTY(qs::bluetooth::BluetoothDeviceState::Enum state READ default NOTIFY stateChanged BINDABLE bindableState);
+ 	/// True if the device is currently connected to the computer.
+ 	///
+ 	/// Setting this property is equivalent to calling @@connect() and @@disconnect().
+@@ -100,7 +100,7 @@ class BluetoothDevice: public QObject {
+ 	/// Battery level of the connected device, from `0.0` to `1.0`. Only valid if @@batteryAvailable is true.
+ 	Q_PROPERTY(qreal battery READ default NOTIFY batteryChanged BINDABLE bindableBattery);
+ 	/// The Bluetooth adapter this device belongs to.
+-	Q_PROPERTY(BluetoothAdapter* adapter READ adapter NOTIFY adapterChanged);
++	Q_PROPERTY(qs::bluetooth::BluetoothAdapter* adapter READ adapter NOTIFY adapterChanged);
+ 	/// DBus path of the device under the `org.bluez` system service.
+ 	Q_PROPERTY(QString dbusPath READ path CONSTANT);
+ 	// clang-format on
+diff --git a/src/core/logging_p.hpp b/src/core/logging_p.hpp
+index 3297ea1..d93689b 100644
+--- a/src/core/logging_p.hpp
++++ b/src/core/logging_p.hpp
+@@ -118,7 +118,7 @@ public:
+ 	void setupFileLogging();
+ 
+ private slots:
+-	void onMessage(const LogMessage& msg, bool showInSparse);
++	void onMessage(const qs::log::LogMessage& msg, bool showInSparse);
+ 
+ private:
+ 	QFile* file = nullptr;
+diff --git a/src/dbus/dbusmenu/CMakeLists.txt b/src/dbus/dbusmenu/CMakeLists.txt
+index 61cee42..add6a33 100644
+--- a/src/dbus/dbusmenu/CMakeLists.txt
++++ b/src/dbus/dbusmenu/CMakeLists.txt
+@@ -20,7 +20,7 @@ qt_add_qml_module(quickshell-dbusmenu
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-dbusmenu Quickshell)
++qs_add_module_deps_light(quickshell-dbusmenu quickshell-core)
+ 
+ install_qml_module(quickshell-dbusmenu)
+ 
+diff --git a/src/io/CMakeLists.txt b/src/io/CMakeLists.txt
+index 991beaa..859f05e 100644
+--- a/src/io/CMakeLists.txt
++++ b/src/io/CMakeLists.txt
+@@ -21,7 +21,7 @@ qt_add_qml_module(quickshell-io
+ 		FileView.qml
+ )
+ 
+-qs_add_module_deps_light(quickshell-io Quickshell)
++qs_add_module_deps_light(quickshell-io quickshell-core)
+ install_qml_module(quickshell-io)
+ 
+ target_link_libraries(quickshell-io PRIVATE Qt::Quick quickshell-ipc)
+diff --git a/src/io/fileview.hpp b/src/io/fileview.hpp
+index 4d6128c..e1180a7 100644
+--- a/src/io/fileview.hpp
++++ b/src/io/fileview.hpp
+@@ -227,7 +227,7 @@ class FileView: public QObject {
+ 	/// Its state may be saved with @@writeAdapter().
+ 	///
+ 	/// Currently the only adapter is @@JsonAdapter.
+-	Q_PROPERTY(FileViewAdapter* adapter READ adapter WRITE setAdapter NOTIFY adapterChanged);
++	Q_PROPERTY(qs::io::FileViewAdapter* adapter READ adapter WRITE setAdapter NOTIFY adapterChanged);
+ 
+ 	QSDOC_HIDE Q_PROPERTY(QString __path READ path WRITE setPath NOTIFY pathChanged);
+ 	QSDOC_HIDE Q_PROPERTY(QString __text READ text NOTIFY internalTextChanged);
+diff --git a/src/network/CMakeLists.txt b/src/network/CMakeLists.txt
+index 03ef86a..85b347b 100644
+--- a/src/network/CMakeLists.txt
++++ b/src/network/CMakeLists.txt
+@@ -17,7 +17,7 @@ qt_add_qml_module(quickshell-network
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-network Quickshell)
++qs_add_module_deps_light(quickshell-network quickshell-core)
+ install_qml_module(quickshell-network)
+ target_link_libraries(quickshell-network PRIVATE quickshell-network-nm Qt::Qml Qt::DBus)
+ qs_add_link_dependencies(quickshell-network quickshell-dbus)
+diff --git a/src/network/device.hpp b/src/network/device.hpp
+index 8d914a1..2d7b5b0 100644
+--- a/src/network/device.hpp
++++ b/src/network/device.hpp
+@@ -22,7 +22,7 @@ class NetworkDevice: public QObject {
+ 	///
+ 	/// When the device type is `Wifi`, the device object is a @@WifiDevice which exposes wifi network
+ 	/// connection and scanning.
+-	Q_PROPERTY(DeviceType::Enum type READ type CONSTANT);
++	Q_PROPERTY(qs::network::DeviceType::Enum type READ type CONSTANT);
+ 	/// The name of the device's control interface.
+ 	Q_PROPERTY(QString name READ name NOTIFY nameChanged BINDABLE bindableName);
+ 	/// The hardware address of the device in the XX:XX:XX:XX:XX:XX format.
+diff --git a/src/network/enums.hpp b/src/network/enums.hpp
+index 49c28ce..6c1490f 100644
+--- a/src/network/enums.hpp
++++ b/src/network/enums.hpp
+@@ -27,7 +27,7 @@ public:
+ 		Full = 4,
+ 	};
+ 	Q_ENUM(Enum);
+-	Q_INVOKABLE static QString toString(NetworkConnectivity::Enum conn);
++	Q_INVOKABLE static QString toString(qs::network::NetworkConnectivity::Enum conn);
+ };
+ 
+ ///! The backend supplying the Network service.
+@@ -42,7 +42,7 @@ public:
+ 		NetworkManager = 1,
+ 	};
+ 	Q_ENUM(Enum);
+-	Q_INVOKABLE static QString toString(NetworkBackendType::Enum type);
++	Q_INVOKABLE static QString toString(qs::network::NetworkBackendType::Enum type);
+ };
+ 
+ ///! The connection state of a device or network.
+@@ -60,7 +60,7 @@ public:
+ 		Disconnected = 4,
+ 	};
+ 	Q_ENUM(Enum);
+-	Q_INVOKABLE static QString toString(ConnectionState::Enum state);
++	Q_INVOKABLE static QString toString(qs::network::ConnectionState::Enum state);
+ };
+ 
+ ///! The reason a connection failed.
+@@ -85,7 +85,7 @@ public:
+ 		WifiNetworkLost = 5,
+ 	};
+ 	Q_ENUM(Enum);
+-	Q_INVOKABLE static QString toString(ConnectionFailReason::Enum reason);
++	Q_INVOKABLE static QString toString(qs::network::ConnectionFailReason::Enum reason);
+ };
+ 
+ ///! Type of a @@NetworkDevice.
+@@ -100,7 +100,7 @@ public:
+ 		Wifi = 1,
+ 	};
+ 	Q_ENUM(Enum);
+-	Q_INVOKABLE static QString toString(DeviceType::Enum type);
++	Q_INVOKABLE static QString toString(qs::network::DeviceType::Enum type);
+ };
+ 
+ ///! The security type of a @@WifiNetwork.
+@@ -125,7 +125,7 @@ public:
+ 		Unknown = 11,
+ 	};
+ 	Q_ENUM(Enum);
+-	Q_INVOKABLE static QString toString(WifiSecurityType::Enum type);
++	Q_INVOKABLE static QString toString(qs::network::WifiSecurityType::Enum type);
+ };
+ 
+ ///! The 802.11 mode of a @@WifiDevice.
+@@ -148,7 +148,7 @@ public:
+ 		Unknown = 4,
+ 	};
+ 	Q_ENUM(Enum);
+-	Q_INVOKABLE static QString toString(WifiDeviceMode::Enum mode);
++	Q_INVOKABLE static QString toString(qs::network::WifiDeviceMode::Enum mode);
+ };
+ 
+ } // namespace qs::network
+diff --git a/src/network/network.hpp b/src/network/network.hpp
+index f7734a2..f38a9de 100644
+--- a/src/network/network.hpp
++++ b/src/network/network.hpp
+@@ -184,7 +184,7 @@ public:
+ 	/// Attempt to connect to the network with a specific @@nmSettings entry.
+ 	///
+ 	/// > [!WARNING] Only valid for the NetworkManager backend.
+-	Q_INVOKABLE void connectWithSettings(NMSettings* settings);
++	Q_INVOKABLE void connectWithSettings(qs::network::NMSettings* settings);
+ 	/// Disconnect from the network.
+ 	Q_INVOKABLE void disconnect();
+ 	/// Forget all connection settings for this network.
+@@ -206,7 +206,7 @@ public:
+ 
+ signals:
+ 	/// Signals that a connection to the network has failed because of the given @@ConnectionFailReason.
+-	void connectionFailed(ConnectionFailReason::Enum reason);
++	void connectionFailed(qs::network::ConnectionFailReason::Enum reason);
+ 
+ 	void connectedChanged();
+ 	void knownChanged();
+@@ -214,7 +214,7 @@ signals:
+ 	void stateChangingChanged();
+ 	void nmSettingsChanged();
+ 	QSDOC_HIDE void requestConnect();
+-	QSDOC_HIDE void requestConnectWithSettings(NMSettings* settings);
++	QSDOC_HIDE void requestConnectWithSettings(qs::network::NMSettings* settings);
+ 	QSDOC_HIDE void requestDisconnect();
+ 	QSDOC_HIDE void requestForget();
+ 
+diff --git a/src/network/nm/accesspoint.hpp b/src/network/nm/accesspoint.hpp
+index 63e35ee..b30ca12 100644
+--- a/src/network/nm/accesspoint.hpp
++++ b/src/network/nm/accesspoint.hpp
+@@ -61,11 +61,11 @@ signals:
+ 	void loaded();
+ 	void ssidChanged(const QByteArray& ssid);
+ 	void signalStrengthChanged(quint8 signal);
+-	void flagsChanged(NM80211ApFlags::Enum flags);
+-	void wpaFlagsChanged(NM80211ApSecurityFlags::Enum wpaFlags);
+-	void rsnFlagsChanged(NM80211ApSecurityFlags::Enum rsnFlags);
+-	void modeChanged(NM80211Mode::Enum mode);
+-	void securityChanged(WifiSecurityType::Enum security);
++	void flagsChanged(qs::network::NM80211ApFlags::Enum flags);
++	void wpaFlagsChanged(qs::network::NM80211ApSecurityFlags::Enum wpaFlags);
++	void rsnFlagsChanged(qs::network::NM80211ApSecurityFlags::Enum rsnFlags);
++	void modeChanged(qs::network::NM80211Mode::Enum mode);
++	void securityChanged(qs::network::WifiSecurityType::Enum security);
+ 
+ private:
+ 	// clang-format off
+diff --git a/src/network/nm/active_connection.hpp b/src/network/nm/active_connection.hpp
+index 33426a1..a8988cd 100644
+--- a/src/network/nm/active_connection.hpp
++++ b/src/network/nm/active_connection.hpp
+@@ -43,8 +43,8 @@ public:
+ signals:
+ 	void loaded();
+ 	void connectionChanged(QDBusObjectPath path);
+-	void stateChanged(NMConnectionState::Enum state);
+-	void stateReasonChanged(NMConnectionStateReason::Enum reason);
++	void stateChanged(qs::network::NMConnectionState::Enum state);
++	void stateReasonChanged(qs::network::NMConnectionStateReason::Enum reason);
+ 
+ private slots:
+ 	void onStateChanged(quint32 state, quint32 reason);
+diff --git a/src/network/nm/backend.hpp b/src/network/nm/backend.hpp
+index 2825a17..86d6482 100644
+--- a/src/network/nm/backend.hpp
++++ b/src/network/nm/backend.hpp
+@@ -43,11 +43,11 @@ public:
+ 	[[nodiscard]] NMConnectivityState::Enum connectivity() const { return this->bConnectivity; }
+ 
+ signals:
+-	void deviceAdded(NetworkDevice* device);
+-	void deviceRemoved(NetworkDevice* device);
++	void deviceAdded(qs::network::NetworkDevice* device);
++	void deviceRemoved(qs::network::NetworkDevice* device);
+ 	void wifiEnabledChanged(bool enabled);
+ 	void wifiHardwareEnabledChanged(bool enabled);
+-	void connectivityStateChanged(NMConnectivityState::Enum state);
++	void connectivityStateChanged(qs::network::NMConnectivityState::Enum state);
+ 	void connectivityCheckAvailableChanged(bool available);
+ 	void connectivityCheckEnabledChanged(bool enabled);
+ 
+@@ -61,7 +61,7 @@ private slots:
+ 	void onDevicePathRemoved(const QDBusObjectPath& path);
+ 	void activateConnection(const QDBusObjectPath& connPath, const QDBusObjectPath& devPath);
+ 	void addAndActivateConnection(
+-	    const NMSettingsMap& settings,
++	    const qs::network::NMSettingsMap& settings,
+ 	    const QDBusObjectPath& devPath,
+ 	    const QDBusObjectPath& specificObjectPath
+ 	);
+diff --git a/src/network/nm/settings.hpp b/src/network/nm/settings.hpp
+index 3a76c61..cbab991 100644
+--- a/src/network/nm/settings.hpp
++++ b/src/network/nm/settings.hpp
+@@ -61,7 +61,7 @@ public:
+ 
+ signals:
+ 	void loaded();
+-	void settingsChanged(NMSettingsMap settings);
++	void settingsChanged(qs::network::NMSettingsMap settings);
+ 	void idChanged(QString id);
+ 	void uuidChanged(QString uuid);
+ 
+diff --git a/src/network/wifi.hpp b/src/network/wifi.hpp
+index c0091f7..208bb56 100644
+--- a/src/network/wifi.hpp
++++ b/src/network/wifi.hpp
+@@ -23,7 +23,7 @@ class WifiNetwork: public Network {
+ 	/// The current signal strength of the network, from 0.0 to 1.0.
+ 	Q_PROPERTY(qreal signalStrength READ default NOTIFY signalStrengthChanged BINDABLE bindableSignalStrength);
+ 	/// The security type of the wifi network.
+-	Q_PROPERTY(WifiSecurityType::Enum security READ default NOTIFY securityChanged BINDABLE bindableSecurity);
++	Q_PROPERTY(qs::network::WifiSecurityType::Enum security READ default NOTIFY securityChanged BINDABLE bindableSecurity);
+ 	// clang-format on
+ 
+ public:
+@@ -68,7 +68,7 @@ class WifiDevice: public NetworkDevice {
+ 	/// When enabled, the scanner populates the device with an active list of available wifi networks.
+ 	Q_PROPERTY(bool scannerEnabled READ scannerEnabled WRITE setScannerEnabled NOTIFY scannerEnabledChanged BINDABLE bindableScannerEnabled);
+ 	/// The 802.11 mode the device is in.
+-	Q_PROPERTY(WifiDeviceMode::Enum mode READ default NOTIFY modeChanged BINDABLE bindableMode);
++	Q_PROPERTY(qs::network::WifiDeviceMode::Enum mode READ default NOTIFY modeChanged BINDABLE bindableMode);
+ 	// clang-format on
+ 
+ public:
+diff --git a/src/services/mpris/CMakeLists.txt b/src/services/mpris/CMakeLists.txt
+index 4440c0a..06be13a 100644
+--- a/src/services/mpris/CMakeLists.txt
++++ b/src/services/mpris/CMakeLists.txt
+@@ -33,7 +33,7 @@ qt_add_qml_module(quickshell-service-mpris
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-service-mpris Quickshell)
++qs_add_module_deps_light(quickshell-service-mpris quickshell-core)
+ 
+ install_qml_module(quickshell-service-mpris)
+ 
+diff --git a/src/services/notifications/CMakeLists.txt b/src/services/notifications/CMakeLists.txt
+index 58b6648..57f8376 100644
+--- a/src/services/notifications/CMakeLists.txt
++++ b/src/services/notifications/CMakeLists.txt
+@@ -22,7 +22,7 @@ qt_add_qml_module(quickshell-service-notifications
+ 	VERSION 0.1
+ )
+ 
+-qs_add_module_deps_light(quickshell-service-notifications Quickshell)
++qs_add_module_deps_light(quickshell-service-notifications quickshell-core)
+ install_qml_module(quickshell-service-notifications)
+ 
+ target_link_libraries(quickshell-service-notifications PRIVATE Qt::Quick Qt::DBus)
+diff --git a/src/services/pipewire/CMakeLists.txt b/src/services/pipewire/CMakeLists.txt
+index 3bc9021..606e4bc 100644
+--- a/src/services/pipewire/CMakeLists.txt
++++ b/src/services/pipewire/CMakeLists.txt
+@@ -21,7 +21,7 @@ qt_add_qml_module(quickshell-service-pipewire
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-service-pipewire Quickshell)
++qs_add_module_deps_light(quickshell-service-pipewire quickshell-core)
+ 
+ install_qml_module(quickshell-service-pipewire)
+ 
+diff --git a/src/services/pipewire/defaults.hpp b/src/services/pipewire/defaults.hpp
+index f31669e..4e06e5b 100644
+--- a/src/services/pipewire/defaults.hpp
++++ b/src/services/pipewire/defaults.hpp
+@@ -41,9 +41,9 @@ signals:
+ 	void defaultConfiguredSourceNameChanged();
+ 
+ private slots:
+-	void onMetadataAdded(PwMetadata* metadata);
++	void onMetadataAdded(qs::service::pipewire::PwMetadata* metadata);
+ 	void onMetadataProperty(const char* key, const char* type, const char* value);
+-	void onNodeAdded(PwNode* node);
++	void onNodeAdded(qs::service::pipewire::PwNode* node);
+ 	void onDefaultSinkDestroyed();
+ 	void onDefaultSourceDestroyed();
+ 	void onDefaultConfiguredSinkDestroyed();
+diff --git a/src/services/pipewire/device.hpp b/src/services/pipewire/device.hpp
+index cd61709..f973b18 100644
+--- a/src/services/pipewire/device.hpp
++++ b/src/services/pipewire/device.hpp
+@@ -39,7 +39,8 @@ public:
+ 
+ signals:
+ 	void deviceReady();
+-	void routeVolumesChanged(qint32 routeDevice, const PwVolumeProps& volumeProps);
++	void
++	routeVolumesChanged(qint32 routeDevice, const qs::service::pipewire::PwVolumeProps& volumeProps);
+ 
+ private slots:
+ 	void polled();
+diff --git a/src/services/pipewire/node.hpp b/src/services/pipewire/node.hpp
+index efc819c..d1dcd80 100644
+--- a/src/services/pipewire/node.hpp
++++ b/src/services/pipewire/node.hpp
+@@ -209,7 +209,8 @@ signals:
+ 
+ private slots:
+ 	void onDeviceReady();
+-	void onDeviceVolumesChanged(qint32 routeDevice, const PwVolumeProps& props);
++	void
++	onDeviceVolumesChanged(qint32 routeDevice, const qs::service::pipewire::PwVolumeProps& props);
+ 
+ private:
+ 	void updateVolumeProps(const PwVolumeProps& volumeProps);
+diff --git a/src/services/pipewire/peak.hpp b/src/services/pipewire/peak.hpp
+index c4af3c2..3465852 100644
+--- a/src/services/pipewire/peak.hpp
++++ b/src/services/pipewire/peak.hpp
+@@ -8,18 +8,12 @@
+ #include <qvector.h>
+ 
+ #include "node.hpp"
++#include "qml.hpp"
+ 
+ namespace qs::service::pipewire {
+ 
+-class PwNodeIface;
+ class PwPeakStream;
+ 
+-} // namespace qs::service::pipewire
+-
+-Q_DECLARE_OPAQUE_POINTER(qs::service::pipewire::PwNodeIface*);
+-
+-namespace qs::service::pipewire {
+-
+ ///! Monitors peak levels of an audio node.
+ /// Tracks volume peaks for a node across all its channels.
+ ///
+diff --git a/src/services/pipewire/qml.hpp b/src/services/pipewire/qml.hpp
+index a43ce19..a1697d0 100644
+--- a/src/services/pipewire/qml.hpp
++++ b/src/services/pipewire/qml.hpp
+@@ -158,11 +158,11 @@ signals:
+ 	void readyChanged();
+ 
+ private slots:
+-	void onNodeAdded(PwNode* node);
++	void onNodeAdded(qs::service::pipewire::PwNode* node);
+ 	void onNodeRemoved(QObject* object);
+-	void onLinkAdded(PwLink* link);
++	void onLinkAdded(qs::service::pipewire::PwLink* link);
+ 	void onLinkRemoved(QObject* object);
+-	void onLinkGroupAdded(PwLinkGroup* group);
++	void onLinkGroupAdded(qs::service::pipewire::PwLinkGroup* group);
+ 	void onLinkGroupRemoved(QObject* object);
+ 
+ private:
+@@ -199,7 +199,7 @@ signals:
+ 
+ private slots:
+ 	void onNodeDestroyed();
+-	void onLinkGroupCreated(PwLinkGroup* linkGroup);
++	void onLinkGroupCreated(qs::service::pipewire::PwLinkGroup* linkGroup);
+ 	void onLinkGroupDestroyed(QObject* object);
+ 
+ private:
+@@ -361,7 +361,7 @@ class PwLinkIface: public PwObjectIface {
+ 	/// The current state of the link.
+ 	///
+ 	/// > [!WARNING] This property is invalid unless the node is bound using @@PwObjectTracker.
+-	Q_PROPERTY(PwLinkState::Enum state READ state NOTIFY stateChanged);
++	Q_PROPERTY(qs::service::pipewire::PwLinkState::Enum state READ state NOTIFY stateChanged);
+ 	QML_NAMED_ELEMENT(PwLink);
+ 	QML_UNCREATABLE("PwLinks cannot be created directly");
+ 
+diff --git a/src/services/pipewire/registry.hpp b/src/services/pipewire/registry.hpp
+index bb2db8c..ec0a9ea 100644
+--- a/src/services/pipewire/registry.hpp
++++ b/src/services/pipewire/registry.hpp
+@@ -49,7 +49,7 @@ public:
+ 
+ signals:
+ 	// goes with safeDestroy
+-	void destroying(PwBindableObject* self);
++	void destroying(qs::service::pipewire::PwBindableObject* self);
+ 
+ protected:
+ 	void registryBind(const char* interface, quint32 version);
+@@ -132,10 +132,10 @@ public:
+ 	[[nodiscard]] PwNode* findNodeByName(QStringView name) const;
+ 
+ signals:
+-	void nodeAdded(PwNode* node);
+-	void linkAdded(PwLink* link);
+-	void linkGroupAdded(PwLinkGroup* group);
+-	void metadataAdded(PwMetadata* metadata);
++	void nodeAdded(qs::service::pipewire::PwNode* node);
++	void linkAdded(qs::service::pipewire::PwLink* link);
++	void linkGroupAdded(qs::service::pipewire::PwLinkGroup* group);
++	void metadataAdded(qs::service::pipewire::PwMetadata* metadata);
+ 	void initialized();
+ 	void cleared();
+ 
+diff --git a/src/services/polkit/flow.hpp b/src/services/polkit/flow.hpp
+index 0b7e845..1a97df1 100644
+--- a/src/services/polkit/flow.hpp
++++ b/src/services/polkit/flow.hpp
+@@ -45,12 +45,12 @@ class AuthFlow
+ 	/// Each identity may be a user or a group. You may select any of them to
+ 	/// authenticate by setting @@selectedIdentity. By default, the first identity
+ 	/// in the list is selected.
+-	Q_PROPERTY(QList<Identity*> identities READ identities CONSTANT);
++	Q_PROPERTY(QList<qs::service::polkit::Identity*> identities READ identities CONSTANT);
+ 
+ 	/// The identity that will be used to authenticate.
+ 	///
+ 	/// Changing this will abort any ongoing authentication conversations and start a new one.
+-	Q_PROPERTY(Identity* selectedIdentity READ default WRITE setSelectedIdentity NOTIFY selectedIdentityChanged BINDABLE selectedIdentity);
++	Q_PROPERTY(qs::service::polkit::Identity* selectedIdentity READ default WRITE setSelectedIdentity NOTIFY selectedIdentityChanged BINDABLE selectedIdentity);
+ 
+ 	/// Indicates that a response from the user is required from the user,
+ 	/// typically a password.
+diff --git a/src/services/polkit/qml.hpp b/src/services/polkit/qml.hpp
+index 5343bcd..b9ede83 100644
+--- a/src/services/polkit/qml.hpp
++++ b/src/services/polkit/qml.hpp
+@@ -47,7 +47,7 @@ class PolkitAgent
+ 	/// The current authentication state if an authentication request is active.
+ 	///
+ 	/// Null when no authentication request is active.
+-	Q_PROPERTY(AuthFlow* flow READ default NOTIFY flowChanged BINDABLE flow);
++	Q_PROPERTY(qs::service::polkit::AuthFlow* flow READ default NOTIFY flowChanged BINDABLE flow);
+ 
+ public:
+ 	explicit PolkitAgent(QObject* parent = nullptr): QObject(parent) {};
+diff --git a/src/services/status_notifier/CMakeLists.txt b/src/services/status_notifier/CMakeLists.txt
+index 7e0bf2b..913152e 100644
+--- a/src/services/status_notifier/CMakeLists.txt
++++ b/src/services/status_notifier/CMakeLists.txt
+@@ -44,7 +44,7 @@ qt_add_qml_module(quickshell-service-statusnotifier
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-service-statusnotifier Quickshell Quickshell.DBusMenu)
++qs_add_module_deps_light(quickshell-service-statusnotifier quickshell-core quickshell-dbusmenu)
+ 
+ install_qml_module(quickshell-service-statusnotifier)
+ 
+diff --git a/src/services/status_notifier/host.hpp b/src/services/status_notifier/host.hpp
+index 87b3137..ce84450 100644
+--- a/src/services/status_notifier/host.hpp
++++ b/src/services/status_notifier/host.hpp
+@@ -29,9 +29,9 @@ public:
+ 	static StatusNotifierHost* instance();
+ 
+ signals:
+-	void itemRegistered(StatusNotifierItem* item);
+-	void itemReady(StatusNotifierItem* item);
+-	void itemUnregistered(StatusNotifierItem* item);
++	void itemRegistered(qs::service::sni::StatusNotifierItem* item);
++	void itemReady(qs::service::sni::StatusNotifierItem* item);
++	void itemUnregistered(qs::service::sni::StatusNotifierItem* item);
+ 
+ private slots:
+ 	void onWatcherRegistered();
+diff --git a/src/services/upower/CMakeLists.txt b/src/services/upower/CMakeLists.txt
+index b18ec15..5c9c1f9 100644
+--- a/src/services/upower/CMakeLists.txt
++++ b/src/services/upower/CMakeLists.txt
+@@ -34,7 +34,7 @@ qt_add_qml_module(quickshell-service-upower
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-service-upower Quickshell)
++qs_add_module_deps_light(quickshell-service-upower quickshell-core)
+ 
+ install_qml_module(quickshell-service-upower)
+ 
+diff --git a/src/wayland/CMakeLists.txt b/src/wayland/CMakeLists.txt
+index 8777a9b..80e397d 100644
+--- a/src/wayland/CMakeLists.txt
++++ b/src/wayland/CMakeLists.txt
+@@ -156,7 +156,7 @@ qt_add_qml_module(quickshell-wayland
+ 	IMPORTS ${WAYLAND_MODULES}
+ )
+ 
+-qs_add_module_deps_light(quickshell-wayland Quickshell)
++qs_add_module_deps_light(quickshell-wayland quickshell-core)
+ 
+ install_qml_module(quickshell-wayland)
+ 
+diff --git a/src/wayland/background_effect/CMakeLists.txt b/src/wayland/background_effect/CMakeLists.txt
+index f45f94d..1103397 100644
+--- a/src/wayland/background_effect/CMakeLists.txt
++++ b/src/wayland/background_effect/CMakeLists.txt
+@@ -10,6 +10,8 @@ qt_add_qml_module(quickshell-wayland-background-effect
+ 	DEPENDENCIES QtQml
+ )
+ 
++qs_add_module_deps_light(quickshell-wayland-background-effect quickshell-core)
++
+ install_qml_module(quickshell-wayland-background-effect)
+ 
+ wl_proto(wlp-background-effect ext-background-effect-v1 "${WAYLAND_PROTOCOLS}/staging/ext-background-effect")
+diff --git a/src/wayland/hyprland/CMakeLists.txt b/src/wayland/hyprland/CMakeLists.txt
+index 40c8548..f3e43c8 100644
+--- a/src/wayland/hyprland/CMakeLists.txt
++++ b/src/wayland/hyprland/CMakeLists.txt
+@@ -30,7 +30,7 @@ qt_add_qml_module(quickshell-hyprland
+ 	IMPORTS ${HYPRLAND_MODULES}
+ )
+ 
+-qs_add_module_deps_light(quickshell-io Quickshell)
++qs_add_module_deps_light(quickshell-hyprland quickshell-core)
+ install_qml_module(quickshell-hyprland)
+ 
+ # intentionally no pch as the module is empty
+diff --git a/src/wayland/hyprland/focus_grab/CMakeLists.txt b/src/wayland/hyprland/focus_grab/CMakeLists.txt
+index 9582562..4911a30 100644
+--- a/src/wayland/hyprland/focus_grab/CMakeLists.txt
++++ b/src/wayland/hyprland/focus_grab/CMakeLists.txt
+@@ -10,7 +10,7 @@ qt_add_qml_module(quickshell-hyprland-focus-grab
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-hyprland-focus-grab Quickshell)
++qs_add_module_deps_light(quickshell-hyprland-focus-grab quickshell-core)
+ 
+ install_qml_module(quickshell-hyprland-focus-grab)
+ 
+diff --git a/src/wayland/hyprland/ipc/CMakeLists.txt b/src/wayland/hyprland/ipc/CMakeLists.txt
+index 9e42520..e79841d 100644
+--- a/src/wayland/hyprland/ipc/CMakeLists.txt
++++ b/src/wayland/hyprland/ipc/CMakeLists.txt
+@@ -11,13 +11,15 @@ qt_add_qml_module(quickshell-hyprland-ipc
+ 	DEPENDENCIES QtQuick
+ )
+ 
+-qs_add_module_deps_light(quickshell-hyprland-ipc Quickshell)
++qs_add_module_deps_light(quickshell-hyprland-ipc quickshell-core)
+ 
+ install_qml_module(quickshell-hyprland-ipc)
+ 
+ target_link_libraries(quickshell-hyprland-ipc PRIVATE Qt::Quick quickshell-core)
+ 
+ if (WAYLAND_TOPLEVEL_MANAGEMENT)
++	qs_add_module_deps_light(quickshell-hyprland-ipc quickshell-wayland-toplevel-management)
++
+ 	target_sources(quickshell-hyprland-ipc PRIVATE
+ 		toplevel_mapping.cpp
+ 		hyprland_toplevel.cpp
+diff --git a/src/wayland/hyprland/ipc/connection.cpp b/src/wayland/hyprland/ipc/connection.cpp
+index 3d7a397..2519dac 100644
+--- a/src/wayland/hyprland/ipc/connection.cpp
++++ b/src/wayland/hyprland/ipc/connection.cpp
+@@ -37,6 +37,18 @@ QS_LOGGING_CATEGORY(logHyprlandIpc, "quickshell.hyprland.ipc", QtWarningMsg);
+ QS_LOGGING_CATEGORY(logHyprlandIpcEvents, "quickshell.hyprland.ipc.events", QtWarningMsg);
+ } // namespace
+ 
++QBindable<HyprlandMonitor*> HyprlandIpc::bindableFocusedMonitor() const {
++	return &this->bFocusedMonitor;
++}
++
++QBindable<HyprlandWorkspace*> HyprlandIpc::bindableFocusedWorkspace() const {
++	return &this->bFocusedWorkspace;
++}
++
++QBindable<HyprlandToplevel*> HyprlandIpc::bindableActiveToplevel() const {
++	return &this->bActiveToplevel;
++}
++
+ HyprlandIpc::HyprlandIpc() {
+ 	auto his = qEnvironmentVariable("HYPRLAND_INSTANCE_SIGNATURE");
+ 	if (his.isEmpty()) {
+diff --git a/src/wayland/hyprland/ipc/connection.hpp b/src/wayland/hyprland/ipc/connection.hpp
+index ba1e7c9..82c3c50 100644
+--- a/src/wayland/hyprland/ipc/connection.hpp
++++ b/src/wayland/hyprland/ipc/connection.hpp
+@@ -25,9 +25,9 @@ class HyprlandToplevel;
+ 
+ } // namespace qs::hyprland::ipc
+ 
+-Q_DECLARE_OPAQUE_POINTER(qs::hyprland::ipc::HyprlandWorkspace*);
+-Q_DECLARE_OPAQUE_POINTER(qs::hyprland::ipc::HyprlandMonitor*);
+-Q_DECLARE_OPAQUE_POINTER(qs::hyprland::ipc::HyprlandToplevel*);
++Q_MOC_INCLUDE("hyprland_toplevel.hpp")
++Q_MOC_INCLUDE("monitor.hpp")
++Q_MOC_INCLUDE("workspace.hpp")
+ 
+ namespace qs::hyprland::ipc {
+ 
+@@ -81,17 +81,9 @@ public:
+ 
+ 	[[nodiscard]] HyprlandMonitor* monitorFor(QuickshellScreenInfo* screen);
+ 
+-	[[nodiscard]] QBindable<HyprlandMonitor*> bindableFocusedMonitor() const {
+-		return &this->bFocusedMonitor;
+-	}
+-
+-	[[nodiscard]] QBindable<HyprlandWorkspace*> bindableFocusedWorkspace() const {
+-		return &this->bFocusedWorkspace;
+-	}
+-
+-	[[nodiscard]] QBindable<HyprlandToplevel*> bindableActiveToplevel() const {
+-		return &this->bActiveToplevel;
+-	}
++	[[nodiscard]] QBindable<HyprlandMonitor*> bindableFocusedMonitor() const;
++	[[nodiscard]] QBindable<HyprlandWorkspace*> bindableFocusedWorkspace() const;
++	[[nodiscard]] QBindable<HyprlandToplevel*> bindableActiveToplevel() const;
+ 
+ 	void setFocusedMonitor(HyprlandMonitor* monitor);
+ 
+@@ -114,7 +106,7 @@ public:
+ 
+ signals:
+ 	void connected();
+-	void rawEvent(HyprlandIpcEvent* event);
++	void rawEvent(qs::hyprland::ipc::HyprlandIpcEvent* event);
+ 
+ 	void focusedMonitorChanged();
+ 	void focusedWorkspaceChanged();
+diff --git a/src/wayland/hyprland/ipc/hyprland_toplevel.cpp b/src/wayland/hyprland/ipc/hyprland_toplevel.cpp
+index 43b9838..524fee1 100644
+--- a/src/wayland/hyprland/ipc/hyprland_toplevel.cpp
++++ b/src/wayland/hyprland/ipc/hyprland_toplevel.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include "../../toplevel_management/qml.hpp"
+ #include "connection.hpp"
++#include "monitor.hpp"
+ #include "toplevel_mapping.hpp"
+ #include "workspace.hpp"
+ 
+@@ -15,6 +16,10 @@ using namespace qs::wayland::toplevel_management;
+ 
+ namespace qs::hyprland::ipc {
+ 
++QBindable<HyprlandWorkspace*> HyprlandToplevel::bindableWorkspace() { return &this->bWorkspace; }
++
++QBindable<HyprlandMonitor*> HyprlandToplevel::bindableMonitor() { return &this->bMonitor; }
++
+ HyprlandToplevel::HyprlandToplevel(HyprlandIpc* ipc): QObject(ipc), ipc(ipc) {
+ 	this->bMonitor.setBinding([this]() {
+ 		return this->bWorkspace ? this->bWorkspace->bindableMonitor().value() : nullptr;
+diff --git a/src/wayland/hyprland/ipc/hyprland_toplevel.hpp b/src/wayland/hyprland/ipc/hyprland_toplevel.hpp
+index ebd4f84..8d11d0c 100644
+--- a/src/wayland/hyprland/ipc/hyprland_toplevel.hpp
++++ b/src/wayland/hyprland/ipc/hyprland_toplevel.hpp
+@@ -28,7 +28,7 @@ class HyprlandToplevel: public QObject {
+ 	Q_PROPERTY(QString address READ addressStr NOTIFY addressChanged);
+ 	/// The toplevel handle, exposing the Hyprland toplevel.
+ 	/// Will be null until the address is reported
+-	Q_PROPERTY(HyprlandToplevel* handle READ hyprlandHandle NOTIFY hyprlandHandleChanged);
++	Q_PROPERTY(qs::hyprland::ipc::HyprlandToplevel* handle READ hyprlandHandle NOTIFY hyprlandHandleChanged);
+ 	/// The wayland toplevel handle. Will be null intil the address is reported
+ 	Q_PROPERTY(qs::wayland::toplevel_management::Toplevel* wayland READ waylandHandle NOTIFY waylandHandleChanged);
+ 	/// The title of the toplevel
+@@ -81,10 +81,10 @@ public:
+ 		return &this->bLastIpcObject;
+ 	};
+ 
+-	[[nodiscard]] QBindable<HyprlandWorkspace*> bindableWorkspace() { return &this->bWorkspace; }
++	[[nodiscard]] QBindable<HyprlandWorkspace*> bindableWorkspace();
+ 	void setWorkspace(HyprlandWorkspace* workspace);
+ 
+-	[[nodiscard]] QBindable<HyprlandMonitor*> bindableMonitor() { return &this->bMonitor; }
++	[[nodiscard]] QBindable<HyprlandMonitor*> bindableMonitor();
+ 
+ signals:
+ 	void addressChanged();
+diff --git a/src/wayland/hyprland/ipc/monitor.cpp b/src/wayland/hyprland/ipc/monitor.cpp
+index ddf3706..3b753dd 100644
+--- a/src/wayland/hyprland/ipc/monitor.cpp
++++ b/src/wayland/hyprland/ipc/monitor.cpp
+@@ -13,6 +13,10 @@ namespace qs::hyprland::ipc {
+ 
+ QVariantMap HyprlandMonitor::lastIpcObject() const { return this->mLastIpcObject; }
+ 
++QBindable<HyprlandWorkspace*> HyprlandMonitor::bindableActiveWorkspace() const {
++	return &this->bActiveWorkspace;
++}
++
+ void HyprlandMonitor::updateInitial(qint32 id, const QString& name, const QString& description) {
+ 	Qt::beginPropertyUpdateGroup();
+ 	this->bId = id;
+diff --git a/src/wayland/hyprland/ipc/monitor.hpp b/src/wayland/hyprland/ipc/monitor.hpp
+index b9ac434..d368adf 100644
+--- a/src/wayland/hyprland/ipc/monitor.hpp
++++ b/src/wayland/hyprland/ipc/monitor.hpp
+@@ -54,9 +54,7 @@ public:
+ 	[[nodiscard]] QBindable<qint32> bindableHeight() { return &this->bHeight; }
+ 	[[nodiscard]] QBindable<qreal> bindableScale() { return &this->bScale; }
+ 
+-	[[nodiscard]] QBindable<HyprlandWorkspace*> bindableActiveWorkspace() const {
+-		return &this->bActiveWorkspace;
+-	}
++	[[nodiscard]] QBindable<HyprlandWorkspace*> bindableActiveWorkspace() const;
+ 
+ 	[[nodiscard]] QBindable<bool> bindableFocused() const { return &this->bFocused; }
+ 
+diff --git a/src/wayland/hyprland/ipc/qml.hpp b/src/wayland/hyprland/ipc/qml.hpp
+index ebf5d80..5a49357 100644
+--- a/src/wayland/hyprland/ipc/qml.hpp
++++ b/src/wayland/hyprland/ipc/qml.hpp
+@@ -48,7 +48,7 @@ public:
+ 	Q_INVOKABLE static void dispatch(const QString& request);
+ 
+ 	/// Get the HyprlandMonitor object that corrosponds to a quickshell screen.
+-	Q_INVOKABLE static HyprlandMonitor* monitorFor(QuickshellScreenInfo* screen);
++	Q_INVOKABLE static qs::hyprland::ipc::HyprlandMonitor* monitorFor(QuickshellScreenInfo* screen);
+ 
+ 	/// Refresh monitor information.
+ 	///
+diff --git a/src/wayland/hyprland/ipc/workspace.cpp b/src/wayland/hyprland/ipc/workspace.cpp
+index c5d63b0..f1ab6e4 100644
+--- a/src/wayland/hyprland/ipc/workspace.cpp
++++ b/src/wayland/hyprland/ipc/workspace.cpp
+@@ -15,6 +15,8 @@ namespace qs::hyprland::ipc {
+ 
+ QVariantMap HyprlandWorkspace::lastIpcObject() const { return this->mLastIpcObject; }
+ 
++QBindable<HyprlandMonitor*> HyprlandWorkspace::bindableMonitor() { return &this->bMonitor; }
++
+ HyprlandWorkspace::HyprlandWorkspace(HyprlandIpc* ipc): QObject(ipc), ipc(ipc) {
+ 	Qt::beginPropertyUpdateGroup();
+ 
+diff --git a/src/wayland/hyprland/ipc/workspace.hpp b/src/wayland/hyprland/ipc/workspace.hpp
+index a0b09cf..3a3a710 100644
+--- a/src/wayland/hyprland/ipc/workspace.hpp
++++ b/src/wayland/hyprland/ipc/workspace.hpp
+@@ -64,7 +64,7 @@ public:
+ 	[[nodiscard]] QBindable<bool> bindableFocused() { return &this->bFocused; }
+ 	[[nodiscard]] QBindable<bool> bindableUrgent() { return &this->bUrgent; }
+ 	[[nodiscard]] QBindable<bool> bindableHasFullscreen() { return &this->bHasFullscreen; }
+-	[[nodiscard]] QBindable<HyprlandMonitor*> bindableMonitor() { return &this->bMonitor; }
++	[[nodiscard]] QBindable<HyprlandMonitor*> bindableMonitor();
+ 	[[nodiscard]] ObjectModel<HyprlandToplevel>* toplevels() { return &this->mToplevels; }
+ 
+ 	[[nodiscard]] QVariantMap lastIpcObject() const;
+diff --git a/src/wayland/hyprland/surface/CMakeLists.txt b/src/wayland/hyprland/surface/CMakeLists.txt
+index 7f889c9..0f762b6 100644
+--- a/src/wayland/hyprland/surface/CMakeLists.txt
++++ b/src/wayland/hyprland/surface/CMakeLists.txt
+@@ -10,6 +10,8 @@ qt_add_qml_module(quickshell-hyprland-surface-extensions
+ 	DEPENDENCIES QtQml
+ )
+ 
++qs_add_module_deps_light(quickshell-hyprland-surface-extensions quickshell-core)
++
+ install_qml_module(quickshell-hyprland-surface-extensions)
+ 
+ wl_proto(wlp-hyprland-surface hyprland-surface-v1 "${CMAKE_CURRENT_SOURCE_DIR}")
+diff --git a/src/wayland/idle_inhibit/CMakeLists.txt b/src/wayland/idle_inhibit/CMakeLists.txt
+index eb346d6..668a617 100644
+--- a/src/wayland/idle_inhibit/CMakeLists.txt
++++ b/src/wayland/idle_inhibit/CMakeLists.txt
+@@ -11,7 +11,7 @@ qt_add_qml_module(quickshell-wayland-idle-inhibit
+ 
+ install_qml_module(quickshell-wayland-idle-inhibit)
+ 
+-qs_add_module_deps_light(quickshell-wayland-idle-inhibit Quickshell)
++qs_add_module_deps_light(quickshell-wayland-idle-inhibit quickshell-core)
+ 
+ wl_proto(wlp-idle-inhibit idle-inhibit-unstable-v1 "${WAYLAND_PROTOCOLS}/unstable/idle-inhibit")
+ 
+diff --git a/src/wayland/idle_notify/CMakeLists.txt b/src/wayland/idle_notify/CMakeLists.txt
+index 889c7ce..74dc05d 100644
+--- a/src/wayland/idle_notify/CMakeLists.txt
++++ b/src/wayland/idle_notify/CMakeLists.txt
+@@ -11,7 +11,7 @@ qt_add_qml_module(quickshell-wayland-idle-notify
+ 
+ install_qml_module(quickshell-wayland-idle-notify)
+ 
+-qs_add_module_deps_light(quickshell-wayland-idle-notify Quickshell)
++qs_add_module_deps_light(quickshell-wayland-idle-notify quickshell-core)
+ 
+ wl_proto(wlp-idle-notify ext-idle-notify-v1 "${WAYLAND_PROTOCOLS}/staging/ext-idle-notify")
+ 
+diff --git a/src/wayland/niri/CMakeLists.txt b/src/wayland/niri/CMakeLists.txt
+index 7e3fae5..4d92936 100644
+--- a/src/wayland/niri/CMakeLists.txt
++++ b/src/wayland/niri/CMakeLists.txt
+@@ -15,7 +15,7 @@ qt_add_qml_module(quickshell-niri
+ 	IMPORTS ${NIRI_MODULES}
+ )
+ 
+-qs_add_module_deps_light(quickshell-niri Quickshell)
++qs_add_module_deps_light(quickshell-niri quickshell-core)
+ install_qml_module(quickshell-niri)
+ 
+ # intentionally no pch as the module is empty
+diff --git a/src/wayland/niri/ipc/CMakeLists.txt b/src/wayland/niri/ipc/CMakeLists.txt
+index 1edaaf3..6eb64de 100644
+--- a/src/wayland/niri/ipc/CMakeLists.txt
++++ b/src/wayland/niri/ipc/CMakeLists.txt
+@@ -12,7 +12,7 @@ qt_add_qml_module(quickshell-niri-ipc
+ 	DEPENDENCIES QtQuick
+ )
+ 
+-qs_add_module_deps_light(quickshell-niri-ipc Quickshell)
++qs_add_module_deps_light(quickshell-niri-ipc quickshell-core)
+ 
+ install_qml_module(quickshell-niri-ipc)
+ 
+diff --git a/src/wayland/shortcuts_inhibit/CMakeLists.txt b/src/wayland/shortcuts_inhibit/CMakeLists.txt
+index 8dedd3d..46686fa 100644
+--- a/src/wayland/shortcuts_inhibit/CMakeLists.txt
++++ b/src/wayland/shortcuts_inhibit/CMakeLists.txt
+@@ -11,7 +11,7 @@ qt_add_qml_module(quickshell-wayland-shortcuts-inhibit
+ 
+ install_qml_module(quickshell-wayland-shortcuts-inhibit)
+ 
+-qs_add_module_deps_light(quickshell-wayland-shortcuts-inhibit Quickshell)
++qs_add_module_deps_light(quickshell-wayland-shortcuts-inhibit quickshell-core)
+ 
+ wl_proto(wlp-shortcuts-inhibit keyboard-shortcuts-inhibit-unstable-v1 "${WAYLAND_PROTOCOLS}/unstable/keyboard-shortcuts-inhibit")
+ 
+diff --git a/src/wayland/toplevel_management/CMakeLists.txt b/src/wayland/toplevel_management/CMakeLists.txt
+index 97f8c7a..1826454 100644
+--- a/src/wayland/toplevel_management/CMakeLists.txt
++++ b/src/wayland/toplevel_management/CMakeLists.txt
+@@ -11,7 +11,8 @@ qt_add_qml_module(quickshell-wayland-toplevel-management
+ )
+ 
+ qs_add_module_deps_light(quickshell-wayland-toplevel-management
+-	Quickshell Quickshell.Wayland
++	quickshell-core
++	URIS Quickshell.Wayland
+ )
+ 
+ install_qml_module(quickshell-wayland-toplevel-management)
+diff --git a/src/wayland/windowmanager/ext_workspace.hpp b/src/wayland/windowmanager/ext_workspace.hpp
+index 6aff209..5358004 100644
+--- a/src/wayland/windowmanager/ext_workspace.hpp
++++ b/src/wayland/windowmanager/ext_workspace.hpp
+@@ -33,10 +33,10 @@ public:
+ 
+ signals:
+ 	void serverCommit();
+-	void workspaceCreated(Workspace* workspace);
+-	void workspaceDestroyed(Workspace* workspace);
+-	void groupCreated(WorkspaceGroup* group);
+-	void groupDestroyed(WorkspaceGroup* group);
++	void workspaceCreated(qs::wayland::workspace::Workspace* workspace);
++	void workspaceDestroyed(qs::wayland::workspace::Workspace* workspace);
++	void groupCreated(qs::wayland::workspace::WorkspaceGroup* group);
++	void groupDestroyed(qs::wayland::workspace::WorkspaceGroup* group);
+ 
+ protected:
+ 	void ext_workspace_manager_v1_workspace_group(::ext_workspace_group_handle_v1* handle) override;
+diff --git a/src/wayland/wlr_layershell/CMakeLists.txt b/src/wayland/wlr_layershell/CMakeLists.txt
+index 444f512..752c2cb 100644
+--- a/src/wayland/wlr_layershell/CMakeLists.txt
++++ b/src/wayland/wlr_layershell/CMakeLists.txt
+@@ -10,7 +10,10 @@ qt_add_qml_module(quickshell-wayland-layershell
+ 	DEPENDENCIES QtQuick
+ )
+ 
+-qs_add_module_deps_light(quickshell-wayland-layershell Quickshell Quickshell.Wayland)
++qs_add_module_deps_light(quickshell-wayland-layershell
++	quickshell-core quickshell-window
++	URIS Quickshell.Wayland
++)
+ 
+ install_qml_module(quickshell-wayland-layershell)
+ 
+diff --git a/src/window/CMakeLists.txt b/src/window/CMakeLists.txt
+index 1cd6317..c73f87a 100644
+--- a/src/window/CMakeLists.txt
++++ b/src/window/CMakeLists.txt
+@@ -12,7 +12,7 @@ qt_add_qml_module(quickshell-window
+ 	DEPENDENCIES QtQuick
+ )
+ 
+-qs_add_module_deps_light(quickshell-window Quickshell)
++qs_add_module_deps_light(quickshell-window quickshell-core)
+ 
+ install_qml_module(quickshell-window)
+ 
+diff --git a/src/windowmanager/CMakeLists.txt b/src/windowmanager/CMakeLists.txt
+index 3c032f4..9833b5e 100644
+--- a/src/windowmanager/CMakeLists.txt
++++ b/src/windowmanager/CMakeLists.txt
+@@ -10,7 +10,7 @@ qt_add_qml_module(quickshell-windowmanager
+ 	DEPENDENCIES QtQuick
+ )
+ 
+-qs_add_module_deps_light(quickshell-windowmanager Quickshell)
++qs_add_module_deps_light(quickshell-windowmanager quickshell-core)
+ 
+ install_qml_module(quickshell-windowmanager)
+ 
+diff --git a/src/windowmanager/windowmanager.hpp b/src/windowmanager/windowmanager.hpp
+index 054e485..c2681d9 100644
+--- a/src/windowmanager/windowmanager.hpp
++++ b/src/windowmanager/windowmanager.hpp
+@@ -23,7 +23,7 @@ public:
+ 	static void setProvider(std::function<WindowManager*()> provider);
+ 	static WindowManager* instance();
+ 
+-	Q_INVOKABLE ScreenProjection* screenProjection(QuickshellScreenInfo* screen);
++	Q_INVOKABLE qs::wm::ScreenProjection* screenProjection(QuickshellScreenInfo* screen);
+ 
+ 	[[nodiscard]] QBindable<QList<Windowset*>> bindableWindowsets() const {
+ 		return &this->bWindowsets;
+@@ -64,10 +64,10 @@ class WindowManagerQml: public QObject {
+ 	QML_SINGLETON;
+ 	// clang-format off
+ 	/// All windowsets tracked by the WM across all projections.
+-	Q_PROPERTY(QList<Windowset*> windowsets READ default BINDABLE bindableWindowsets);
++	Q_PROPERTY(QList<qs::wm::Windowset*> windowsets READ default BINDABLE bindableWindowsets);
+ 	/// All windowset projections tracked by the WM. Does not include
+ 	/// internal projections from @@screenProjection().
+-	Q_PROPERTY(QList<WindowsetProjection*> windowsetProjections READ default BINDABLE bindableWindowsetProjections);
++	Q_PROPERTY(QList<qs::wm::WindowsetProjection*> windowsetProjections READ default BINDABLE bindableWindowsetProjections);
+ 	// clang-format on
+ 
+ public:
+@@ -75,7 +75,7 @@ public:
+ 	/// windowsets on that screen, regardless of the WM-specified projection. Depending on
+ 	/// how the WM lays out its actual projections, multiple ScreenProjections may contain
+ 	/// the same Windowsets.
+-	Q_INVOKABLE static ScreenProjection* screenProjection(QuickshellScreenInfo* screen) {
++	Q_INVOKABLE static qs::wm::ScreenProjection* screenProjection(QuickshellScreenInfo* screen) {
+ 		return WindowManager::instance()->screenProjection(screen);
+ 	}
+ 
+diff --git a/src/windowmanager/windowset.hpp b/src/windowmanager/windowset.hpp
+index 51cbd9b..8e3059a 100644
+--- a/src/windowmanager/windowset.hpp
++++ b/src/windowmanager/windowset.hpp
+@@ -41,7 +41,7 @@ class Windowset: public QObject {
+ 	Q_PROPERTY(bool active READ default NOTIFY activeChanged BINDABLE bindableActive);
+ 	/// The projection this windowset is a member of. A projection is the set of screens covered by
+ 	/// a windowset.
+-	Q_PROPERTY(WindowsetProjection* projection READ default NOTIFY projectionChanged BINDABLE bindableProjection);
++	Q_PROPERTY(qs::wm::WindowsetProjection* projection READ default NOTIFY projectionChanged BINDABLE bindableProjection);
+ 	/// If false, this windowset should generally be hidden from workspace pickers.
+ 	Q_PROPERTY(bool shouldDisplay READ default NOTIFY shouldDisplayChanged BINDABLE bindableShouldDisplay);
+ 	/// If true, a window in this windowset has been marked as urgent.
+@@ -70,7 +70,7 @@ public:
+ 	Q_INVOKABLE virtual void remove();
+ 	/// Move the windowset to a different projection. A projection represents the set of screens
+ 	/// a workspace spans. Requires @@canSetProjection.
+-	Q_INVOKABLE virtual void setProjection(WindowsetProjection* projection);
++	Q_INVOKABLE virtual void setProjection(qs::wm::WindowsetProjection* projection);
+ 
+ 	[[nodiscard]] QBindable<QString> bindableId() const { return &this->bId; }
+ 	[[nodiscard]] QBindable<QString> bindableName() const { return &this->bName; }
+@@ -134,7 +134,7 @@ class WindowsetProjection: public QObject {
+ 	/// Screens the windowset projection spans, often a single screen or all screens.
+ 	Q_PROPERTY(QList<QuickshellScreenInfo*> screens READ default NOTIFY screensChanged BINDABLE bindableScreens);
+ 	/// Windowsets that are currently present on the projection.
+-	Q_PROPERTY(QList<Windowset*> windowsets READ default NOTIFY windowsetsChanged BINDABLE bindableWindowsets);
++	Q_PROPERTY(QList<qs::wm::Windowset*> windowsets READ default NOTIFY windowsetsChanged BINDABLE bindableWindowsets);
+ 	// clang-format on
+ 
+ public:
+diff --git a/src/x11/CMakeLists.txt b/src/x11/CMakeLists.txt
+index 2a085d9..9321aaa 100644
+--- a/src/x11/CMakeLists.txt
++++ b/src/x11/CMakeLists.txt
+@@ -15,6 +15,8 @@ if(I3)
+ 	add_subdirectory(i3)
+ endif()
+ 
++qs_add_module_deps_light(quickshell-x11 quickshell-core quickshell-window)
++
+ install_qml_module(quickshell-x11)
+ 
+ add_library(quickshell-x11-init OBJECT init.cpp)
+diff --git a/src/x11/i3/ipc/CMakeLists.txt b/src/x11/i3/ipc/CMakeLists.txt
+index a073459..afece59 100644
+--- a/src/x11/i3/ipc/CMakeLists.txt
++++ b/src/x11/i3/ipc/CMakeLists.txt
+@@ -13,7 +13,7 @@ qt_add_qml_module(quickshell-i3-ipc
+ 	DEPENDENCIES QtQml
+ )
+ 
+-qs_add_module_deps_light(quickshell-i3-ipc Quickshell)
++qs_add_module_deps_light(quickshell-i3-ipc quickshell-core)
+ 
+ install_qml_module(quickshell-i3-ipc)
+ 
+diff --git a/src/x11/i3/ipc/connection.hpp b/src/x11/i3/ipc/connection.hpp
+index 7d03ecd..6123708 100644
+--- a/src/x11/i3/ipc/connection.hpp
++++ b/src/x11/i3/ipc/connection.hpp
+@@ -80,7 +80,7 @@ public:
+ 
+ signals:
+ 	void connected();
+-	void rawEvent(I3IpcEvent* event);
++	void rawEvent(qs::i3::ipc::I3IpcEvent* event);
+ 
+ protected slots:
+ 	void eventSocketError(QLocalSocket::LocalSocketError error) const;
+diff --git a/src/x11/i3/ipc/controller.cpp b/src/x11/i3/ipc/controller.cpp
+index 30b0fe1..4e39847 100644
+--- a/src/x11/i3/ipc/controller.cpp
++++ b/src/x11/i3/ipc/controller.cpp
+@@ -31,6 +31,14 @@ QS_LOGGING_CATEGORY(logI3Ipc, "quickshell.I3.ipc", QtWarningMsg);
+ QS_LOGGING_CATEGORY(logI3IpcEvents, "quickshell.I3.ipc.events", QtWarningMsg);
+ } // namespace
+ 
++QBindable<I3Monitor*> I3IpcController::bindableFocusedMonitor() const {
++	return &this->bFocusedMonitor;
++}
++
++QBindable<I3Workspace*> I3IpcController::bindableFocusedWorkspace() const {
++	return &this->bFocusedWorkspace;
++}
++
+ I3IpcController::I3IpcController(): I3Ipc({"workspace", "output"}) {
+ 	// bind focused workspace to focused monitor's active workspace
+ 	this->bFocusedWorkspace.setBinding([this]() -> I3Workspace* {
+diff --git a/src/x11/i3/ipc/controller.hpp b/src/x11/i3/ipc/controller.hpp
+index 464f6f6..4df7257 100644
+--- a/src/x11/i3/ipc/controller.hpp
++++ b/src/x11/i3/ipc/controller.hpp
+@@ -20,8 +20,8 @@ class I3Workspace;
+ class I3Monitor;
+ } // namespace qs::i3::ipc
+ 
+-Q_DECLARE_OPAQUE_POINTER(qs::i3::ipc::I3Workspace*);
+-Q_DECLARE_OPAQUE_POINTER(qs::i3::ipc::I3Monitor*);
++Q_MOC_INCLUDE("monitor.hpp")
++Q_MOC_INCLUDE("workspace.hpp")
+ 
+ namespace qs::i3::ipc {
+ 
+@@ -43,13 +43,8 @@ public:
+ 
+ 	I3Monitor* monitorFor(QuickshellScreenInfo* screen);
+ 
+-	[[nodiscard]] QBindable<I3Monitor*> bindableFocusedMonitor() const {
+-		return &this->bFocusedMonitor;
+-	};
+-
+-	[[nodiscard]] QBindable<I3Workspace*> bindableFocusedWorkspace() const {
+-		return &this->bFocusedWorkspace;
+-	};
++	[[nodiscard]] QBindable<I3Monitor*> bindableFocusedMonitor() const;
++	[[nodiscard]] QBindable<I3Workspace*> bindableFocusedWorkspace() const;
+ 
+ 	[[nodiscard]] ObjectModel<I3Monitor>* monitors();
+ 	[[nodiscard]] ObjectModel<I3Workspace>* workspaces();
+@@ -61,7 +56,7 @@ signals:
+ private slots:
+ 	void onFocusedMonitorDestroyed();
+ 
+-	void onEvent(I3IpcEvent* event);
++	void onEvent(qs::i3::ipc::I3IpcEvent* event);
+ 	void onConnected();
+ 
+ private:
+diff --git a/src/x11/i3/ipc/listener.hpp b/src/x11/i3/ipc/listener.hpp
+index 9cb40bb..66a55e1 100644
+--- a/src/x11/i3/ipc/listener.hpp
++++ b/src/x11/i3/ipc/listener.hpp
+@@ -52,7 +52,7 @@ public:
+ 	void setSubscriptions(QList<QString> subscriptions);
+ 
+ signals:
+-	void ipcEvent(I3IpcEvent* event);
++	void ipcEvent(qs::i3::ipc::I3IpcEvent* event);
+ 	void subscriptionsChanged();
+ 
+ private:
+diff --git a/src/x11/i3/ipc/monitor.cpp b/src/x11/i3/ipc/monitor.cpp
+index ed5506d..f4ecb5a 100644
+--- a/src/x11/i3/ipc/monitor.cpp
++++ b/src/x11/i3/ipc/monitor.cpp
+@@ -12,6 +12,10 @@
+ 
+ namespace qs::i3::ipc {
+ 
++QBindable<I3Workspace*> I3Monitor::bindableActiveWorkspace() const {
++	return &this->bActiveWorkspace;
++}
++
+ I3Monitor::I3Monitor(I3IpcController* ipc): QObject(ipc), ipc(ipc) {
+ 	// clang-format off
+ 	this->bFocused.setBinding([this]() { return this->ipc->bindableFocusedMonitor().value() == this; });
+diff --git a/src/x11/i3/ipc/monitor.hpp b/src/x11/i3/ipc/monitor.hpp
+index 3ed9617..2fdc5ec 100644
+--- a/src/x11/i3/ipc/monitor.hpp
++++ b/src/x11/i3/ipc/monitor.hpp
+@@ -55,9 +55,7 @@ public:
+ 	[[nodiscard]] QBindable<qreal> bindableScale() { return &this->bScale; }
+ 	[[nodiscard]] QBindable<bool> bindableFocused() { return &this->bFocused; }
+ 
+-	[[nodiscard]] QBindable<I3Workspace*> bindableActiveWorkspace() {
+-		return &this->bActiveWorkspace;
+-	}
++	[[nodiscard]] QBindable<I3Workspace*> bindableActiveWorkspace() const;
+ 
+ 	[[nodiscard]] QVariantMap lastIpcObject() const;
+ 
+diff --git a/src/x11/i3/ipc/qml.hpp b/src/x11/i3/ipc/qml.hpp
+index 2e7c81c..e9b7486 100644
+--- a/src/x11/i3/ipc/qml.hpp
++++ b/src/x11/i3/ipc/qml.hpp
+@@ -43,13 +43,13 @@ public:
+ 	Q_INVOKABLE static void refreshWorkspaces();
+ 
+ 	/// Find an I3Workspace using its name, returns null if the workspace doesn't exist.
+-	Q_INVOKABLE static I3Workspace* findWorkspaceByName(const QString& name);
++	Q_INVOKABLE static qs::i3::ipc::I3Workspace* findWorkspaceByName(const QString& name);
+ 
+ 	/// Find an I3Monitor using its name, returns null if the monitor doesn't exist.
+-	Q_INVOKABLE static I3Monitor* findMonitorByName(const QString& name);
++	Q_INVOKABLE static qs::i3::ipc::I3Monitor* findMonitorByName(const QString& name);
+ 
+ 	/// Return the i3/Sway monitor associated with `screen`
+-	Q_INVOKABLE static I3Monitor* monitorFor(QuickshellScreenInfo* screen);
++	Q_INVOKABLE static qs::i3::ipc::I3Monitor* monitorFor(QuickshellScreenInfo* screen);
+ 
+ 	/// The path to the I3 or Sway socket currently being used
+ 	[[nodiscard]] static QString socketPath();
+@@ -67,7 +67,7 @@ public:
+ 	[[nodiscard]] static QBindable<I3Monitor*> bindableFocusedMonitor();
+ 
+ signals:
+-	void rawEvent(I3IpcEvent* event);
++	void rawEvent(qs::i3::ipc::I3IpcEvent* event);
+ 	void connected();
+ 	void focusedWorkspaceChanged();
+ 	void focusedMonitorChanged();
+diff --git a/src/x11/i3/ipc/workspace.cpp b/src/x11/i3/ipc/workspace.cpp
+index 632fdfa..0bfd756 100644
+--- a/src/x11/i3/ipc/workspace.cpp
++++ b/src/x11/i3/ipc/workspace.cpp
+@@ -12,6 +12,8 @@
+ 
+ namespace qs::i3::ipc {
+ 
++QBindable<I3Monitor*> I3Workspace::bindableMonitor() const { return &this->bMonitor; }
++
+ I3Workspace::I3Workspace(I3IpcController* ipc): QObject(ipc), ipc(ipc) {
+ 	Qt::beginPropertyUpdateGroup();
+ 
+diff --git a/src/x11/i3/ipc/workspace.hpp b/src/x11/i3/ipc/workspace.hpp
+index 8824cbe..85ecfb7 100644
+--- a/src/x11/i3/ipc/workspace.hpp
++++ b/src/x11/i3/ipc/workspace.hpp
+@@ -57,7 +57,7 @@ public:
+ 	[[nodiscard]] QBindable<bool> bindableActive() { return &this->bActive; }
+ 	[[nodiscard]] QBindable<bool> bindableFocused() { return &this->bFocused; }
+ 	[[nodiscard]] QBindable<bool> bindableUrgent() { return &this->bUrgent; }
+-	[[nodiscard]] QBindable<I3Monitor*> bindableMonitor() { return &this->bMonitor; }
++	[[nodiscard]] QBindable<I3Monitor*> bindableMonitor() const;
+ 	[[nodiscard]] QVariantMap lastIpcObject() const;
+ 
+ 	void updateFromObject(const QVariantMap& obj);

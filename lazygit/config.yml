@@ -2,8 +2,8 @@ git:
   overrideGpg: true
   autoFetch: false
   diffContextSize: 2
-  pagers:
-    - pager: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}" --max-line-length=512
+  diffRenderers:
+    - command: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}" --max-line-length=512
 gui:
   skipDiscardChangeWarning: true
   expandFocusedSidePanel: true

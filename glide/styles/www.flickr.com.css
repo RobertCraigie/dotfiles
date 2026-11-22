@@ -1,0 +1,3 @@
+html:has(.upsell-modal) :is(.fluid-modal-view, .fluid-modal-overlay) {
+  display: none !important;
+}
